@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kiboo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 class="logo" aria-label="Kiboo"><span>K</span><span>i</span><span>b</span><span>o</span><span>o</span></h1>
+    <p class="tagline">Le petit bridge, sans atout, à quatre autour de la table.</p>
+  </header>
+
+  <section class="setup" aria-label="Réglages de la table">
+    <label class="field">Ouest
+      <select id="cfg-O"></select>
+    </label>
+    <div class="field">Nord
+      <span class="fixed">le mort, joué par Sud</span>
+    </div>
+    <label class="field">Est
+      <select id="cfg-E"></select>
+    </label>
+    <label class="field">Sud (déclarant)
+      <select id="cfg-S"></select>
+    </label>
+    <label class="field">Vitesse des robots
+      <select id="cfg-speed">
+        <option value="1100">Lente</option>
+        <option value="650" selected>Normale</option>
+        <option value="250">Rapide</option>
+      </select>
+    </label>
+    <label class="check"><input type="checkbox" id="cfg-open"> Jeux ouverts</label>
+    <label class="check"><input type="checkbox" id="cfg-hints"> Montrer les meilleurs coups</label>
+    <div class="btns">
+      <button class="act ghost" id="btn-replay" type="button">Rejouer la donne</button>
+      <button class="act" id="btn-new" type="button">Nouvelle donne</button>
+    </div>
+    <p class="note">Les changements de joueurs s'appliquent à la prochaine donne. Jeux ouverts montre toutes les mains. Les meilleurs coups affichent, sur chaque carte jouable, le nombre de plis que votre camp fera si tout le monde joue parfaitement à jeux ouverts. Le robot expert voit toutes les cartes.</p>
+  </section>
+
+  <main class="table" id="table">
+    <div class="seat north"><div class="tag" id="tag-N"></div><div class="hand main" id="hand-N"></div></div>
+    <div class="seat west"><div class="tag" id="tag-O"></div><div class="hand side" id="hand-O"></div></div>
+    <div class="center" id="center"></div>
+    <div class="seat east"><div class="tag" id="tag-E"></div><div class="hand side" id="hand-E"></div></div>
+    <div class="seat south"><div class="hand main" id="hand-S"></div><div class="tag" id="tag-S"></div></div>
+  </main>
+
+  <div class="bar">
+    <div class="status" id="status" aria-live="polite"></div>
+    <div class="score" aria-label="Plis gagnés">
+      <div class="team">Nord-Sud <span class="pips" id="pips-NS"></span> <span class="count" id="count-NS">0</span></div>
+      <div class="team">Est-Ouest <span class="pips" id="pips-EO"></span> <span class="count" id="count-EO">0</span></div>
+    </div>
+  </div>
+</div>
+
+<script src="js/dds.js"></script>
+<script src="js/images.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
