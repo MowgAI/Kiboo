@@ -60,7 +60,6 @@ header { display: flex; align-items: baseline; justify-content: space-between; g
 .logo span:nth-child(3) { color: var(--c-red); }
 .logo span:nth-child(4) { color: var(--c-yellow); }
 .logo span:nth-child(5) { color: var(--c-blue); }
-.tagline { color: var(--ink-soft); margin: 0; }
 
 /* Réglages */
 .setup {
