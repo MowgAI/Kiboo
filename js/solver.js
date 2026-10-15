@@ -7,6 +7,7 @@
 
      Solver.solve(position)    -> Promise<plis NS restants>
      Solver.analyze(position)  -> Promise<[{ card, ns }]>
+     Solver.pimc(info, opts)   -> Promise<{ card, samples, scores }> (js/pimc.js)
      Solver.reset()            -> abandonne les calculs en cours (leurs
                                   promesses renvoient null) et vide la table
                                   de transposition
@@ -18,7 +19,8 @@ const Solver = (() => {
   const pending = new Map();          // id -> { op, arg, resolve }
 
   function local(op, arg) {
-    return new Promise(resolve => setTimeout(() => resolve(DDS[op](arg)), 0));
+    const run = op === "pimc" ? () => PIMC.choose(arg.info, arg.opts) : () => DDS[op](arg);
+    return new Promise(resolve => setTimeout(() => resolve(run()), 0));
   }
 
   // Le Worker a échoué : on rejoue ses demandes en attente sur le thread principal.
@@ -69,6 +71,7 @@ const Solver = (() => {
   return {
     solve: position => call("solve", position),
     analyze: position => call("analyze", position),
+    pimc: (info, opts) => call("pimc", { info, opts }),
     reset,
   };
 })();

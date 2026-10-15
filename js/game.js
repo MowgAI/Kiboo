@@ -145,6 +145,45 @@ class ExpertBot {
   }
 }
 
+// Robot PIMC : honnête, il ne voit que sa main et le mort. Il tire des donnes
+// compatibles avec ce qu'il sait et joue la carte la meilleure en moyenne
+// selon le DDS (voir js/pimc.js).
+class PimcBot {
+  async choose(view) {
+    if (view.legal.length === 1) return view.legal[0];
+    // Entame : trois mains cachées, l'analyse serait lente et bruitée ;
+    // on applique la règle d'entame, comme le robot facile.
+    if (view.played.length === 0) return openingCard(view.hand);
+    const res = await Solver.pimc(pimcInfo(view), PIMC_OPTS);
+    return res ? res.card : view.legal[0];
+  }
+}
+const PIMC_OPTS = { samples: 40, minSamples: 3, timeMs: 1500 };
+
+// Ce que sait le joueur au trait, au format de js/pimc.js.
+function pimcInfo(view) {
+  const known = new Set(view.played.map(cardId));
+  const hands = SEATS.map(s => view.visible[s] ? view.visible[s].slice() : null);
+  hands.forEach(h => h && h.forEach(c => known.add(cardId(c))));
+  // Chicanes : un joueur qui n'a pas fourni n'a plus la couleur entamée.
+  const voids = SEATS.map(() => [false, false, false, false]);
+  const ledSuit = {};
+  for (const h of view.history) {
+    if (!(h.trickNo in ledSuit)) ledSuit[h.trickNo] = h.card.s;
+    else if (h.card.s !== ledSuit[h.trickNo]) voids[SEATS.indexOf(h.seat)][ledSuit[h.trickNo]] = true;
+  }
+  return {
+    seat: SEATS.indexOf(view.seat),
+    hands,
+    counts: SEATS.map(s => view.counts[s]),
+    unknown: makeDeck().filter(c => !known.has(cardId(c))),
+    voids,
+    trick: view.trick.map(p => ({ seat: SEATS.indexOf(p.seat), card: p.card })),
+    leader: SEATS.indexOf(view.leader),
+    legal: view.legal,
+  };
+}
+
 // Joueur humain : la promesse est résolue par un clic sur une carte.
 class HumanController {
   constructor(seat) { this.seat = seat; this.human = true; }
@@ -157,6 +196,7 @@ const PLAYER_TYPES = {
   humain:       { label: "Humain",        make: s => new HumanController(s) },
   deterministe: { label: "Robot facile",  make: () => new DeterministicBot() },
   aleatoire:    { label: "Robot hasard",  make: () => new RandomBot() },
+  pimc:         { label: "Robot PIMC",    make: () => new PimcBot() },
   expert:       { label: "Robot expert",  make: () => new ExpertBot() },
 };
 
@@ -216,6 +256,10 @@ function viewFor(seat) {
     trick: game.trick.map(p => ({ seat: p.seat, card: p.card })),
     played: game.played.slice(),
     tricksWon: { ...game.tricksWon },
+    // Informations publiques : qui a joué quoi, l'entameur du pli, la taille des mains.
+    history: game.history.map(h => ({ seat: h.seat, card: h.card, trickNo: h.trickNo })),
+    leader: game.leader,
+    counts: Object.fromEntries(SEATS.map(s => [s, game.hands[s].length])),
     legal: legalCards(game.hands[seat], game.trick),
     // Uniquement pour les robots omniscients (expert) : la donne complète.
     position: game.controllers[seat].omniscient ? fullPosition() : undefined,

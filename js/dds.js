@@ -239,8 +239,43 @@ const DDS = (() => {
     return out;
   }
 
+  /* Variante rapide d'analyze pour le PIMC. On calcule la valeur v de la
+     position, puis pour chaque carte demandée un ou deux tests à fenêtre
+     nulle : « cette carte garde-t-elle v ? v - 1 ? ». Une carte qui perd plus
+     de maxLoss plis est notée comme en perdant maxLoss.
+     analyzeFast(position, cards, maxLoss) -> [{ card, ns }] */
+  function analyzeFast(position, cards, maxLoss = 2) {
+    load(position);
+    const seat = (leader + trick.length) & 3;
+    const max = isNS(seat);
+    const v = exact();
+    // La carte jouée, NS fait-il au moins t plis ?
+    const atLeast = t => {
+      if (t <= 0) return true;
+      if (trick.length < 4) return search(t - 1, t) >= t;
+      const saved = trick, savedLeader = leader;
+      const w = winnerOfTrick();
+      const gain = isNS(w) ? 1 : 0;
+      trick = []; leader = w; tricksLeft--;
+      const ok = gain + search(t - 1 - gain, t - gain) >= t;
+      tricksLeft++; leader = savedLeader; trick = saved;
+      return ok;
+    };
+    const out = [];
+    for (const card of cards) {
+      const m = { s: card.s, v: card.v };
+      play(seat, m);
+      let loss = 0;
+      if (max) while (loss < maxLoss && !atLeast(v - loss)) loss++;
+      else while (loss < maxLoss && atLeast(v + loss + 1)) loss++;
+      unplay(seat, m);
+      out.push({ card, ns: max ? v - loss : v + loss });
+    }
+    return out;
+  }
+
   return {
-    solve, analyze,
+    solve, analyze, analyzeFast,
     reset() { tt = new Map(); },
     stats() { return { nodes, ttSize: tt.size }; },
   };
