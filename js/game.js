@@ -68,7 +68,7 @@ function trickWinner(trick) {
    via WebAssembly ou un serveur), il suffit d'ajouter une entrée dans BOTS.
    ===================================================================== */
 
-// Robot aléatoire : joue une carte légale au hasard.
+// PiperRand (robot hasard) : joue une carte légale au hasard.
 class RandomBot {
   choose(view) { return view.legal[Math.floor(Math.random() * view.legal.length)]; }
 }
@@ -94,7 +94,7 @@ function openingCard(hand) {
   return top || cards[0];
 }
 
-// Robot déterministe de Samuel (src/strategy/deterministic.rs), adapté.
+// Piperno : robot déterministe de Samuel (src/strategy/deterministic.rs), adapté.
 class DeterministicBot {
   constructor() { this.mySuit = {}; }          // une couleur préférée par main jouée
   choose(view) {
@@ -128,7 +128,7 @@ class DeterministicBot {
   }
 }
 
-// Robot expert : utilise le DDS. Il « triche » : il voit toutes les cartes
+// Cheater (robot expert) : utilise le DDS. Il « triche » : il voit toutes les cartes
 // (omniscient), ce qui en fait un adversaire de référence, pas un vrai joueur.
 class ExpertBot {
   constructor() { this.omniscient = true; }
@@ -145,14 +145,14 @@ class ExpertBot {
   }
 }
 
-// Robot PIMC : honnête, il ne voit que sa main et le mort. Il tire des donnes
+// Averell (robot PIMC) : honnête, il ne voit que sa main et le mort. Il tire des donnes
 // compatibles avec ce qu'il sait et joue la carte la meilleure en moyenne
 // selon le DDS (voir js/pimc.js).
 class PimcBot {
   async choose(view) {
     if (view.legal.length === 1) return view.legal[0];
     // Entame : trois mains cachées, l'analyse serait lente et bruitée ;
-    // on applique la règle d'entame, comme le robot facile.
+    // on applique la règle d'entame, comme Piperno.
     if (view.played.length === 0) return openingCard(view.hand);
     const res = await Solver.pimc(pimcInfo(view), PIMC_OPTS);
     return res ? res.card : view.legal[0];
@@ -194,10 +194,10 @@ class HumanController {
 
 const PLAYER_TYPES = {
   humain:       { label: "Humain",        make: s => new HumanController(s) },
-  deterministe: { label: "Robot facile",  make: () => new DeterministicBot() },
-  aleatoire:    { label: "Robot hasard",  make: () => new RandomBot() },
-  pimc:         { label: "Robot PIMC",    make: () => new PimcBot() },
-  expert:       { label: "Robot expert",  make: () => new ExpertBot() },
+  deterministe: { label: "Piperno",       make: () => new DeterministicBot() },
+  aleatoire:    { label: "PiperRand",     make: () => new RandomBot() },
+  pimc:         { label: "Averell",       make: () => new PimcBot() },
+  expert:       { label: "Cheater",       make: () => new ExpertBot() },
 };
 
 /* ===================== État de la partie ===================== */
@@ -429,7 +429,7 @@ function render() {
     // Étiquette du siège
     const tag = $("tag-" + seat);
     const ctrl = seatController(seat);
-    const role = seat === DUMMY ? "le mort" : PLAYER_TYPES[game.types[ctrl]].label.toLowerCase();
+    const role = seat === DUMMY ? "le mort" : PLAYER_TYPES[game.types[ctrl]].label;
     tag.innerHTML = `<b>${SEAT_NAMES[seat]}</b><small>${role}</small>`;
     tag.classList.toggle("turn", !game.over && game.turn === seat);
   }
