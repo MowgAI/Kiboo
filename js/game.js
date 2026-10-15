@@ -76,7 +76,8 @@ class RandomBot {
 // Règle d'entame du rapport (section 3.1) : couleur la plus longue
 // (à égalité, la plus forte somme), puis la plus haute d'une séquence
 // d'au moins deux cartes, sinon la plus petite.
-function openingCard(hand) {
+// Renvoie aussi les éléments qui ont décidé du choix, pour les explications.
+function openingChoice(hand) {
   const bySuit = [0, 1, 2, 3].map(s => hand.filter(c => c.s === s).sort((a, b) => a.v - b.v));
   const maxLen = Math.max(...bySuit.map(x => x.length));
   let suit = -1, bestSum = -1;
@@ -91,18 +92,31 @@ function openingCard(hand) {
     const endsSeq = i === cards.length - 1 || cards[i + 1].v !== cards[i].v + 1;
     if (cards[i].v === cards[i - 1].v + 1 && endsSeq) top = cards[i];
   }
-  return top || cards[0];
+  const tied = bySuit.filter(x => x.length === maxLen).length > 1;
+  return { card: top || cards[0], suit, len: maxLen, tied, seq: !!top };
 }
+const openingCard = hand => openingChoice(hand).card;
 
 // Piperno : robot déterministe de Samuel (src/strategy/deterministic.rs), adapté.
+// Après chaque choix, `this.reason` dit en français quelle règle a décidé.
 class DeterministicBot {
   constructor() { this.mySuit = {}; }          // une couleur préférée par main jouée
   choose(view) {
     const { seat, hand, trick, played, legal } = view;
-    if (played.length === 0 && trick.length === 0) return openingCard(hand);
+    const col = s => COLOR_NAMES[s];
+    if (played.length === 0 && trick.length === 0) {
+      const o = openingChoice(hand);
+      this.reason = `Entame : le ${col(o.suit)} est sa couleur la plus longue (${o.len} cartes)` +
+        (o.tied ? ", la plus forte des couleurs de même longueur" : "") + ". " +
+        (o.seq ? "Il joue la plus haute carte de sa séquence."
+               : "Sans séquence d'au moins deux cartes qui se suivent, il joue la plus petite.");
+      return o.card;
+    }
 
+    let note = "";
     if (this.mySuit[seat] === undefined || !hand.some(c => c.s === this.mySuit[seat])) {
       this.mySuit[seat] = openingCard(hand).s;
+      note = `Sa couleur préférée devient le ${col(this.mySuit[seat])} (sa couleur la plus longue). `;
     }
     const my = this.mySuit[seat];
 
@@ -113,18 +127,40 @@ class DeterministicBot {
       for (let v = 10; v >= 1; v--) if (!gone.has(my * 10 + v - 1)) { top = v; break; }
       const mine = hand.filter(c => c.s === my).sort((a, b) => a.v - b.v);
       const strong = mine.some(c => c.v === top);
+      this.reason = note + `Il entame dans sa couleur préférée, le ${col(my)}. ` +
+        (strong ? `Il détient la plus forte carte restante (le ${top}) : il joue sa plus haute.`
+                : `Il n'a pas la plus forte carte restante (le ${top}) : il joue sa plus petite.`);
       return strong ? mine[mine.length - 1] : mine[0];
     }
 
+    const led = trick[0].card.s;
+    const follows = legal[0].s === led;
+    const partnerWins = team(trickWinner(trick)) === team(seat);
     const sorted = sortAsc(legal);
     // La plus petite carte qui fait gagner (provisoirement) mon camp.
     for (const c of sorted) {
-      if (team(trickWinner([...trick, { seat, card: c }])) === team(seat)) return c;
+      if (team(trickWinner([...trick, { seat, card: c }])) !== team(seat)) continue;
+      if (partnerWins) {
+        this.reason = (follows
+          ? "Son partenaire gagne déjà le pli : il fournit sa plus petite carte."
+          : `Son partenaire gagne déjà le pli et il n'a plus de ${col(led)} : il défausse la première carte de sa main, dans l'ordre bleu, vert, rouge, jaune.`);
+      } else {
+        this.reason = "Il joue la plus petite carte qui fait gagner son camp" +
+          (trick.length < 3 ? " pour l'instant." : ".");
+      }
+      return c;
     }
     // Sinon, je fournis la plus petite.
-    if (sorted[0].s === trick[0].card.s) return sorted[0];
+    if (follows) {
+      this.reason = "Il ne peut pas faire gagner son camp : il fournit sa plus petite carte.";
+      return sorted[0];
+    }
     // Sinon, je défausse une petite carte en épargnant ma couleur préférée.
-    return sorted.find(c => c.s !== my) || sorted[0];
+    const other = sorted.find(c => c.s !== my);
+    this.reason = note + `Il n'a plus de ${col(led)} et ne peut pas gagner le pli : ` + (other
+      ? `il défausse une petite carte en gardant sa couleur préférée (le ${col(my)}).`
+      : `il ne lui reste que sa couleur préférée (le ${col(my)}), il défausse sa plus petite.`);
+    return other || sorted[0];
   }
 }
 
@@ -209,7 +245,7 @@ const PLAYER_TYPES = {
 };
 
 /* ===================== État de la partie ===================== */
-const config = { O: "deterministe", E: "deterministe", S: "humain", speed: 650, open: false, hints: false };
+const config = { O: "deterministe", E: "deterministe", S: "humain", speed: 650, open: false, hints: false, explain: false };
 let game = null;
 let runToken = 0;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -240,6 +276,7 @@ function newGame(hands) {
   game.hint = null;
   game.history = [];                            // un instantané avant chaque carte, pour le bilan
   game.review = null;
+  game.explanations = [];                       // pourquoi Piperno a joué chaque carte, la plus récente d'abord
   const token = ++runToken;
   render();
   play(token);
@@ -292,6 +329,9 @@ async function play(token) {
       trickNo: game.tricksWon.NS + game.tricksWon.EO + 1,
     });
 
+    if (game.types[seatController(seat)] === "deterministe" && controller.reason) {
+      game.explanations.unshift({ seat, card, reason: controller.reason, trickNo: game.tricksWon.NS + game.tricksWon.EO + 1 });
+    }
     game.hands[seat] = game.hands[seat].filter(c => c !== card);
     game.trick.push({ seat, card, fresh: true });
     game.played.push(card);
@@ -350,6 +390,19 @@ async function reviewDeal(token) {
   }
   game.review = { par: T[0], errors };
   render();
+}
+
+function renderExplanations() {
+  const box = $("explain");
+  const piperno = ["O", "E", "S"].some(s => game.types[s] === "deterministe");
+  box.hidden = !config.explain || !piperno;
+  if (box.hidden) return;
+  const items = game.explanations.map(e => {
+    const who = e.seat === DUMMY ? "Nord (mort)" : SEAT_NAMES[e.seat];
+    return `<li><b>Pli ${e.trickNo}</b> · ${who} joue <b>${cardName(e.card)}</b>. ${e.reason}</li>`;
+  }).join("");
+  box.innerHTML = "<h2>Explications de Piperno</h2>" +
+    (items ? `<ul>${items}</ul>` : "<p>Piperno n'a pas encore joué.</p>");
 }
 
 function renderReview() {
@@ -496,6 +549,7 @@ function render() {
   if (config.hints && game.waiting && !hintsReady()) msg += " Calcul des meilleurs coups…";
   else if (hintsReady()) msg += " Pastilles : plis de votre camp en fin de donne.";
   $("status").textContent = msg;
+  renderExplanations();
   renderReview();
   scheduleHints();
 }
@@ -538,6 +592,7 @@ for (const s of ["O", "E", "S"]) {
 $("cfg-speed").addEventListener("change", e => { config.speed = +e.target.value; });
 $("cfg-open").addEventListener("change", e => { config.open = e.target.checked; render(); });
 $("cfg-hints").addEventListener("change", e => { config.hints = e.target.checked; render(); });
+$("cfg-explain").addEventListener("change", e => { config.explain = e.target.checked; render(); });
 $("btn-new").addEventListener("click", () => newGame(dealHands()));
 $("btn-replay").addEventListener("click", replayDeal);
 

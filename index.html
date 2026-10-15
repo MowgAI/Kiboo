@@ -37,11 +37,12 @@
     </label>
     <label class="check"><input type="checkbox" id="cfg-open"> Jeux ouverts</label>
     <label class="check"><input type="checkbox" id="cfg-hints"> Montrer les meilleurs coups</label>
+    <label class="check"><input type="checkbox" id="cfg-explain"> Explications de Piperno</label>
     <div class="btns">
       <button class="act ghost" id="btn-replay" type="button">Rejouer la donne</button>
       <button class="act" id="btn-new" type="button">Nouvelle donne</button>
     </div>
-    <p class="note">Les changements de joueurs s'appliquent à la prochaine donne. Jeux ouverts montre toutes les mains. Les meilleurs coups affichent, sur chaque carte jouable, le nombre de plis que votre camp fera si tout le monde joue parfaitement à jeux ouverts. Piperno joue avec des règles simples et PiperRand au hasard. Averell ne voit que sa main et le mort : à partir du deuxième pli, il simule jusqu'à 40 donnes possibles et les analyse avec le DDS ; Averell250 en simule jusqu'à 250, plus fort mais plus lent. Cheater, lui, voit toutes les cartes. En fin de donne, le DDS fait le bilan des cartes qui ont coûté des plis.</p>
+    <p class="note">Les changements de joueurs s'appliquent à la prochaine donne. Jeux ouverts montre toutes les mains. Les meilleurs coups affichent, sur chaque carte jouable, le nombre de plis que votre camp fera si tout le monde joue parfaitement à jeux ouverts. Piperno joue avec des règles simples (cochez Explications de Piperno pour voir laquelle il applique à chaque carte) et PiperRand au hasard. Averell ne voit que sa main et le mort : à partir du deuxième pli, il simule jusqu'à 40 donnes possibles et les analyse avec le DDS ; Averell250 en simule jusqu'à 250, plus fort mais plus lent. Cheater, lui, voit toutes les cartes. En fin de donne, le DDS fait le bilan des cartes qui ont coûté des plis.</p>
   </section>
 
   <main class="table" id="table">
@@ -60,6 +61,7 @@
     </div>
   </div>
 
+  <section class="review" id="explain" hidden aria-live="polite"></section>
   <section class="review" id="review" hidden aria-live="polite"></section>
 </div>
 

@@ -26,6 +26,10 @@ python3 -m http.server 8000
 - `js/game.js` : règles, robots, état de la partie, affichage et réglages
 - `assets/cards/` : images des 40 cartes (WebP)
 
+## Explications de Piperno
+
+La case « Explications de Piperno » affiche, sous la table, pourquoi Piperno a joué chaque carte : règle d'entame, entame dans sa couleur préférée (plus haute s'il détient la plus forte carte restante, sinon plus petite), plus petite carte qui fait gagner son camp, partenaire déjà maître, fourniture de la plus petite carte ou défausse qui garde sa couleur préférée. Seules les cartes jouées par Piperno sont expliquées (pas celles d'Averell au premier pli).
+
 ## Le DDS dans Kiboo
 
 `js/dds.js` est un solveur « double-mort » : il calcule le nombre de plis que fera Nord-Sud si les quatre joueurs jouent parfaitement à jeux ouverts. Kiboo s'en sert de quatre façons :
