@@ -30,7 +30,8 @@ python3 -m http.server 8000
 
 `js/dds.js` est un solveur « double-mort » : il calcule le nombre de plis que fera Nord-Sud si les quatre joueurs jouent parfaitement à jeux ouverts. Kiboo s'en sert de quatre façons :
 
-- **Averell** (robot PIMC) : un robot honnête, qui ne voit que sa main et le mort. À chaque coup, il tire jusqu'à 40 donnes compatibles avec ce qu'il sait (cartes jouées, chicanes révélées), les analyse avec le DDS et joue la carte qui rapporte le plus de plis en moyenne. Pour l'entame, il applique la règle d'entame de Piperno.
+- **Averell** (robot PIMC) : un robot honnête, qui ne voit que sa main et le mort. À chaque coup, il tire jusqu'à 40 donnes compatibles avec ce qu'il sait (cartes jouées, chicanes révélées), les analyse avec le DDS et joue la carte qui rapporte le plus de plis en moyenne. Au premier pli, il joue comme Piperno, sans simulation.
+- **Averell250** : comme Averell, mais avec jusqu'à 250 donnes par coup (budget de 8 s au lieu de 1,5 s). Plus précis, plus lent.
 - **Cheater** (robot expert) : à chaque coup, il joue une carte qui maximise les plis de son camp. Il voit toutes les cartes.
 - **Montrer les meilleurs coups** : chaque carte jouable du joueur humain affiche le nombre de plis que son camp fera en fin de donne.
 - **Bilan de la donne** : en fin de donne, le DDS donne le résultat avec un jeu parfait, et la liste des cartes qui ont coûté des plis avec les meilleures cartes possibles.

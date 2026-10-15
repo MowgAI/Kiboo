@@ -148,17 +148,24 @@ class ExpertBot {
 // Averell (robot PIMC) : honnête, il ne voit que sa main et le mort. Il tire des donnes
 // compatibles avec ce qu'il sait et joue la carte la meilleure en moyenne
 // selon le DDS (voir js/pimc.js).
+// Au premier pli, trop de cartes sont cachées : l'analyse serait lente et
+// bruitée. Il joue alors comme Piperno, sans simulation.
 class PimcBot {
+  constructor(opts) {
+    this.opts = opts;
+    this.piperno = new DeterministicBot();
+  }
   async choose(view) {
     if (view.legal.length === 1) return view.legal[0];
-    // Entame : trois mains cachées, l'analyse serait lente et bruitée ;
-    // on applique la règle d'entame, comme Piperno.
-    if (view.played.length === 0) return openingCard(view.hand);
-    const res = await Solver.pimc(pimcInfo(view), PIMC_OPTS);
+    if (view.tricksWon.NS + view.tricksWon.EO === 0) return this.piperno.choose(view);
+    const res = await Solver.pimc(pimcInfo(view), this.opts);
     return res ? res.card : view.legal[0];
   }
 }
-const PIMC_OPTS = { samples: 40, minSamples: 3, timeMs: 1500 };
+// Nombre de donnes tirées par coup : au plus `samples`, au moins `minSamples`,
+// et entre les deux tant que le calcul reste sous `timeMs` millisecondes.
+const AVERELL_OPTS = { samples: 40, minSamples: 3, timeMs: 1500 };
+const AVERELL250_OPTS = { samples: 250, minSamples: 3, timeMs: 8000 };
 
 // Ce que sait le joueur au trait, au format de js/pimc.js.
 function pimcInfo(view) {
@@ -196,7 +203,8 @@ const PLAYER_TYPES = {
   humain:       { label: "Humain",        make: s => new HumanController(s) },
   deterministe: { label: "Piperno",       make: () => new DeterministicBot() },
   aleatoire:    { label: "PiperRand",     make: () => new RandomBot() },
-  pimc:         { label: "Averell",       make: () => new PimcBot() },
+  pimc:         { label: "Averell",       make: () => new PimcBot(AVERELL_OPTS) },
+  pimc250:      { label: "Averell250",    make: () => new PimcBot(AVERELL250_OPTS) },
   expert:       { label: "Cheater",       make: () => new ExpertBot() },
 };
 
