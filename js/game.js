@@ -133,8 +133,8 @@ class DeterministicBot {
 class ExpertBot {
   constructor() { this.omniscient = true; }
   async choose(view) {
-    await sleep(20);                                  // laisse l'écran se rafraîchir
-    const res = DDS.analyze(view.position);
+    const res = await Solver.analyze(view.position);
+    if (!res) return view.legal[0];                   // calcul abandonné (nouvelle donne)
     const mine = team(view.seat) === "NS";
     let best = null;
     for (const r of res.sort((a, b) => a.card.v - b.card.v)) {
@@ -188,8 +188,10 @@ function newGame(hands) {
   };
   game.hands = {};
   SEATS.forEach(s => { game.hands[s] = initial[s].slice(); });
-  DDS.reset();
+  Solver.reset();
   game.hint = null;
+  game.history = [];                            // un instantané avant chaque carte, pour le bilan
+  game.review = null;
   const token = ++runToken;
   render();
   play(token);
@@ -233,6 +235,10 @@ async function play(token) {
     const legal = legalCards(game.hands[seat], game.trick);
     if (!card || !legal.some(c => cardId(c) === cardId(card))) card = legal[0];   // sécurité
     card = game.hands[seat].find(c => cardId(c) === cardId(card));
+    game.history.push({
+      seat, card, pos: fullPosition(), ns: game.tricksWon.NS,
+      trickNo: game.tricksWon.NS + game.tricksWon.EO + 1,
+    });
 
     game.hands[seat] = game.hands[seat].filter(c => c !== card);
     game.trick.push({ seat, card, fresh: true });
@@ -260,6 +266,62 @@ async function play(token) {
   }
   game.over = true;
   render();
+  reviewDeal(token);
+}
+
+/* ===================== Bilan de la donne =====================
+   Le DDS évalue la position avant chaque carte jouée. En notant T(i) le
+   total de plis Nord-Sud attendu avec un jeu parfait à partir du coup i,
+   une carte coûte T(i) - T(i+1) plis au camp Nord-Sud qui la joue
+   (T(i+1) - T(i) pour Est-Ouest). T(0) est le résultat « par » de la donne. */
+async function reviewDeal(token) {
+  const steps = game.history;
+  const T = [];
+  for (const st of steps) {
+    const v = await Solver.solve(st.pos);
+    if (v === null || token !== runToken) return;
+    T.push(st.ns + v);
+  }
+  T.push(game.tricksWon.NS);
+
+  const errors = [];
+  steps.forEach((st, i) => {
+    const loss = team(st.seat) === "NS" ? T[i] - T[i + 1] : T[i + 1] - T[i];
+    if (loss > 0) errors.push({ ...st, loss });
+  });
+  for (const e of errors) {
+    const res = await Solver.analyze(e.pos);
+    if (!res || token !== runToken) return;
+    const val = r => team(e.seat) === "NS" ? r.ns : -r.ns;
+    const top = Math.max(...res.map(val));
+    e.best = sortForDisplay(res.filter(r => val(r) === top).map(r => r.card));
+  }
+  game.review = { par: T[0], errors };
+  render();
+}
+
+function renderReview() {
+  const box = $("review");
+  box.hidden = !game.over;
+  if (!game.over) return;
+  if (!game.review) { box.innerHTML = "<p>Analyse de la donne par le DDS…</p>"; return; }
+  const { par, errors } = game.review;
+  const ns = game.tricksWon.NS;
+  let html = `<h2>Bilan de la donne</h2>
+    <p>Avec un jeu parfait des quatre joueurs, Nord-Sud faisait <b>${par}</b> pli${par > 1 ? "s" : ""}
+    (résultat : ${ns}).</p>`;
+  if (!errors.length) {
+    html += "<p>Aucune erreur : chaque carte jouée était un meilleur coup.</p>";
+  } else {
+    html += "<ol>" + errors.map(e => {
+      const who = e.seat === DUMMY ? "Nord (mort)" : SEAT_NAMES[e.seat];
+      const camp = team(e.seat) === "NS" ? "Nord-Sud" : "Est-Ouest";
+      const alt = e.best.slice(0, 3).map(cardName).join(", ") + (e.best.length > 3 ? "…" : "");
+      return `<li><b>Pli ${e.trickNo}</b> · ${who} joue ${cardName(e.card)} :
+        coûte ${e.loss} pli${e.loss > 1 ? "s" : ""} à ${camp}. Mieux : ${alt}.</li>`;
+    }).join("") + "</ol>";
+  }
+  box.innerHTML = html;
 }
 
 /* ===================== Affichage ===================== */
@@ -382,6 +444,7 @@ function render() {
   if (config.hints && game.waiting && !hintsReady()) msg += " Calcul des meilleurs coups…";
   else if (hintsReady()) msg += " Pastilles : plis de votre camp en fin de donne.";
   $("status").textContent = msg;
+  renderReview();
   scheduleHints();
 }
 
@@ -394,10 +457,9 @@ function scheduleHints() {
   if (game.hint && (game.hint.at === game.played.length || game.hint.pending === game.played.length)) return;
   const at = game.played.length, token = runToken;
   game.hint = { pending: at };
-  setTimeout(() => {
-    if (token !== runToken || !game.waiting || game.played.length !== at) return;
+  Solver.analyze(fullPosition()).then(res => {
+    if (!res || token !== runToken || !game.waiting || game.played.length !== at) return;
     const seat = game.waiting.seat;
-    const res = DDS.analyze(fullPosition());
     const mine = team(seat) === "NS";
     // Plis restants (pli en cours compris) et plis déjà gagnés par le camp du joueur
     const remaining = 10 - game.tricksWon.NS - game.tricksWon.EO;
@@ -405,7 +467,7 @@ function scheduleHints() {
     const values = new Map(res.map(r => [cardId(r.card), already + (mine ? r.ns : remaining - r.ns)]));
     game.hint = { at, values, best: Math.max(...values.values()) };
     render();
-  }, 30);
+  });
 }
 
 function replayDeal() { if (game) newGame(game.initial); }

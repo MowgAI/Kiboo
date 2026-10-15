@@ -42,7 +42,7 @@
       <button class="act ghost" id="btn-replay" type="button">Rejouer la donne</button>
       <button class="act" id="btn-new" type="button">Nouvelle donne</button>
     </div>
-    <p class="note">Les changements de joueurs s'appliquent à la prochaine donne. Jeux ouverts montre toutes les mains. Les meilleurs coups affichent, sur chaque carte jouable, le nombre de plis que votre camp fera si tout le monde joue parfaitement à jeux ouverts. Le robot expert voit toutes les cartes.</p>
+    <p class="note">Les changements de joueurs s'appliquent à la prochaine donne. Jeux ouverts montre toutes les mains. Les meilleurs coups affichent, sur chaque carte jouable, le nombre de plis que votre camp fera si tout le monde joue parfaitement à jeux ouverts. Le robot expert voit toutes les cartes. En fin de donne, le DDS fait le bilan des cartes qui ont coûté des plis.</p>
   </section>
 
   <main class="table" id="table">
@@ -60,9 +60,12 @@
       <div class="team">Est-Ouest <span class="pips" id="pips-EO"></span> <span class="count" id="count-EO">0</span></div>
     </div>
   </div>
+
+  <section class="review" id="review" hidden aria-live="polite"></section>
 </div>
 
 <script src="js/dds.js"></script>
+<script src="js/solver.js"></script>
 <script src="js/images.js"></script>
 <script src="js/game.js"></script>
 </body>
