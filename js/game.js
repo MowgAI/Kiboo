@@ -594,6 +594,10 @@ $("cfg-open").addEventListener("change", e => { config.open = e.target.checked; 
 $("cfg-hints").addEventListener("change", e => { config.hints = e.target.checked; render(); });
 $("cfg-explain").addEventListener("change", e => { config.explain = e.target.checked; render(); });
 $("btn-new").addEventListener("click", () => newGame(dealHands()));
+// Règles du jeu : fenêtre modale, fermée par le bouton ×, la touche Échap ou un clic à côté.
+$("btn-rules").addEventListener("click", () => $("rules").showModal());
+$("btn-rules-close").addEventListener("click", () => $("rules").close());
+$("rules").addEventListener("click", e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
 $("btn-replay").addEventListener("click", replayDeal);
 
 newGame(dealHands());
