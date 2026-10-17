@@ -162,8 +162,8 @@ const Quiz = (() => {
       <div class="ex-led"><div class="ex-led-cards" data-role="lead"></div>
         <p>Ouest (${PLAYER_TYPES[game.types.O].label}) a entamé le <strong>${cardName(lead)}</strong>. Il suit la règle d'entame de Piperno.</p></div>
       <p class="ex-q">${Q.text}</p>
-      <p class="quiz-label">Ta main</p><div class="ex-hand quiz-mini" data-role="me"></div>
       <p class="quiz-label">Le mort (Nord)</p><div class="ex-hand quiz-mini" data-role="dummy"></div>
+      <p class="quiz-label">Ta main (Sud, déclarant)</p><div class="ex-hand quiz-mini" data-role="me"></div>
       <div class="ex-choices" role="group" aria-label="Réponses">
         ${ANSWERS.map(a => `<button class="ex-choice" type="button" data-a="${a.key}">${a.label}</button>`).join("")}
       </div>
