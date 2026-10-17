@@ -14,6 +14,7 @@
   --c-green: #22A45D;
   --c-red: #E5383B;
   --c-yellow: #F2B705;
+  --mark: rgba(255, 201, 60, 0.45);
   color-scheme: light;
   box-sizing: border-box;
   padding-top: env(safe-area-inset-top, 0px);
@@ -28,6 +29,7 @@
     --line: #3A2F4A;
     --felt: #33244B;
     --felt-ring: #46345F;
+    --mark: rgba(255, 201, 60, 0.28);
     color-scheme: dark;
   }
 }
@@ -39,6 +41,7 @@
   --line: #3A2F4A;
   --felt: #33244B;
   --felt-ring: #46345F;
+  --mark: rgba(255, 201, 60, 0.28);
   color-scheme: dark;
 }
 *, *::before, *::after { box-sizing: inherit; }
@@ -55,11 +58,11 @@ body {
 
 header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
 .logo { font-size: 2.4rem; font-weight: 700; letter-spacing: 0.01em; margin: 0; line-height: 1; }
-.logo span:nth-child(1) { color: var(--c-blue); }
-.logo span:nth-child(2) { color: var(--c-green); }
-.logo span:nth-child(3) { color: var(--c-red); }
-.logo span:nth-child(4) { color: var(--c-yellow); }
-.logo span:nth-child(5) { color: var(--c-blue); }
+.kiboo span:nth-child(1) { color: var(--c-blue); }
+.kiboo span:nth-child(2) { color: var(--c-green); }
+.kiboo span:nth-child(3) { color: var(--c-red); }
+.kiboo span:nth-child(4) { color: var(--c-yellow); }
+.kiboo span:nth-child(5) { color: var(--c-blue); }
 
 /* Réglages */
 .setup {
@@ -236,6 +239,24 @@ button.card:disabled { cursor: default; }
 .rules p { margin: 8px 0 0; }
 .rules ul { margin: 4px 0 0; padding-left: 1.2em; }
 .rules li { margin: 3px 0; }
+.rules .kiboo { font-weight: 700; white-space: nowrap; }
+.rules strong { font-weight: 600; }
+/* Vocabulaire du jeu : surligné comme au feutre */
+.rules dfn {
+  font-style: normal; font-weight: 600;
+  background: linear-gradient(transparent 58%, var(--mark) 58%);
+  padding: 0 0.1em;
+}
+/* Familles : une pastille de la couleur de la famille */
+.rules .fam { font-weight: 600; white-space: nowrap; }
+.rules .fam::before {
+  content: ""; display: inline-block; width: 0.62em; height: 0.62em;
+  border-radius: 50%; margin-right: 0.3em; vertical-align: 0.05em;
+}
+.rules .fam.blue::before { background: var(--c-blue); }
+.rules .fam.green::before { background: var(--c-green); }
+.rules .fam.red::before { background: var(--c-red); }
+.rules .fam.yellow::before { background: var(--c-yellow); }
 .rules .close {
   font: 600 1.5rem/1 "Fredoka", "Nunito", system-ui, sans-serif;
   width: 2em; height: 2em; flex: none; cursor: pointer;

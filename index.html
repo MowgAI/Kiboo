@@ -12,46 +12,46 @@
 <body>
 <div class="wrap">
   <header>
-    <h1 class="logo" aria-label="Kiboo"><span>K</span><span>i</span><span>b</span><span>o</span><span>o</span></h1>
+    <h1 class="logo kiboo" aria-label="Kiboo"><span>K</span><span>i</span><span>b</span><span>o</span><span>o</span></h1>
     <button class="act ghost" id="btn-rules" type="button" aria-haspopup="dialog">Règles du jeu</button>
   </header>
 
   <dialog class="rules" id="rules" aria-labelledby="rules-title">
     <div class="rules-head">
-      <h2 id="rules-title">Règles du Kiboo</h2>
+      <h2 id="rules-title">Règles de <span class="kiboo" aria-label="Kiboo"><span>K</span><span>i</span><span>b</span><span>o</span><span>o</span></span></h2>
       <button class="close" id="btn-rules-close" type="button" aria-label="Fermer les règles">×</button>
     </div>
-    <p>Kiboo est un jeu de cartes inspiré du jeu de bridge. Il se joue à 4 joueurs, séparés en 2 équipes représentées par leur place : Nord-Sud contre Est-Ouest. Les partenaires sont assis l'un en face de l'autre.</p>
+    <p><span class="kiboo" aria-label="Kiboo"><span>K</span><span>i</span><span>b</span><span>o</span><span>o</span></span> est un jeu de cartes <strong>inspiré du jeu de bridge</strong>. Il se joue à <strong>4 joueurs</strong>, séparés en <strong>2 équipes</strong> représentées par leur place : <strong>Nord-Sud</strong> contre <strong>Est-Ouest</strong>. Les partenaires sont assis l'un en face de l'autre. Comme le bridge, Kiboo est un <strong>jeu de plis</strong> : un <dfn>pli</dfn> est l'ensemble des quatre cartes jouées à tour de rôle par chacun des quatre joueurs autour de la table.</p>
 
     <h3>Les cartes</h3>
     <ul>
-      <li>40 cartes : 4 familles (animaux, dinosaures, robots et métiers), représentées par leur couleur (respectivement bleu, vert, rouge et jaune). Chaque carte a une valeur de 1 à 10 : le 10 est la plus forte carte, le 1 la plus faible.</li>
-      <li>Chaque joueur reçoit 10 cartes.</li>
+      <li><strong>40 cartes</strong> : <strong>4 familles</strong> (<span class="fam blue">animaux</span>, <span class="fam green">dinosaures</span>, <span class="fam red">robots</span> et <span class="fam yellow">métiers</span>), représentées par leur couleur (respectivement bleu, vert, rouge et jaune). Chaque carte a une <strong>valeur de 1 à 10</strong> : le <strong>10 est la plus forte</strong> carte, le 1 la plus faible.</li>
+      <li>Chaque joueur reçoit <strong>10 cartes</strong>.</li>
     </ul>
 
     <h3>Le déclarant et le mort</h3>
     <ul>
-      <li>Sud est le déclarant. Il joue ses cartes et aussi celles de son partenaire Nord, appelé le mort.</li>
-      <li>Ouest joue la première carte : c'est l'entame. Le mort étale alors ses cartes face visible, et tout le monde les voit jusqu'à la fin de la donne.</li>
+      <li>Sud est le <dfn>déclarant</dfn>. Il joue ses cartes et aussi celles de son partenaire Nord, appelé le <dfn>mort</dfn>.</li>
+      <li>Ouest joue la première carte : c'est la phase d'<dfn>entame</dfn>. Le mort étale alors ses cartes <strong>face visible</strong>, et tout le monde les voit jusqu'à la fin de la donne.</li>
     </ul>
 
     <h3>Le déroulement d'un pli</h3>
     <ul>
-      <li>On joue chacun son tour dans le sens des aiguilles d'une montre : Ouest, Nord, Est, Sud.</li>
-      <li>Le premier joueur du pli choisit librement sa carte. Sa couleur est la couleur demandée.</li>
-      <li>Les autres doivent fournir une carte de la couleur demandée s'ils en ont. Sinon, ils jouent n'importe quelle carte : ils défaussent.</li>
-      <li>Il n'y a pas d'atout : la plus forte carte de la couleur demandée remporte le pli. Une carte d'une autre couleur ne gagne jamais.</li>
-      <li>Le joueur qui remporte le pli joue la première carte du pli suivant.</li>
+      <li>On joue chacun son tour <strong>dans le sens des aiguilles d'une montre</strong> : Ouest, Nord, Est, Sud.</li>
+      <li>Le premier joueur du pli choisit librement sa carte. Sa couleur est la <dfn>couleur demandée</dfn> pour le reste du pli.</li>
+      <li>Les autres joueurs <strong>doivent fournir</strong> une carte de la couleur demandée s'ils en ont. Sinon, ils jouent n'importe quelle carte : on appelle cette action <dfn>défausser</dfn>.</li>
+      <li>Dans cette version, il n'y a <strong>pas d'atout</strong> : la <strong>plus forte carte de la couleur demandée</strong> remporte donc le pli. Une carte d'une autre couleur ne remporte jamais le pli.</li>
+      <li>Le joueur qui remporte le pli <strong>joue la première carte du pli suivant</strong>.</li>
     </ul>
 
     <h3>Qui gagne ?</h3>
-    <p>À la fin des 10 plis, l'équipe qui en a remporté le plus gagne la donne. À 5 plis partout, c'est une égalité.</p>
+    <p>À la fin des 10 plis, l'équipe qui en a <strong>remporté le plus</strong> gagne la donne. À <strong>5 plis partout</strong>, c'est une égalité.</p>
 
-    <h3>Jouer dans Kiboo</h3>
+    <h3>Jouer dans <span class="kiboo" aria-label="Kiboo"><span>K</span><span>i</span><span>b</span><span>o</span><span>o</span></span></h3>
     <ul>
-      <li>Choisissez qui joue chaque place dans les réglages : vous (Humain) ou un robot. Les changements s'appliquent à la prochaine donne.</li>
-      <li>Quand c'est votre tour, cliquez sur une carte mise en avant. Les cartes que vous n'avez pas le droit de jouer sont grisées.</li>
-      <li>Rejouer la donne redistribue les mêmes cartes, pour essayer une autre façon de jouer.</li>
+      <li>Choisissez qui joue chaque place dans les <strong>réglages</strong> : vous (<strong>Humain</strong>) ou un robot. Les changements s'appliquent à la prochaine donne.</li>
+      <li>Quand c'est votre tour, <strong>cliquez sur une carte mise en avant</strong>. Les cartes que vous n'avez pas le droit de jouer sont grisées.</li>
+      <li><strong>Rejouer la donne</strong> redistribue les mêmes cartes, pour essayer une autre façon de jouer.</li>
     </ul>
   </dialog>
 
