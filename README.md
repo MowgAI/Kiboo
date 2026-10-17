@@ -23,6 +23,8 @@ python3 -m http.server 8000
 - `js/pimc.js` : Averell, le robot PIMC (Perfect Information Monte Carlo), construit sur le DDS
 - `js/solver.js` : accès asynchrone au DDS et au PIMC via un Web Worker (`js/dds-worker.js`)
 - `js/images.js` : correspondance carte → image
+- `js/quiz.js` : questions pendant la partie et moteur de déduction
+- `js/rewards.js` : cadeaux, progression et collection
 - `js/exercises.js` : exercices (compter sa main, couleur la plus longue, cartes jouables)
 - `js/game.js` : règles, robots, état de la partie, affichage et réglages
 - `assets/cards/` : images des 40 cartes (WebP)
@@ -36,6 +38,16 @@ Le bouton « Exercices » ouvre trois exercices sur une main de 10 cartes tirée
 - **Cartes jouables** : une couleur est demandée, il faut sélectionner toutes les cartes autorisées (fournir si possible, sinon défausser n'importe quelle carte).
 
 Chaque réponse est corrigée avec le détail du calcul, et un compteur suit les réussites de la session. Le code est dans `js/exercises.js`.
+
+## Questions pendant la partie, cadeaux et collection
+
+Avec la case « Questions pendant la partie » (et Sud humain), la partie s'arrête parfois sur une question, puis reprend exactement où elle en était après la réponse (ou « Passer la question ») :
+
+- **Avant l'entame** : compter sa main (cartes et points par couleur, total).
+- **Après l'entame**, si Ouest est Piperno, Averell ou Averell250 : questions de déduction sur la main cachée d'Ouest (a-t-il plus de cartes, autant de cartes dans une autre couleur ? une carte plus forte, plus faible dans la couleur d'entame ?). Réponses : « Oui, forcément », « Non, c'est impossible » ou « On ne peut pas savoir ». La correction passe en revue toutes les mains qu'Ouest peut avoir compte tenu de ce que voit le joueur et de la règle d'entame, sans regarder les vraies cartes, et en montre des exemples.
+- **Avant de jouer** sur un pli commencé : quelles cartes as-tu le droit de jouer ?
+
+Toutes les 3 bonnes réponses (cumulées, exercices compris), le joueur choisit un cadeau : voir une carte cachée d'Ouest ou d'Est (pendant une partie), ou gagner une carte pour sa collection. Le bouton « Collection » montre l'album des 40 cartes. La progression et la collection sont gardées dans le navigateur. Le code est dans `js/quiz.js` et `js/rewards.js`.
 
 ## Explications de Piperno
 

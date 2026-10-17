@@ -51,6 +51,7 @@
   color-scheme: dark;
 }
 *, *::before, *::after { box-sizing: inherit; }
+[hidden] { display: none !important; }
 html { scroll-padding-top: env(safe-area-inset-top, 0px); }
 body {
   margin: 0;
@@ -342,6 +343,36 @@ button.card:disabled { cursor: default; }
 .ex-result.ko { color: var(--ink); }
 @media (prefers-reduced-motion: reduce) {
   .ex-hand button.card { transition: none; }
+}
+
+/* Questions en cours de partie, cadeaux et collection */
+.gift-progress { margin: 0; color: var(--ink-soft); font-size: 0.9rem; white-space: nowrap; }
+.gift-progress .dots { color: var(--c-yellow); letter-spacing: 0.15em; font-size: 1.05rem; }
+.rules-head .gift-progress { margin-left: auto; }
+.ex-led-cards { display: flex; gap: 4px; flex: none; }
+.quiz-label { margin: 10px 0 0; font-size: 0.85rem; color: var(--ink-soft); }
+.ex-hand.quiz-mini { margin: 4px 0 0; gap: 4px; }
+.ex-hand.quiz-mini .card { --w: clamp(34px, 8vw, 46px); }
+.quiz-why { margin-top: 8px; padding-top: 4px; border-top: 1px solid var(--line); }
+.quiz-why p { margin: 8px 0 0; }
+.gift h3 { margin: 4px 0 0; }
+.gift-won { display: flex; align-items: center; gap: 16px; margin-top: 14px; flex-wrap: wrap; }
+.gift-won p { margin: 0; flex: 1 1 16em; }
+.gift-card .card { --w: 96px; margin: 0; box-shadow: 0 0 0 3px var(--sun), 0 4px 14px rgba(0, 0, 0, 0.3); animation: gift-in 0.5s ease-out; }
+@keyframes gift-in { from { transform: rotateY(90deg) scale(0.8); } to { transform: none; } }
+.card.revealed { box-shadow: 0 0 0 3px var(--sun), 0 1px 3px rgba(0, 0, 0, 0.35); z-index: 1; }
+.album-row { margin-top: 14px; }
+.album-row h3 { margin: 0 0 6px; display: flex; align-items: baseline; gap: 8px; }
+.album-row small { color: var(--ink-soft); font-weight: 400; font-size: 0.85rem; }
+.album-cards { display: flex; flex-wrap: wrap; gap: 6px; }
+.album-cards .card { --w: clamp(40px, 8.5vw, 60px); margin: 0; }
+.card.missing {
+  display: grid; place-items: center; box-shadow: none;
+  border: 2px dashed var(--line); background: var(--page);
+  color: var(--ink-soft); font-weight: 700; font-size: 1.1rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .gift-card .card { animation: none; }
 }
 
 /* Bilan de la donne */

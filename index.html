@@ -14,6 +14,7 @@
   <header>
     <h1 class="logo kiboo" aria-label="Kiboo"><span>K</span><span>i</span><span>b</span><span>o</span><span>o</span></h1>
     <div class="head-btns">
+      <button class="act ghost" id="btn-album" type="button" aria-haspopup="dialog">Collection 0/40</button>
       <button class="act ghost" id="btn-exercises" type="button" aria-haspopup="dialog">Exercices</button>
       <button class="act ghost" id="btn-rules" type="button" aria-haspopup="dialog">Règles du jeu</button>
     </div>
@@ -29,8 +30,26 @@
       <button type="button" role="tab" data-ex="longest" aria-selected="false">Couleur la plus longue</button>
       <button type="button" role="tab" data-ex="legal" aria-selected="false">Cartes jouables</button>
     </div>
-    <p class="ex-score" id="ex-score"></p>
+    <p class="ex-score"><span id="ex-score"></span> <span class="gift-progress"></span></p>
     <div id="ex-body" role="tabpanel"></div>
+  </dialog>
+
+  <dialog class="rules exercises" id="quiz" aria-labelledby="quiz-title">
+    <div class="rules-head">
+      <h2 id="quiz-title">Question</h2>
+      <p class="gift-progress"></p>
+    </div>
+    <div id="quiz-body"></div>
+    <div class="ex-actions"><button class="act ghost" id="quiz-skip" type="button">Passer la question</button></div>
+  </dialog>
+
+  <dialog class="rules exercises" id="album" aria-labelledby="album-title">
+    <div class="rules-head">
+      <h2 id="album-title">Ma collection</h2>
+      <button class="close" id="btn-album-close" type="button" aria-label="Fermer la collection">×</button>
+    </div>
+    <p class="ex-score" id="album-count"></p>
+    <div id="album-body"></div>
   </dialog>
 
   <dialog class="rules" id="rules" aria-labelledby="rules-title">
@@ -95,11 +114,12 @@
     <label class="check"><input type="checkbox" id="cfg-open"> Jeux ouverts</label>
     <label class="check"><input type="checkbox" id="cfg-hints"> Montrer les meilleurs coups</label>
     <label class="check"><input type="checkbox" id="cfg-explain"> Explications de Piperno</label>
+    <label class="check"><input type="checkbox" id="cfg-quiz"> Questions pendant la partie</label>
     <div class="btns">
       <button class="act ghost" id="btn-replay" type="button">Rejouer la donne</button>
       <button class="act" id="btn-new" type="button">Nouvelle donne</button>
     </div>
-    <p class="note">Les changements de joueurs s'appliquent à la prochaine donne. Jeux ouverts montre toutes les mains. Les meilleurs coups affichent, sur chaque carte jouable, le nombre de plis que votre camp fera si tout le monde joue parfaitement à jeux ouverts. Piperno joue avec des règles simples (cochez Explications de Piperno pour voir laquelle il applique à chaque carte) et PiperRand au hasard. Averell ne voit que sa main et le mort : à partir du deuxième pli, il simule jusqu'à 40 donnes possibles et les analyse avec le DDS ; Averell250 en simule jusqu'à 250, plus fort mais plus lent. Cheater, lui, voit toutes les cartes. En fin de donne, le DDS fait le bilan des cartes qui ont coûté des plis.</p>
+    <p class="note">Les changements de joueurs s'appliquent à la prochaine donne. Jeux ouverts montre toutes les mains. Les meilleurs coups affichent, sur chaque carte jouable, le nombre de plis que votre camp fera si tout le monde joue parfaitement à jeux ouverts. Piperno joue avec des règles simples (cochez Explications de Piperno pour voir laquelle il applique à chaque carte) et PiperRand au hasard. Averell ne voit que sa main et le mort : à partir du deuxième pli, il simule jusqu'à 40 donnes possibles et les analyse avec le DDS ; Averell250 en simule jusqu'à 250, plus fort mais plus lent. Cheater, lui, voit toutes les cartes. En fin de donne, le DDS fait le bilan des cartes qui ont coûté des plis. Avec Questions pendant la partie, la partie s'arrête parfois sur une question (quand Sud est humain) ; toutes les 3 bonnes réponses, tu choisis un cadeau.</p>
   </section>
 
   <main class="table" id="table">
@@ -127,6 +147,8 @@
 <script src="js/solver.js"></script>
 <script src="js/images.js"></script>
 <script src="js/game.js"></script>
+<script src="js/rewards.js"></script>
 <script src="js/exercises.js"></script>
+<script src="js/quiz.js"></script>
 </body>
 </html>

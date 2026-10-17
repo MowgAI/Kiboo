@@ -245,7 +245,7 @@ const PLAYER_TYPES = {
 };
 
 /* ===================== État de la partie ===================== */
-const config = { O: "deterministe", E: "deterministe", S: "humain", speed: 650, open: false, hints: false, explain: false };
+const config = { O: "deterministe", E: "deterministe", S: "humain", speed: 650, open: false, hints: false, explain: false, quiz: false };
 let game = null;
 let runToken = 0;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -274,6 +274,8 @@ function newGame(hands) {
   SEATS.forEach(s => { game.hands[s] = initial[s].slice(); });
   Solver.reset();
   game.hint = null;
+  game.revealed = new Map();                    // cartes cachées révélées par un cadeau : id -> siège
+  if (typeof Quiz !== "undefined") Quiz.reset();
   game.history = [];                            // un instantané avant chaque carte, pour le bilan
   game.review = null;
   game.explanations = [];                       // pourquoi Piperno a joué chaque carte, la plus récente d'abord
@@ -312,9 +314,16 @@ function viewFor(seat) {
 }
 
 async function play(token) {
+  // Questions en cours de partie (js/quiz.js) : la partie attend la réponse puis reprend.
+  await Quiz.at("start");
+  if (token !== runToken) return;
   while (game.played.length < 40) {
     const seat = game.turn;
     const controller = game.controllers[seat];
+    if (controller.human && game.trick.length) {
+      await Quiz.at("play", { seat });
+      if (token !== runToken) return;
+    }
     const view = viewFor(seat);
     if (!controller.human) { render(); await sleep(config.speed); }
     if (token !== runToken) return;
@@ -342,6 +351,10 @@ async function play(token) {
       game.turn = nextSeat(seat);
       render();
       game.trick.forEach(p => { p.fresh = false; });
+      if (game.played.length === 1) {
+        await Quiz.at("lead");
+        if (token !== runToken) return;
+      }
       continue;
     }
     const winner = trickWinner(game.trick);
@@ -349,6 +362,8 @@ async function play(token) {
     render();
     game.trick.forEach(p => { p.fresh = false; });
     await sleep(Math.max(700, config.speed * 1.4));
+    if (token !== runToken) return;
+    await Quiz.at("trick");
     if (token !== runToken) return;
     game.tricksWon[team(winner)]++;
     game.lastTrick = game.trick;
@@ -463,7 +478,16 @@ function render() {
     const legalIds = waitingHere ? new Set(game.waiting.legal.map(cardId)) : null;
     const cards = up ? sortForDisplay(game.hands[seat]) : game.hands[seat];
     for (const c of cards) {
-      if (!up) { handEl.appendChild(cardEl(null)); continue; }
+      if (!up) {
+        // Une carte révélée par un cadeau reste visible dans la main cachée.
+        if (game.revealed.has(cardId(c))) {
+          const el = cardEl(c);
+          el.classList.add("revealed");
+          el.setAttribute("aria-label", `${cardName(c)} (révélée)`);
+          handEl.appendChild(el);
+        } else handEl.appendChild(cardEl(null));
+        continue;
+      }
       const playable = waitingHere && legalIds.has(cardId(c));
       const el = cardEl(c, { button: waitingHere });
       if (playable && hintsReady()) {
@@ -593,6 +617,7 @@ $("cfg-speed").addEventListener("change", e => { config.speed = +e.target.value;
 $("cfg-open").addEventListener("change", e => { config.open = e.target.checked; render(); });
 $("cfg-hints").addEventListener("change", e => { config.hints = e.target.checked; render(); });
 $("cfg-explain").addEventListener("change", e => { config.explain = e.target.checked; render(); });
+$("cfg-quiz").addEventListener("change", e => { config.quiz = e.target.checked; });
 $("btn-new").addEventListener("click", () => newGame(dealHands()));
 // Règles du jeu : fenêtre modale, fermée par le bouton ×, la touche Échap ou un clic à côté.
 $("btn-rules").addEventListener("click", () => $("rules").showModal());
@@ -600,4 +625,5 @@ $("btn-rules-close").addEventListener("click", () => $("rules").close());
 $("rules").addEventListener("click", e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
 $("btn-replay").addEventListener("click", replayDeal);
 
-newGame(dealHands());
+// Première donne une fois tous les scripts chargés (exercices, cadeaux, questions).
+window.addEventListener("DOMContentLoaded", () => newGame(dealHands()));
