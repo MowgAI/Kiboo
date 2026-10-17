@@ -19,8 +19,9 @@
    jamais en regardant les vraies cartes d'Ouest.
    ===================================================================== */
 const Quiz = (() => {
-  // Probabilité de poser une question à chaque occasion.
-  const CHANCE = { start: 0.5, lead: 0.7, play: 0.12 };
+  // Probabilité de poser une question à chaque occasion. La question sur
+  // l'entame est la plus utile : elle est posée à chaque donne où Ouest suit la règle.
+  const CHANCE = { start: 0.5, lead: 1, play: 0.12 };
   const RULE_LEADERS = ["deterministe", "pimc", "pimc250"];   // entament selon la règle de Piperno
   const ANSWERS = [
     { key: "yes", label: "Oui, forcément" },
@@ -212,6 +213,8 @@ const Quiz = (() => {
   async function at(moment, ctx = {}) {
     if (!config.quiz || !game || game.types.S !== "humain") return;
     if (!(moment in CHANCE) || Math.random() >= CHANCE[moment]) return;
+    // Pas de question pendant le dernier pli : il ne reste qu'une carte, aucun choix à faire.
+    if (game.tricksWon.NS + game.tricksWon.EO === 9) return;
 
     if (moment === "start") {
       await ask("Question : avant l'entame", body => Exercises.countPanel(body, {
@@ -223,6 +226,8 @@ const Quiz = (() => {
     } else if (moment === "play") {
       const trickNo = game.tricksWon.NS + game.tricksWon.EO;
       if (!game.trick.length || askedTrick === trickNo) return;
+      // Une seule carte jouable : la question n'aurait pas d'intérêt.
+      if (legalCards(game.hands[ctx.seat], game.trick).length < 2) return;
       askedTrick = trickNo;
       const seat = ctx.seat;
       await ask("Question : avant de jouer", body => Exercises.legalPanel(body, {
