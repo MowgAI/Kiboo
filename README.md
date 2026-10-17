@@ -7,6 +7,17 @@ Le petit bridge, sans atout, à quatre autour de la table.
 - Il faut fournir la couleur demandée ; la plus forte carte de cette couleur gagne le pli.
 - La paire qui fait le plus de plis gagne (5-5 = égalité).
 
+## Jouer en ligne
+
+**https://mowgai.github.io/Kiboo/** (GitHub Pages, branche `main`) : aucun compte ni installation, sur ordinateur ou téléphone.
+
+## Tester et donner son avis
+
+Le bouton « Donner mon avis » ouvre un petit formulaire : type de retour (un problème, une idée, mon avis), note sur 5, message et prénom facultatif. Les informations utiles pour reproduire un problème (version, taille d'écran, navigateur, joueurs, options, pli en cours) sont ajoutées au message et visibles avant l'envoi. Le testeur peut :
+
+- **Copier son avis** et l'envoyer par le moyen de son choix (e-mail, SMS…) ;
+- **L'envoyer sur GitHub** : une « issue » pré-remplie s'ouvre dans le dépôt (compte GitHub requis).
+
 ## Lancer
 
 Ouvrir `index.html` dans un navigateur, ou servir le dossier :
@@ -23,6 +34,7 @@ python3 -m http.server 8000
 - `js/pimc.js` : Averell, le robot PIMC (Perfect Information Monte Carlo), construit sur le DDS
 - `js/solver.js` : accès asynchrone au DDS et au PIMC via un Web Worker (`js/dds-worker.js`)
 - `js/images.js` : correspondance carte → image
+- `js/feedback.js` : formulaire « Donner mon avis »
 - `js/quiz.js` : questions pendant la partie et moteur de déduction
 - `js/rewards.js` : cadeaux, progression et collection
 - `js/exercises.js` : exercices (compter sa main, couleur la plus longue, cartes jouables)

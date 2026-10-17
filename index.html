@@ -14,6 +14,7 @@
   <header>
     <h1 class="logo kiboo" aria-label="Kiboo"><span>K</span><span>i</span><span>b</span><span>o</span><span>o</span></h1>
     <div class="head-btns">
+      <button class="act ghost" id="btn-feedback" type="button" aria-haspopup="dialog">Donner mon avis</button>
       <button class="act ghost" id="btn-album" type="button" aria-haspopup="dialog">Collection 0/40</button>
       <button class="act ghost" id="btn-exercises" type="button" aria-haspopup="dialog">Exercices</button>
       <button class="act ghost" id="btn-rules" type="button" aria-haspopup="dialog">Règles du jeu</button>
@@ -41,6 +42,40 @@
     </div>
     <div id="quiz-body"></div>
     <div class="ex-actions"><button class="act ghost" id="quiz-skip" type="button">Passer la question</button></div>
+  </dialog>
+
+  <dialog class="rules" id="feedback" aria-labelledby="fb-title">
+    <div class="rules-head">
+      <h2 id="fb-title">Donner mon avis</h2>
+      <button class="close" id="btn-fb-close" type="button" aria-label="Fermer">×</button>
+    </div>
+    <p>Merci de tester Kiboo ! Ton retour aide à améliorer le jeu.</p>
+    <div class="fb-row" role="group" aria-label="Type de retour">
+      <button class="ex-choice" type="button" data-kind="bug">Un problème</button>
+      <button class="ex-choice" type="button" data-kind="idee">Une idée</button>
+      <button class="ex-choice" type="button" data-kind="avis">Mon avis</button>
+    </div>
+    <div class="fb-row fb-stars" role="group" aria-label="Note sur 5">
+      <span>Ta note :</span>
+      <button type="button" data-star="1" aria-label="1 sur 5">★</button><button type="button" data-star="2" aria-label="2 sur 5">★</button><button type="button" data-star="3" aria-label="3 sur 5">★</button><button type="button" data-star="4" aria-label="4 sur 5">★</button><button type="button" data-star="5" aria-label="5 sur 5">★</button>
+    </div>
+    <label class="fb-field" for="fb-text">Ton message
+      <textarea id="fb-text" rows="5" placeholder="Ce qui t'a plu, ce qui ne marche pas, ce que tu faisais quand le problème est arrivé…"></textarea>
+    </label>
+    <label class="fb-field" for="fb-name">Ton prénom (facultatif)
+      <input id="fb-name" type="text" autocomplete="given-name">
+    </label>
+    <details class="fb-context">
+      <summary>Informations ajoutées automatiquement</summary>
+      <pre id="fb-context"></pre>
+    </details>
+    <div class="ex-actions">
+      <button class="act" id="fb-copy" type="button">Copier mon avis</button>
+      <a class="act ghost" id="fb-github" href="https://github.com/MowgAI/Kiboo/issues/new" target="_blank" rel="noopener">Envoyer sur GitHub</a>
+    </div>
+    <p class="fb-hint">« Copier mon avis » : colle-le ensuite dans un message à la personne qui t'a envoyé le lien. « Envoyer sur GitHub » demande un compte GitHub.</p>
+    <p class="ex-result" id="fb-status" aria-live="polite"></p>
+    <textarea id="fb-fallback" rows="6" hidden aria-label="Texte de ton avis à copier"></textarea>
   </dialog>
 
   <dialog class="rules exercises" id="album" aria-labelledby="album-title">
@@ -150,5 +185,6 @@
 <script src="js/rewards.js"></script>
 <script src="js/exercises.js"></script>
 <script src="js/quiz.js"></script>
+<script src="js/feedback.js"></script>
 </body>
 </html>
