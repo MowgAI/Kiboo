@@ -13,8 +13,25 @@
 <div class="wrap">
   <header>
     <h1 class="logo kiboo" aria-label="Kiboo"><span>K</span><span>i</span><span>b</span><span>o</span><span>o</span></h1>
-    <button class="act ghost" id="btn-rules" type="button" aria-haspopup="dialog">Règles du jeu</button>
+    <div class="head-btns">
+      <button class="act ghost" id="btn-exercises" type="button" aria-haspopup="dialog">Exercices</button>
+      <button class="act ghost" id="btn-rules" type="button" aria-haspopup="dialog">Règles du jeu</button>
+    </div>
   </header>
+
+  <dialog class="rules exercises" id="exercises" aria-labelledby="ex-title">
+    <div class="rules-head">
+      <h2 id="ex-title">Exercices</h2>
+      <button class="close" id="btn-ex-close" type="button" aria-label="Fermer les exercices">×</button>
+    </div>
+    <div class="ex-tabs" role="tablist" aria-label="Choix de l'exercice">
+      <button type="button" role="tab" data-ex="count" aria-selected="true">Compter sa main</button>
+      <button type="button" role="tab" data-ex="longest" aria-selected="false">Couleur la plus longue</button>
+      <button type="button" role="tab" data-ex="legal" aria-selected="false">Cartes jouables</button>
+    </div>
+    <p class="ex-score" id="ex-score"></p>
+    <div id="ex-body" role="tabpanel"></div>
+  </dialog>
 
   <dialog class="rules" id="rules" aria-labelledby="rules-title">
     <div class="rules-head">
@@ -110,5 +127,6 @@
 <script src="js/solver.js"></script>
 <script src="js/images.js"></script>
 <script src="js/game.js"></script>
+<script src="js/exercises.js"></script>
 </body>
 </html>

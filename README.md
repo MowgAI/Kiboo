@@ -23,8 +23,19 @@ python3 -m http.server 8000
 - `js/pimc.js` : Averell, le robot PIMC (Perfect Information Monte Carlo), construit sur le DDS
 - `js/solver.js` : accès asynchrone au DDS et au PIMC via un Web Worker (`js/dds-worker.js`)
 - `js/images.js` : correspondance carte → image
+- `js/exercises.js` : exercices (compter sa main, couleur la plus longue, cartes jouables)
 - `js/game.js` : règles, robots, état de la partie, affichage et réglages
 - `assets/cards/` : images des 40 cartes (WebP)
+
+## Exercices
+
+Le bouton « Exercices » ouvre trois exercices sur une main de 10 cartes tirée au hasard :
+
+- **Compter sa main** : nombre de cartes et points par couleur, puis total des points. Dans Kiboo, les points d'une couleur sont la somme des valeurs de ses cartes.
+- **Couleur la plus longue** : en cas d'égalité, toutes les couleurs les plus longues sont acceptées.
+- **Cartes jouables** : une couleur est demandée, il faut sélectionner toutes les cartes autorisées (fournir si possible, sinon défausser n'importe quelle carte).
+
+Chaque réponse est corrigée avec le détail du calcul, et un compteur suit les réussites de la session. Le code est dans `js/exercises.js`.
 
 ## Explications de Piperno
 
