@@ -87,8 +87,10 @@ const Quiz = (() => {
      l'entame, ses cartes révélées et des cartes prises parmi celles que le
      joueur ne voit pas. On garde les mains où la règle d'entame (openingCard)
      choisit exactement la carte entamée.
-     visit(hand) est appelé pour chaque main possible. */
-  function forEachWestHand(visit) {
+     visit(hand, possible, entame) est appelé pour chaque main possible ; avec
+     { all: true }, aussi pour les mains que la règle d'entame exclut
+     (possible = false, entame = la carte que la règle aurait jouée). */
+  function forEachWestHand(visit, opts = {}) {
     const lead = game.history[0].card;
     const seen = new Set([...game.hands.S, ...game.hands.N, lead].map(cardId));
     const revealedW = [], revealedE = new Set();
@@ -106,7 +108,9 @@ const Quiz = (() => {
     const n = unknown.length;
     while (true) {
       const hand = fixed.concat(idx.map(i => unknown[i]));
-      if (cardId(openingCard(hand)) === leadId) visit(hand);
+      const chosen = openingCard(hand);
+      const possible = cardId(chosen) === leadId;
+      if (possible || opts.all) visit(hand, possible, chosen);
       let i = k - 1;
       while (i >= 0 && idx[i] === n - k + i) i--;
       if (i < 0) break;
@@ -121,6 +125,7 @@ const Quiz = (() => {
     const count = (h, s) => h.filter(c => c.s === s).length;
     const list = [
       {
+        key: "same",
         text: `Ouest peut-il avoir <strong>autant de cartes</strong> dans une autre couleur que le ${Exercises.suitName(L)} ?`,
         rule: "À longueur égale, la règle d'entame choisit la couleur qui a le plus de points (à points égaux, la dernière dans l'ordre bleu, vert, rouge, jaune). Une autre couleur aussi longue est donc possible si elle a moins de points.",
         test: h => [0, 1, 2, 3].some(s => s !== L && count(h, s) === count(h, L)),
@@ -139,19 +144,62 @@ const Quiz = (() => {
     return list;
   }
 
+  // Ce que le joueur voit, couleur par couleur : ses cartes, celles du mort,
+  // et ce qui reste pour Est et Ouest (nombre de cartes et points).
+  function remainingTable(lead) {
+    const pts = cards => cards.reduce((t, c) => t + c.v, 0);
+    const rows = [0, 1, 2, 3].map(s => {
+      const seen = new Set([...game.hands.S, ...game.hands.N].filter(c => c.s === s).map(cardId));
+      const rest = makeDeck().filter(c => c.s === s && !seen.has(cardId(c)));
+      return {
+        s, rest: rest.length, pts: pts(rest), values: rest.map(c => c.v).sort((a, b) => b - a),
+        me: game.hands.S.filter(c => c.s === s).length, dummy: game.hands.N.filter(c => c.s === s).length,
+      };
+    });
+    const html = `<div class="ex-grid-wrap"><table class="ex-grid quiz-rest">
+      <thead><tr><th scope="col">Couleur</th><th scope="col">Ta main</th><th scope="col">Le mort</th><th scope="col">Restent pour Est et Ouest</th><th scope="col">Points restants</th></tr></thead>
+      <tbody>${rows.map(r => `<tr><th scope="row">${Exercises.suitName(r.s)}</th><td>${r.me}</td><td>${r.dummy}</td>
+        <td><strong>${r.rest}</strong>${r.rest ? ` (${r.values.join(", ")})` : ""}${r.s === lead.s ? `, dont le ${lead.v} entamé` : ""}</td><td>${r.pts}</td></tr>`).join("")}</tbody>
+    </table></div>`;
+    return { rows, html };
+  }
+
   function leadPanel(body) {
     const lead = game.history[0].card;
+    const L = lead.s;
     const questions = leadQuestions(lead);
     const Q = questions[Math.floor(Math.random() * questions.length)];
+    const count = (h, s) => h.filter(c => c.s === s).length;
+    const points = (h, s) => h.filter(c => c.s === s).reduce((t, c) => t + c.v, 0);
 
-    // Passe en revue les mains possibles ; garde un exemple au hasard de chaque cas.
-    let total = 0, yes = 0, exYes = null, exNo = null;
-    forEachWestHand(h => {
+    // Passe en revue les mains d'Ouest. Pour la question « autant de cartes »,
+    // on note aussi, couleur par couleur : si c'est possible (avec un exemple),
+    // si c'est seulement faisable en nombre de cartes, et sinon ce que la règle
+    // d'entame aurait fait jouer.
+    let total = 0, yes = 0, exYes = null, exNo = null, minL = 10;
+    const per = [0, 1, 2, 3].map(() => ({ feasible: false, possible: false, example: null, n: 0, chosen: new Set() }));
+    forEachWestHand((h, possible, chosen) => {
+      if (Q.key === "same") {
+        for (let s2 = 0; s2 < 4; s2++) {
+          if (s2 === L || count(h, s2) !== count(h, L)) continue;
+          // Seules comptent les mains où les deux couleurs sont à égalité en tête :
+          // si une troisième couleur était plus longue, Ouest n'entamerait pas le L.
+          if ([0, 1, 2, 3].some(x => count(h, x) > count(h, L))) continue;
+          const st = per[s2];
+          st.feasible = true;
+          if (possible) { st.possible = true; st.n++; if (Math.random() * st.n < 1) st.example = h; }
+          else st.chosen.add(chosen.s === L ? "card" : chosen.s);
+        }
+      }
+      if (!possible) return;
       total++;
+      minL = Math.min(minL, count(h, L));
       if (Q.test(h)) { yes++; if (Math.random() * yes < 1) exYes = h; }
       else if (Math.random() * (total - yes) < 1) exNo = h;
-    });
+    }, { all: Q.key === "same" });
     const truth = yes === total ? "yes" : yes === 0 ? "no" : "maybe";
+    const others = [0, 1, 2, 3].filter(s2 => s2 !== L);
+    const followUp = Q.key === "same" && truth !== "no";
 
     body.innerHTML = `
       <div class="ex-led"><div class="ex-led-cards" data-role="lead"></div>
@@ -161,11 +209,20 @@ const Quiz = (() => {
       <div class="quiz-rule" data-role="rule"></div>
       <p class="quiz-label">Le mort (Nord)</p><div class="ex-hand quiz-mini" data-role="dummy"></div>
       <p class="quiz-label">Ta main (Sud, déclarant)</p><div class="ex-hand quiz-mini" data-role="me"></div>
+      <p class="quiz-hint">Ouest a 10 cartes, choisies parmi les 20 que tu ne vois pas (ni dans ta main, ni chez le mort).</p>
       <div class="ex-choices" role="group" aria-label="Réponses">
         ${ANSWERS.map(a => `<button class="ex-choice" type="button" data-a="${a.key}">${a.label}</button>`).join("")}
       </div>
-      <div class="ex-actions" hidden data-role="next"><button class="act" data-role="check" type="button"></button></div>
       <p class="ex-result" data-role="result" aria-live="polite"></p>
+      <div class="quiz-follow" data-role="follow" hidden>
+        <p class="ex-q">Quelles couleurs peuvent avoir <strong>autant de cartes</strong> que le ${Exercises.suitName(L)} dans la main d'Ouest ? Coche toutes les bonnes réponses.</p>
+        <div class="ex-choices" role="group" aria-label="Couleurs">
+          ${others.map(s2 => `<button class="ex-choice" type="button" data-s="${s2}" aria-pressed="false">${Exercises.suitName(s2)}</button>`).join("")}
+        </div>
+        <div class="ex-actions"><button class="act" type="button" data-role="follow-check">Vérifier</button></div>
+        <p class="ex-result" data-role="follow-result" aria-live="polite"></p>
+      </div>
+      <div class="ex-actions" hidden data-role="next"><button class="act" data-role="check" type="button"></button></div>
       <div class="quiz-why" data-role="why" hidden></div>`;
     const q = sel => body.querySelector(sel);
     q("[data-role=lead]").appendChild(cardEl(lead));
@@ -180,36 +237,93 @@ const Quiz = (() => {
     Exercises.drawHand(q("[data-role=me]"), game.hands.S, true);
     Exercises.drawHand(q("[data-role=dummy]"), game.hands.N, true);
 
+    const setResult = (sel, ok, text) => {
+      const res = q(sel);
+      res.className = "ex-result " + (ok ? "ok" : "ko");
+      res.textContent = text;
+    };
+    const fmt = n => n.toLocaleString("fr-FR");
+    const name = s2 => COLOR_NAMES[s2];
+    const example = (h, label) => {
+      const p = document.createElement("p");
+      p.className = "quiz-label";
+      p.textContent = label;
+      const box = document.createElement("div");
+      box.className = "ex-hand quiz-mini";
+      Exercises.drawHand(box, h, true);
+      q("[data-role=why]").append(p, box);
+    };
+
+    // La correction : la règle, le reste de chaque couleur, puis le raisonnement.
+    function explain(ok) {
+      const why = q("[data-role=why]");
+      why.hidden = false;
+      const table = remainingTable(lead);
+      why.innerHTML = `<p>${Q.rule}</p>
+        <p class="quiz-label">Les cartes que tu ne vois pas, couleur par couleur :</p>${table.html}`;
+      if (Q.key === "same") {
+        const lines = others.map(s2 => {
+          const st = per[s2], r = table.rows[s2];
+          if (st.possible) {
+            const h = st.example, k = count(h, L);
+            const tie = points(h, s2) === points(h, L) ? ` (autant de points, mais le ${name(L)} passe après le ${name(s2)} dans l'ordre bleu, vert, rouge, jaune)` : "";
+            return `<li>${Exercises.suitName(s2)} : <strong>possible</strong>. Par exemple ${k} cartes ${Exercises.adj(L, k)} (${points(h, L)} points) et ${k} cartes ${Exercises.adj(s2, k)} (${points(h, s2)} points) : Ouest entame bien le ${name(L)}${tie}.</li>`;
+          }
+          if (!st.feasible) {
+            // Pas assez de cartes pour égaler la couleur la plus longue d'Ouest.
+            const left = r.rest === 0 ? `il ne reste aucune carte ${Exercises.adj(s2, 1)}`
+              : `il ne reste que ${Exercises.plural(r.rest, "carte")} ${Exercises.adj(s2, r.rest)} pour Est et Ouest`;
+            return `<li>${Exercises.suitName(s2)} : <strong>impossible</strong>. Le ${name(L)} est la couleur la plus longue d'Ouest : il en a au moins ${minL} cartes. Or ${left} : pas assez pour en avoir autant.</li>`;
+          }
+          // Assez de cartes, mais la règle d'entame aurait fait jouer autre chose.
+          const parts = [];
+          if (st.chosen.has(s2)) parts.push(`à longueur égale, le ${name(s2)} aurait plus de points que le ${name(L)} (les cartes ${Exercises.adj(s2, 2)} qui restent valent ${r.pts} points en tout), et Ouest aurait entamé le ${name(s2)}`);
+          if (st.chosen.has("card")) parts.push(`à longueur égale, Ouest aurait aussi une séquence ou une carte ${Exercises.adj(L, 1)} plus petite, et n'aurait pas entamé le ${lead.v}`);
+          if (!parts.length) parts.push(`la règle d'entame lui aurait fait jouer une autre carte que le ${lead.v} ${name(L)}`);
+          return `<li>${Exercises.suitName(s2)} : <strong>impossible</strong>. Il reste assez de cartes ${Exercises.adj(s2, 2)}, mais ${parts.join(" ; ou bien ")}.</li>`;
+        });
+        why.insertAdjacentHTML("beforeend", `<p class="quiz-label">Couleur par couleur :</p><ul class="quiz-reasons">${lines.join("")}</ul>`);
+      }
+      why.insertAdjacentHTML("beforeend", `<p>En tout, Ouest peut avoir <strong>${fmt(total)}</strong> main${total > 1 ? "s" : ""} différente${total > 1 ? "s" : ""} qui respecte${total > 1 ? "nt" : ""} la règle d'entame.
+        La réponse à la question est oui dans <strong>${fmt(yes)}</strong> d'entre elles${truth === "maybe" ? ` et non dans ${fmt(total - yes)}` : ""}.</p>`);
+      if (Q.key !== "same") {
+        if (exYes) example(exYes, truth === "maybe" ? "Une main possible d'Ouest où la réponse est oui :" : "Par exemple, Ouest pourrait avoir :");
+        if (exNo) example(exNo, truth === "maybe" ? "Une main possible d'Ouest où la réponse est non :" : "Par exemple, Ouest pourrait avoir :");
+      }
+      q("[data-role=next]").hidden = false;
+      onResult(ok, q("[data-role=check]"));
+    }
+
     const buttons = [...body.querySelectorAll("[data-a]")];
     for (const b of buttons) b.onclick = () => {
       const ok = b.dataset.a === truth;
       buttons.forEach(x => { x.disabled = true; if (x.dataset.a === truth) x.classList.add("ok"); });
       if (!ok) b.classList.add("ko");
       const answer = ANSWERS.find(a => a.key === truth).label;
-      const res = q("[data-role=result]");
-      res.className = "ex-result " + (ok ? "ok" : "ko");
-      res.textContent = (ok ? "Bravo ! " : "Pas tout à fait. ") + `La bonne réponse : ${answer.toLowerCase()}.`;
+      setResult("[data-role=result]", ok, (ok ? "Bravo ! " : "Pas tout à fait. ") + `La bonne réponse : ${answer.toLowerCase()}.`);
+      if (!followUp) return explain(ok);
 
-      // Le raisonnement : la règle, puis le décompte des mains possibles et des exemples.
-      const fmt = n => n.toLocaleString("fr-FR");
-      const why = q("[data-role=why]");
-      why.hidden = false;
-      why.innerHTML = `<p>${Q.rule}</p>
-        <p>Avec les cartes que tu vois et la règle d'entame, Ouest peut avoir <strong>${fmt(total)}</strong> main${total > 1 ? "s" : ""} différente${total > 1 ? "s" : ""}.
-        La réponse est oui dans <strong>${fmt(yes)}</strong> d'entre elles${truth === "maybe" ? ` et non dans ${fmt(total - yes)}` : ""}.</p>`;
-      const example = (h, label) => {
-        const p = document.createElement("p");
-        p.className = "quiz-label";
-        p.textContent = label;
-        const box = document.createElement("div");
-        box.className = "ex-hand quiz-mini";
-        Exercises.drawHand(box, h, true);
-        why.append(p, box);
+      // Deuxième question : lesquelles ?
+      const follow = q("[data-role=follow]");
+      follow.hidden = false;
+      const picks = [...follow.querySelectorAll("[data-s]")];
+      for (const p of picks) p.onclick = () => p.setAttribute("aria-pressed", p.getAttribute("aria-pressed") !== "true");
+      q("[data-role=follow-check]").onclick = () => {
+        let ok2 = true;
+        for (const p of picks) {
+          const on = p.getAttribute("aria-pressed") === "true", good = per[+p.dataset.s].possible;
+          p.disabled = true;
+          if (good) p.classList.add(on ? "ok" : "missed");
+          else if (on) p.classList.add("ko");
+          if (on !== good) ok2 = false;
+        }
+        q("[data-role=follow-check]").hidden = true;
+        const goods = others.filter(s2 => per[s2].possible).map(name);
+        setResult("[data-role=follow-result]", ok2, (ok2 ? "Bravo ! " : "Pas tout à fait. ") +
+          `${goods.length > 1 ? "Les couleurs possibles : " : "La seule couleur possible : le "}${goods.join(", ")}. Le détail est ci-dessous.`);
+        explain(ok && ok2);
       };
-      if (exYes) example(exYes, truth === "maybe" ? "Une main possible d'Ouest où la réponse est oui :" : "Par exemple, Ouest pourrait avoir :");
-      if (exNo) example(exNo, truth === "maybe" ? "Une main possible d'Ouest où la réponse est non :" : "Par exemple, Ouest pourrait avoir :");
-      q("[data-role=next]").hidden = false;
-      onResult(ok, q("[data-role=check]"));
+      picks[0].focus();
     };
     buttons[0].focus();
   }
@@ -251,5 +365,5 @@ const Quiz = (() => {
   $("quiz-skip").addEventListener("click", () => finish && finish());
   $("quiz").addEventListener("close", () => finish && finish());   // touche Échap
 
-  return { at, reset, forEachWestHand };
+  return { at, reset, forEachWestHand, leadPanel };
 })();
