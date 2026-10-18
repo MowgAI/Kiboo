@@ -157,8 +157,8 @@ const Quiz = (() => {
       <div class="ex-led"><div class="ex-led-cards" data-role="lead"></div>
         <p>Ouest (${PLAYER_TYPES[game.types.O].label}) a entamé le <strong>${cardName(lead)}</strong>. Il suit la règle d'entame de Piperno.</p></div>
       <p class="ex-q">${Q.text}</p>
-      <button class="act ghost quiz-rule-btn" type="button" data-role="rule-btn" aria-expanded="false">Voir la règle d'entame</button>
-      <div class="quiz-rule" data-role="rule" hidden></div>
+      <button class="act ghost quiz-rule-btn" type="button" data-role="rule-btn" aria-expanded="true">Cacher la règle d'entame</button>
+      <div class="quiz-rule" data-role="rule"></div>
       <p class="quiz-label">Le mort (Nord)</p><div class="ex-hand quiz-mini" data-role="dummy"></div>
       <p class="quiz-label">Ta main (Sud, déclarant)</p><div class="ex-hand quiz-mini" data-role="me"></div>
       <div class="ex-choices" role="group" aria-label="Réponses">
@@ -169,7 +169,7 @@ const Quiz = (() => {
       <div class="quiz-why" data-role="why" hidden></div>`;
     const q = sel => body.querySelector(sel);
     q("[data-role=lead]").appendChild(cardEl(lead));
-    // La règle d'entame (la même que dans les Règles du jeu), affichée à la demande.
+    // La règle d'entame (la même que dans les Règles du jeu), affichée d'office pendant la question.
     q("[data-role=rule]").innerHTML = $("lead-rule").innerHTML;
     q("[data-role=rule-btn]").onclick = e => {
       const box = q("[data-role=rule]"), open = box.hidden;
