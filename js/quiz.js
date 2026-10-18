@@ -121,11 +121,6 @@ const Quiz = (() => {
     const count = (h, s) => h.filter(c => c.s === s).length;
     const list = [
       {
-        text: `Ouest peut-il avoir <strong>plus de cartes</strong> dans une autre couleur que le ${Exercises.suitName(L)} ?`,
-        rule: "La règle d'entame fait jouer la couleur la plus longue : aucune autre couleur ne peut avoir plus de cartes.",
-        test: h => [0, 1, 2, 3].some(s => s !== L && count(h, s) > count(h, L)),
-      },
-      {
         text: `Ouest peut-il avoir <strong>autant de cartes</strong> dans une autre couleur que le ${Exercises.suitName(L)} ?`,
         rule: "À longueur égale, la règle d'entame choisit la couleur qui a le plus de points (à points égaux, la dernière dans l'ordre bleu, vert, rouge, jaune). Une autre couleur aussi longue est donc possible si elle a moins de points.",
         test: h => [0, 1, 2, 3].some(s => s !== L && count(h, s) === count(h, L)),
@@ -162,6 +157,8 @@ const Quiz = (() => {
       <div class="ex-led"><div class="ex-led-cards" data-role="lead"></div>
         <p>Ouest (${PLAYER_TYPES[game.types.O].label}) a entamé le <strong>${cardName(lead)}</strong>. Il suit la règle d'entame de Piperno.</p></div>
       <p class="ex-q">${Q.text}</p>
+      <button class="act ghost quiz-rule-btn" type="button" data-role="rule-btn" aria-expanded="false">Voir la règle d'entame</button>
+      <div class="quiz-rule" data-role="rule" hidden></div>
       <p class="quiz-label">Le mort (Nord)</p><div class="ex-hand quiz-mini" data-role="dummy"></div>
       <p class="quiz-label">Ta main (Sud, déclarant)</p><div class="ex-hand quiz-mini" data-role="me"></div>
       <div class="ex-choices" role="group" aria-label="Réponses">
@@ -172,6 +169,14 @@ const Quiz = (() => {
       <div class="quiz-why" data-role="why" hidden></div>`;
     const q = sel => body.querySelector(sel);
     q("[data-role=lead]").appendChild(cardEl(lead));
+    // La règle d'entame (la même que dans les Règles du jeu), affichée à la demande.
+    q("[data-role=rule]").innerHTML = $("lead-rule").innerHTML;
+    q("[data-role=rule-btn]").onclick = e => {
+      const box = q("[data-role=rule]"), open = box.hidden;
+      box.hidden = !open;
+      e.currentTarget.setAttribute("aria-expanded", open);
+      e.currentTarget.textContent = open ? "Cacher la règle d'entame" : "Voir la règle d'entame";
+    };
     Exercises.drawHand(q("[data-role=me]"), game.hands.S, true);
     Exercises.drawHand(q("[data-role=dummy]"), game.hands.N, true);
 

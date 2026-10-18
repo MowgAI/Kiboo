@@ -350,6 +350,11 @@ button.card:disabled { cursor: default; }
 .gift-progress .dots { color: var(--c-yellow); letter-spacing: 0.15em; font-size: 1.05rem; }
 .rules-head .gift-progress { margin-left: auto; }
 .ex-led-cards { display: flex; gap: 4px; flex: none; }
+.rules ol { margin: 4px 0 0; padding-left: 1.4em; }
+.rules ol li { margin: 3px 0; }
+.act.quiz-rule-btn { margin-top: 10px; padding: 5px 12px; font-size: 0.9rem; }
+.quiz-rule { margin-top: 8px; padding: 10px 14px; border-radius: 10px; background: var(--page); font-size: 0.95rem; }
+.quiz-rule p:first-child { margin-top: 0; }
 .quiz-label { margin: 10px 0 0; font-size: 0.85rem; color: var(--ink-soft); }
 .ex-hand.quiz-mini { margin: 4px 0 0; gap: 4px; }
 .ex-hand.quiz-mini .card { --w: clamp(34px, 8vw, 46px); }
