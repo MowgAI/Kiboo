@@ -35,7 +35,7 @@ const Solver = (() => {
   function start() {
     if (!useWorker) return;
     try {
-      worker = new Worker("js/dds-worker.js");
+      worker = new Worker("js/dds-worker.js?v=" + (window.KIBOO_VERSION || ""));
     } catch (e) {
       fallback();
       return;

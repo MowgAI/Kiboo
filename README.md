@@ -34,6 +34,7 @@ python3 -m http.server 8000
 - `js/pimc.js` : Averell, le robot PIMC (Perfect Information Monte Carlo), construit sur le DDS
 - `js/solver.js` : accès asynchrone au DDS et au PIMC via un Web Worker (`js/dds-worker.js`)
 - `js/images.js` : correspondance carte → image
+- `tools/bump-version.sh` : change le numéro de version des fichiers (`?v=` dans `index.html`) pour que les navigateurs chargent la nouvelle version après une mise à jour ; à lancer avant chaque envoi sur GitHub
 - `js/feedback.js` : formulaire « Donner mon avis »
 - `js/quiz.js` : questions pendant la partie et moteur de déduction
 - `js/rewards.js` : cadeaux, progression et collection

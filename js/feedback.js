@@ -9,7 +9,7 @@
    cours) est ajouté au message et montré au testeur avant l'envoi.
    ===================================================================== */
 const Feedback = (() => {
-  const VERSION = "2026-10-17";
+  const VERSION = window.KIBOO_VERSION || "?";
   const ISSUES = "https://github.com/MowgAI/Kiboo/issues/new";
   const KINDS = { bug: "Un problème", idee: "Une idée", avis: "Mon avis" };
   let kind = "avis", stars = 0;
