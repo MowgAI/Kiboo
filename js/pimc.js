@@ -19,14 +19,31 @@
      legal:   cartes jouables
    }
    opts = { samples, minSamples, timeMs } : nombre de donnes et budget de temps.
+   opts.seed (facultatif) : graine du hasard. Avec une graine, le robot tire
+   toujours les mêmes donnes et en fait exactement `samples`, sans limite de
+   temps : il joue toujours la même carte dans la même position (utile pour
+   comparer des joueurs sur une même donne, voir js/evaluation.js).
    choose(info, opts) -> { card, samples, scores: [{ card, avg }] }
    ===================================================================== */
 const PIMC = (() => {
   const id = c => c.s * 10 + (c.v - 1);
 
+  // Générateur pseudo-aléatoire à graine (mulberry32).
+  function seeded(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6D2B79F5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  let rand = Math.random;
+
   function shuffle(a) {
     for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
+      const j = Math.floor(rand() * (i + 1));
       [a[i], a[j]] = [a[j], a[i]];
     }
     return a;
@@ -48,7 +65,7 @@ const PIMC = (() => {
         const el = [];
         hidden.forEach((p, i) => { if (cap[i] > 0 && !info.voids[p][c.s]) el.push(i); });
         if (!el.length) { ok = false; break; }
-        let r = Math.random() * el.reduce((t, i) => t + cap[i], 0);
+        let r = rand() * el.reduce((t, i) => t + cap[i], 0);
         let pick = el[el.length - 1];
         for (const i of el) { r -= cap[i]; if (r < 0) { pick = i; break; } }
         out[pick].push(c);
@@ -88,6 +105,8 @@ const PIMC = (() => {
     const maxSamples = opts.samples || 40;
     const minSamples = opts.minSamples || 3;
     const timeMs = opts.timeMs || 1500;
+    const fixed = opts.seed !== undefined;
+    rand = fixed ? seeded(opts.seed) : Math.random;
     const legal = info.legal;
     if (legal.length === 1) return { card: legal[0], samples: 0, scores: [] };
 
@@ -97,7 +116,7 @@ const PIMC = (() => {
     const total = new Map(toAnalyze.map(c => [id(c), 0]));
     const t0 = Date.now();
     let n = 0;
-    while (n < maxSamples && (n < minSamples || Date.now() - t0 < timeMs)) {
+    while (n < maxSamples && (fixed || n < minSamples || Date.now() - t0 < timeMs)) {
       const hands = sampleDeal(info);
       if (!hands) break;
       DDS.reset();                                   // garde la mémoire du Worker sous contrôle

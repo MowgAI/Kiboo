@@ -411,6 +411,22 @@ button.card:disabled { cursor: default; }
 a.act { text-decoration: none; display: inline-flex; align-items: center; }
 .fb-hint { margin: 8px 0 0; font-size: 0.82rem; color: var(--ink-soft); }
 
+/* Évaluation (score duplicate) et progression */
+.eval-score { font-size: 1.15rem; margin: 4px 0 0; }
+.eval-score strong { font-size: 1.4rem; }
+.eval-table td, .eval-table th { font-variant-numeric: tabular-nums; }
+.eval-me th, .eval-me td { font-weight: 700; }
+.eval-par th, .eval-par td { color: var(--ink-soft); font-weight: 400; }
+.eval-table .ok { color: var(--ok); font-weight: 600; }
+.eval-table .ko { color: var(--ko); }
+.eval-how, .eval-note { font-size: 0.85rem; color: var(--ink-soft); }
+.eval-up { font-weight: 600; color: var(--ok); }
+.eval-steps { padding-left: 1.4em; }
+.eval-steps li { margin: 4px 0; }
+.eval-steps li.done { color: var(--ok); }
+.eval-bars { display: flex; align-items: flex-end; gap: 4px; height: 70px; margin-top: 6px; padding: 4px; border-bottom: 1px solid var(--line); }
+.eval-bar { flex: 1 1 0; max-width: 28px; background: var(--c-blue); border-radius: 3px 3px 0 0; }
+
 /* Bilan de la donne */
 .review {
   margin-top: 14px;

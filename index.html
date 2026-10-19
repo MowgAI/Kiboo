@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=2026-10-18-0933">
+<link rel="stylesheet" href="css/style.css?v=2026-10-19-0835">
 </head>
 <body>
 <div class="wrap">
@@ -15,6 +15,7 @@
     <h1 class="logo kiboo" aria-label="Kiboo"><span>K</span><span>i</span><span>b</span><span>o</span><span>o</span></h1>
     <div class="head-btns">
       <button class="act ghost" id="btn-feedback" type="button" aria-haspopup="dialog">Donner mon avis</button>
+      <button class="act ghost" id="btn-progress" type="button" aria-haspopup="dialog">Progression</button>
       <button class="act ghost" id="btn-album" type="button" aria-haspopup="dialog">Collection 0/40</button>
       <button class="act ghost" id="btn-exercises" type="button" aria-haspopup="dialog">Exercices</button>
       <button class="act ghost" id="btn-rules" type="button" aria-haspopup="dialog">Règles du jeu</button>
@@ -76,6 +77,14 @@
     <p class="fb-hint">« Copier mon avis » : colle-le ensuite dans un message à la personne qui t'a envoyé le lien. « Envoyer sur GitHub » demande un compte GitHub.</p>
     <p class="ex-result" id="fb-status" aria-live="polite"></p>
     <textarea id="fb-fallback" rows="6" hidden aria-label="Texte de ton avis à copier"></textarea>
+  </dialog>
+
+  <dialog class="rules exercises" id="progress" aria-labelledby="progress-title">
+    <div class="rules-head">
+      <h2 id="progress-title">Ma progression</h2>
+      <button class="close" id="btn-progress-close" type="button" aria-label="Fermer">×</button>
+    </div>
+    <div id="progress-body"></div>
   </dialog>
 
   <dialog class="rules exercises" id="album" aria-labelledby="album-title">
@@ -162,11 +171,12 @@
     <label class="check"><input type="checkbox" id="cfg-hints"> Montrer les meilleurs coups</label>
     <label class="check"><input type="checkbox" id="cfg-explain"> Explications de Piperno</label>
     <label class="check"><input type="checkbox" id="cfg-quiz"> Questions pendant la partie</label>
+    <label class="check"><input type="checkbox" id="cfg-eval" checked> Mode évaluation</label>
     <div class="btns">
       <button class="act ghost" id="btn-replay" type="button">Rejouer la donne</button>
       <button class="act" id="btn-new" type="button">Nouvelle donne</button>
     </div>
-    <p class="note">Les changements de joueurs s'appliquent à la prochaine donne. Jeux ouverts montre toutes les mains. Les meilleurs coups affichent, sur chaque carte jouable, le nombre de plis que votre camp fera si tout le monde joue parfaitement à jeux ouverts. Piperno joue avec des règles simples (cochez Explications de Piperno pour voir laquelle il applique à chaque carte) et PiperRand au hasard. Averell ne voit que sa main et le mort : à partir du deuxième pli, il simule jusqu'à 40 donnes possibles et les analyse avec le DDS ; Averell250 en simule jusqu'à 250, plus fort mais plus lent. Cheater, lui, voit toutes les cartes. En fin de donne, le DDS fait le bilan des cartes qui ont coûté des plis. Avec Questions pendant la partie, la partie s'arrête parfois sur une question (quand Sud est humain) ; toutes les 3 bonnes réponses, tu choisis un cadeau.</p>
+    <p class="note">Les changements de joueurs s'appliquent à la prochaine donne. Jeux ouverts montre toutes les mains. Les meilleurs coups affichent, sur chaque carte jouable, le nombre de plis que votre camp fera si tout le monde joue parfaitement à jeux ouverts. Piperno joue avec des règles simples (cochez Explications de Piperno pour voir laquelle il applique à chaque carte) et PiperRand au hasard. Averell ne voit que sa main et le mort : à partir du deuxième pli, il simule jusqu'à 40 donnes possibles et les analyse avec le DDS ; Averell250 en simule jusqu'à 250, plus fort mais plus lent. Cheater, lui, voit toutes les cartes. En fin de donne, le DDS fait le bilan des cartes qui ont coûté des plis. Le mode évaluation compare ta donne (en Sud) à celle de Piperno, Averell et Averell250 sur les mêmes cartes : ton score duplicate s'affiche en fin de donne. Avec Questions pendant la partie, la partie s'arrête parfois sur une question (quand Sud est humain) ; toutes les 3 bonnes réponses, tu choisis un cadeau.</p>
   </section>
 
   <main class="table" id="table">
@@ -185,19 +195,21 @@
     </div>
   </div>
 
+  <section class="review" id="evaluation" hidden aria-live="polite"></section>
   <section class="review" id="explain" hidden aria-live="polite"></section>
   <section class="review" id="review" hidden aria-live="polite"></section>
 </div>
 
-<script>window.KIBOO_VERSION = "2026-10-18-0933";   // mis à jour par tools/bump-version.sh</script>
-<script src="js/dds.js?v=2026-10-18-0933"></script>
-<script src="js/pimc.js?v=2026-10-18-0933"></script>
-<script src="js/solver.js?v=2026-10-18-0933"></script>
-<script src="js/images.js?v=2026-10-18-0933"></script>
-<script src="js/game.js?v=2026-10-18-0933"></script>
-<script src="js/rewards.js?v=2026-10-18-0933"></script>
-<script src="js/exercises.js?v=2026-10-18-0933"></script>
-<script src="js/quiz.js?v=2026-10-18-0933"></script>
-<script src="js/feedback.js?v=2026-10-18-0933"></script>
+<script>window.KIBOO_VERSION = "2026-10-19-0835";   // mis à jour par tools/bump-version.sh</script>
+<script src="js/dds.js?v=2026-10-19-0835"></script>
+<script src="js/pimc.js?v=2026-10-19-0835"></script>
+<script src="js/solver.js?v=2026-10-19-0835"></script>
+<script src="js/images.js?v=2026-10-19-0835"></script>
+<script src="js/game.js?v=2026-10-19-0835"></script>
+<script src="js/rewards.js?v=2026-10-19-0835"></script>
+<script src="js/exercises.js?v=2026-10-19-0835"></script>
+<script src="js/quiz.js?v=2026-10-19-0835"></script>
+<script src="js/evaluation.js?v=2026-10-19-0835"></script>
+<script src="js/feedback.js?v=2026-10-19-0835"></script>
 </body>
 </html>

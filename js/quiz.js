@@ -77,6 +77,7 @@ const Quiz = (() => {
     const pool = hiddenCards(seat);
     const card = pool[Math.floor(Math.random() * pool.length)];
     game.revealed.set(cardId(card), seat);
+    game.assisted = true;                         // une carte révélée est une aide : donne non évaluée
     render();
     return card;
   }

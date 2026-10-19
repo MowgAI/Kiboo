@@ -50,6 +50,18 @@ const Rewards = (() => {
     if (btn) btn.textContent = `Collection ${state.collection.length}/40`;
   }
 
+  // Ajoute à la collection une carte qu'on n'a pas encore (null si elle est complète).
+  function grantCard() {
+    const have = owned();
+    const missing = makeDeck().filter(c => !have.has(cardId(c)));
+    if (!missing.length) return null;
+    const card = missing[Math.floor(Math.random() * missing.length)];
+    state.collection.push(cardId(card));
+    save();
+    refresh();
+    return card;
+  }
+
   /* Panneau de choix du cadeau, affiché dans `box`.
      opts = { canReveal, reveal(seat) -> carte | null, revealable(seat) -> bool, doneLabel, onDone } */
   function giftPanel(box, opts) {
@@ -86,10 +98,7 @@ const Rewards = (() => {
       b.onclick = () => {
         b.classList.add("ok");
         if (b.dataset.g === "col") {
-          const have = owned();
-          const missing = makeDeck().filter(c => !have.has(cardId(c)));
-          const card = missing[Math.floor(Math.random() * missing.length)];
-          state.collection.push(cardId(card));
+          const card = grantCard();
           const n = state.collection.length;
           const fam = state.collection.filter(id => Math.floor(id / 10) === card.s).length;
           show(card, `Nouvelle carte pour ta collection : le <strong>${cardName(card)}</strong> de la famille des ${FAMILIES[card.s]}. ` +
@@ -141,5 +150,5 @@ const Rewards = (() => {
   $("album").addEventListener("click", e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
   refresh();
 
-  return { answered, giftReady, giftPanel, refresh };
+  return { answered, giftReady, giftPanel, grantCard, refresh, FAMILIES };
 })();

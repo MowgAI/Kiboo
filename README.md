@@ -35,6 +35,7 @@ python3 -m http.server 8000
 - `js/solver.js` : accès asynchrone au DDS et au PIMC via un Web Worker (`js/dds-worker.js`)
 - `js/images.js` : correspondance carte → image
 - `tools/bump-version.sh` : change le numéro de version des fichiers (`?v=` dans `index.html`) pour que les navigateurs chargent la nouvelle version après une mise à jour ; à lancer avant chaque envoi sur GitHub
+- `js/evaluation.js` : mode évaluation (score duplicate), historique et niveaux
 - `js/feedback.js` : formulaire « Donner mon avis »
 - `js/quiz.js` : questions pendant la partie et moteur de déduction
 - `js/rewards.js` : cadeaux, progression et collection
@@ -61,6 +62,17 @@ Avec la case « Questions pendant la partie » (et Sud humain), la partie s'arr�
 - **Avant de jouer** sur un pli commencé (jamais au dernier pli ni quand une seule carte est jouable) : quelles cartes as-tu le droit de jouer ?
 
 Toutes les 3 bonnes réponses (cumulées, exercices compris), le joueur choisit un cadeau : voir une carte cachée d'Ouest ou d'Est (pendant une partie), ou gagner une carte pour sa collection. Le bouton « Collection » montre l'album des 40 cartes. La progression et la collection sont gardées dans le navigateur. Le code est dans `js/quiz.js` et `js/rewards.js`.
+
+## Mode évaluation (score duplicate)
+
+Comme au bridge en tournoi, on compare son résultat à celui d'autres joueurs **sur les mêmes cartes**. Quand Sud est humain et que la case « Mode évaluation » est cochée (par défaut), la donne est rejouée en coulisses avec **Piperno, Averell et Averell250 en déclarant, contre les mêmes défenseurs**. Ces parties fantômes démarrent dès le début de la donne, dans un Worker séparé.
+
+- **Score duplicate** : 2 points par robot battu, 1 par égalité, rapportés au maximum (6 points), en pourcentage. Le résultat avec un jeu parfait (DDS) est affiché pour information.
+- **Résultats reproductibles** : le hasard d'Averell (et de PiperRand en défense) est fixé par une graine tirée de la donne ; avec une graine, Averell fait toujours exactement 40 (ou 250) simulations.
+- **Historique et niveaux** (bouton « Progression », gardés dans le navigateur) : Débutant, puis Niveau Piperno, Niveau Averell, Niveau Averell250 et Expert, en faisant au moins aussi bien que le robot (ou que le jeu parfait) sur 7 des 10 dernières donnes. Chaque nouveau niveau rapporte une carte pour la collection.
+- Une donne n'est **pas comptée** si le joueur a eu de l'aide (meilleurs coups, jeux ouverts, carte révélée) ou s'il l'a rejouée.
+
+Le code est dans `js/evaluation.js`.
 
 ## Explications de Piperno
 

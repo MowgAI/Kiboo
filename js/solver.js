@@ -12,7 +12,10 @@
                                   promesses renvoient null) et vide la table
                                   de transposition
    ===================================================================== */
-const Solver = (() => {
+// makeSolver() crée un accès indépendant (son propre Worker) : la partie en
+// cours utilise `Solver`, l'évaluation (js/evaluation.js) un second, pour que
+// ses calculs ne retardent pas les robots de la partie.
+function makeSolver() {
   let worker = null;
   let useWorker = typeof Worker !== "undefined";
   let nextId = 0;
@@ -74,4 +77,5 @@ const Solver = (() => {
     pimc: (info, opts) => call("pimc", { info, opts }),
     reset,
   };
-})();
+}
+const Solver = makeSolver();

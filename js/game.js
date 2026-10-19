@@ -70,7 +70,8 @@ function trickWinner(trick) {
 
 // PiperRand (robot hasard) : joue une carte légale au hasard.
 class RandomBot {
-  choose(view) { return view.legal[Math.floor(Math.random() * view.legal.length)]; }
+  constructor(env = {}) { this.rand = env.rand || Math.random; }
+  choose(view) { return view.legal[Math.floor(this.rand() * view.legal.length)]; }
 }
 
 // Règle d'entame du rapport (section 3.1) : couleur la plus longue
@@ -167,9 +168,9 @@ class DeterministicBot {
 // Cheater (robot expert) : utilise le DDS. Il « triche » : il voit toutes les cartes
 // (omniscient), ce qui en fait un adversaire de référence, pas un vrai joueur.
 class ExpertBot {
-  constructor() { this.omniscient = true; }
+  constructor(env = {}) { this.omniscient = true; this.solver = env.solver || Solver; }
   async choose(view) {
-    const res = await Solver.analyze(view.position);
+    const res = await this.solver.analyze(view.position);
     if (!res) return view.legal[0];                   // calcul abandonné (nouvelle donne)
     const mine = team(view.seat) === "NS";
     let best = null;
@@ -187,14 +188,19 @@ class ExpertBot {
 // Au premier pli, trop de cartes sont cachées : l'analyse serait lente et
 // bruitée. Il joue alors comme Piperno, sans simulation.
 class PimcBot {
-  constructor(opts) {
+  constructor(opts, env = {}) {
     this.opts = opts;
+    this.solver = env.solver || Solver;
+    this.seed = env.seed;
     this.piperno = new DeterministicBot();
   }
   async choose(view) {
     if (view.legal.length === 1) return view.legal[0];
     if (view.tricksWon.NS + view.tricksWon.EO === 0) return this.piperno.choose(view);
-    const res = await Solver.pimc(pimcInfo(view), this.opts);
+    // Avec une graine (évaluation), le même coup est toujours choisi dans la même position.
+    const opts = this.seed === undefined ? this.opts
+      : { ...this.opts, seed: (this.seed + view.played.length * 7919 + SEATS.indexOf(view.seat) * 104729) >>> 0 };
+    const res = await this.solver.pimc(pimcInfo(view), opts);
     return res ? res.card : view.legal[0];
   }
 }
@@ -236,16 +242,17 @@ class HumanController {
 }
 
 const PLAYER_TYPES = {
+// make(siège, env) : env = { solver, seed, rand } pour les parties rejouées par l'évaluation.
   humain:       { label: "Humain",        make: s => new HumanController(s) },
   deterministe: { label: "Piperno",       make: () => new DeterministicBot() },
-  aleatoire:    { label: "PiperRand",     make: () => new RandomBot() },
-  pimc:         { label: "Averell",       make: () => new PimcBot(AVERELL_OPTS) },
-  pimc250:      { label: "Averell250",    make: () => new PimcBot(AVERELL250_OPTS) },
-  expert:       { label: "Cheater",       make: () => new ExpertBot() },
+  aleatoire:    { label: "PiperRand",     make: (s, env) => new RandomBot(env) },
+  pimc:         { label: "Averell",       make: (s, env) => new PimcBot(AVERELL_OPTS, env) },
+  pimc250:      { label: "Averell250",    make: (s, env) => new PimcBot(AVERELL250_OPTS, env) },
+  expert:       { label: "Cheater",       make: (s, env) => new ExpertBot(env) },
 };
 
 /* ===================== État de la partie ===================== */
-const config = { O: "deterministe", E: "deterministe", S: "humain", speed: 650, open: false, hints: false, explain: false, quiz: false };
+const config = { O: "deterministe", E: "deterministe", S: "humain", speed: 650, open: false, hints: false, explain: false, quiz: false, eval: true };
 let game = null;
 let runToken = 0;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -257,7 +264,7 @@ function dealHands() {
   return hands;
 }
 
-function newGame(hands) {
+function newGame(hands, opts = {}) {
   const initial = {};
   SEATS.forEach(s => { initial[s] = hands[s].slice(); });
   const types = { O: config.O, E: config.E, S: config.S };
@@ -275,6 +282,8 @@ function newGame(hands) {
   Solver.reset();
   game.hint = null;
   game.revealed = new Map();                    // cartes cachées révélées par un cadeau : id -> siège
+  game.assisted = false;                        // aide utilisée (meilleurs coups, jeux ouverts, carte révélée)
+  game.replayed = !!opts.replay;                // « Rejouer la donne » : le joueur connaît déjà les cartes
   if (typeof Quiz !== "undefined") Quiz.reset();
   game.history = [];                            // un instantané avant chaque carte, pour le bilan
   game.review = null;
@@ -282,34 +291,37 @@ function newGame(hands) {
   const token = ++runToken;
   render();
   play(token);
+  if (typeof Evaluation !== "undefined") Evaluation.start();   // parties fantômes du mode évaluation
 }
 
-function fullPosition() {
+function fullPosition(g = game) {
   return {
-    hands: SEATS.map(s => game.hands[s].slice()),
-    trick: game.trick.map(p => ({ seat: SEATS.indexOf(p.seat), card: p.card })),
-    leader: SEATS.indexOf(game.leader),
+    hands: SEATS.map(s => g.hands[s].slice()),
+    trick: g.trick.map(p => ({ seat: SEATS.indexOf(p.seat), card: p.card })),
+    leader: SEATS.indexOf(g.leader),
   };
 }
 
-function viewFor(seat) {
-  const visible = { [seat]: game.hands[seat].slice() };
-  if (game.dummyShown) visible[DUMMY] = game.hands[DUMMY].slice();
-  if (seat === DUMMY) visible[DECLARER] = game.hands[DECLARER].slice();
+// `g` : l'état d'une partie (la partie affichée par défaut, ou une partie
+// rejouée en coulisses par l'évaluation).
+function viewFor(seat, g = game) {
+  const visible = { [seat]: g.hands[seat].slice() };
+  if (g.dummyShown) visible[DUMMY] = g.hands[DUMMY].slice();
+  if (seat === DUMMY) visible[DECLARER] = g.hands[DECLARER].slice();
   return {
     seat,
-    hand: game.hands[seat].slice(),
+    hand: g.hands[seat].slice(),
     visible,
-    trick: game.trick.map(p => ({ seat: p.seat, card: p.card })),
-    played: game.played.slice(),
-    tricksWon: { ...game.tricksWon },
+    trick: g.trick.map(p => ({ seat: p.seat, card: p.card })),
+    played: g.played.slice(),
+    tricksWon: { ...g.tricksWon },
     // Informations publiques : qui a joué quoi, l'entameur du pli, la taille des mains.
-    history: game.history.map(h => ({ seat: h.seat, card: h.card, trickNo: h.trickNo })),
-    leader: game.leader,
-    counts: Object.fromEntries(SEATS.map(s => [s, game.hands[s].length])),
-    legal: legalCards(game.hands[seat], game.trick),
+    history: g.history.map(h => ({ seat: h.seat, card: h.card, trickNo: h.trickNo })),
+    leader: g.leader,
+    counts: Object.fromEntries(SEATS.map(s => [s, g.hands[s].length])),
+    legal: legalCards(g.hands[seat], g.trick),
     // Uniquement pour les robots omniscients (expert) : la donne complète.
-    position: game.controllers[seat].omniscient ? fullPosition() : undefined,
+    position: g.controllers[seat].omniscient ? fullPosition(g) : undefined,
   };
 }
 
@@ -327,6 +339,7 @@ async function play(token) {
     const view = viewFor(seat);
     if (!controller.human) { render(); await sleep(config.speed); }
     if (token !== runToken) return;
+    if (controller.human && (config.hints || config.open)) game.assisted = true;
     let card = await controller.choose(view);
     if (token !== runToken) return;
     game.waiting = null;
@@ -372,6 +385,7 @@ async function play(token) {
     game.leader = game.turn = winner;
   }
   game.over = true;
+  if (typeof Evaluation !== "undefined") Evaluation.dealOver();
   render();
   reviewDeal(token);
 }
@@ -574,6 +588,7 @@ function render() {
   else if (hintsReady()) msg += " Pastilles : plis de votre camp en fin de donne.";
   $("status").textContent = msg;
   renderExplanations();
+  if (typeof Evaluation !== "undefined") Evaluation.render();
   renderReview();
   scheduleHints();
 }
@@ -600,7 +615,7 @@ function scheduleHints() {
   });
 }
 
-function replayDeal() { if (game) newGame(game.initial); }
+function replayDeal() { if (game) newGame(game.initial, { replay: true }); }
 
 /* ===================== Réglages ===================== */
 for (const s of ["O", "E", "S"]) {
@@ -618,6 +633,7 @@ $("cfg-open").addEventListener("change", e => { config.open = e.target.checked; 
 $("cfg-hints").addEventListener("change", e => { config.hints = e.target.checked; render(); });
 $("cfg-explain").addEventListener("change", e => { config.explain = e.target.checked; render(); });
 $("cfg-quiz").addEventListener("change", e => { config.quiz = e.target.checked; });
+$("cfg-eval").addEventListener("change", e => { config.eval = e.target.checked; });
 $("btn-new").addEventListener("click", () => newGame(dealHands()));
 // Règles du jeu : fenêtre modale, fermée par le bouton ×, la touche Échap ou un clic à côté.
 $("btn-rules").addEventListener("click", () => $("rules").showModal());
