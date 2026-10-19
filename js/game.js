@@ -476,6 +476,20 @@ function cardEl(card, opts = {}) {
   return el;
 }
 
+/* La table tourne pour que la place du joueur humain soit toujours en bas,
+   en grand : Sud par défaut, sinon Ouest ou Est s'il défend. Les autres
+   places suivent l'ordre du jeu (sens des aiguilles d'une montre) : à
+   gauche le joueur suivant, en face le partenaire, à droite le précédent. */
+const POSITIONS = ["south", "west", "north", "east"];
+const SLOT_CLASS = { south: "s", west: "o", north: "n", east: "e" };
+function bottomSeat() {
+  if (game) for (const s of ["S", "O", "E"]) if (game.types[s] === "humain") return s;
+  return "S";
+}
+function position(seat) {
+  return POSITIONS[(SEATS.indexOf(seat) - SEATS.indexOf(bottomSeat()) + 4) % 4];
+}
+
 function seatController(seat) { return seat === DUMMY ? DECLARER : seat; }
 function isHumanSeat(seat) { return game.types[seatController(seat)] === "humain"; }
 function faceUp(seat) {
@@ -486,6 +500,9 @@ function render() {
   if (!game) return;
   for (const seat of SEATS) {
     const handEl = $("hand-" + seat);
+    const pos = position(seat);
+    $("seat-" + seat).className = "seat " + pos;
+    handEl.className = "hand " + (pos === "west" || pos === "east" ? "side" : "main");
     handEl.innerHTML = "";
     const up = faceUp(seat);
     const waitingHere = game.waiting && game.waiting.seat === seat;
@@ -550,7 +567,7 @@ function render() {
   } else {
     for (const p of game.trick) {
       const slot = document.createElement("div");
-      slot.className = "slot " + p.seat.toLowerCase();
+      slot.className = "slot " + SLOT_CLASS[position(p.seat)];
       const el = cardEl(p.card);
       if (p.fresh) el.classList.add("enter");
       if (game.winnerSeat === p.seat) el.classList.add("win");

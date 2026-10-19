@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=2026-10-19-0835">
+<link rel="stylesheet" href="css/style.css?v=2026-10-19-0847">
 </head>
 <body>
 <div class="wrap">
@@ -180,11 +180,12 @@
   </section>
 
   <main class="table" id="table">
-    <div class="seat north"><div class="tag" id="tag-N"></div><div class="hand main" id="hand-N"></div></div>
-    <div class="seat west"><div class="tag" id="tag-O"></div><div class="hand side" id="hand-O"></div></div>
+    <!-- Les places tournent : celle du joueur humain est toujours en bas (voir position() dans js/game.js). -->
+    <div class="seat north" id="seat-N"><div class="tag" id="tag-N"></div><div class="hand main" id="hand-N"></div></div>
+    <div class="seat west" id="seat-O"><div class="tag" id="tag-O"></div><div class="hand side" id="hand-O"></div></div>
     <div class="center" id="center"></div>
-    <div class="seat east"><div class="tag" id="tag-E"></div><div class="hand side" id="hand-E"></div></div>
-    <div class="seat south"><div class="hand main" id="hand-S"></div><div class="tag" id="tag-S"></div></div>
+    <div class="seat east" id="seat-E"><div class="tag" id="tag-E"></div><div class="hand side" id="hand-E"></div></div>
+    <div class="seat south" id="seat-S"><div class="tag" id="tag-S"></div><div class="hand main" id="hand-S"></div></div>
   </main>
 
   <div class="bar">
@@ -200,16 +201,16 @@
   <section class="review" id="review" hidden aria-live="polite"></section>
 </div>
 
-<script>window.KIBOO_VERSION = "2026-10-19-0835";   // mis à jour par tools/bump-version.sh</script>
-<script src="js/dds.js?v=2026-10-19-0835"></script>
-<script src="js/pimc.js?v=2026-10-19-0835"></script>
-<script src="js/solver.js?v=2026-10-19-0835"></script>
-<script src="js/images.js?v=2026-10-19-0835"></script>
-<script src="js/game.js?v=2026-10-19-0835"></script>
-<script src="js/rewards.js?v=2026-10-19-0835"></script>
-<script src="js/exercises.js?v=2026-10-19-0835"></script>
-<script src="js/quiz.js?v=2026-10-19-0835"></script>
-<script src="js/evaluation.js?v=2026-10-19-0835"></script>
-<script src="js/feedback.js?v=2026-10-19-0835"></script>
+<script>window.KIBOO_VERSION = "2026-10-19-0847";   // mis à jour par tools/bump-version.sh</script>
+<script src="js/dds.js?v=2026-10-19-0847"></script>
+<script src="js/pimc.js?v=2026-10-19-0847"></script>
+<script src="js/solver.js?v=2026-10-19-0847"></script>
+<script src="js/images.js?v=2026-10-19-0847"></script>
+<script src="js/game.js?v=2026-10-19-0847"></script>
+<script src="js/rewards.js?v=2026-10-19-0847"></script>
+<script src="js/exercises.js?v=2026-10-19-0847"></script>
+<script src="js/quiz.js?v=2026-10-19-0847"></script>
+<script src="js/evaluation.js?v=2026-10-19-0847"></script>
+<script src="js/feedback.js?v=2026-10-19-0847"></script>
 </body>
 </html>

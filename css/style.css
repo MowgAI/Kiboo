@@ -121,6 +121,7 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px s
 .seat.south { grid-area: south; }
 .seat.west { grid-area: west; }
 .seat.east { grid-area: east; }
+.seat.south .tag { order: 2; }                 /* en bas, l'étiquette passe sous la main */
 .tag {
   display: inline-flex; align-items: baseline; gap: 6px;
   border-radius: 999px; padding: 3px 12px;

@@ -40,7 +40,7 @@ python3 -m http.server 8000
 - `js/quiz.js` : questions pendant la partie et moteur de déduction
 - `js/rewards.js` : cadeaux, progression et collection
 - `js/exercises.js` : exercices (compter sa main, couleur la plus longue, cartes jouables)
-- `js/game.js` : règles, robots, état de la partie, affichage et réglages
+- `js/game.js` : règles, robots (la table tourne pour que la place du joueur humain, Sud, Ouest ou Est, soit toujours en bas), état de la partie, affichage et réglages
 - `assets/cards/` : images des 40 cartes (WebP)
 
 ## Exercices
