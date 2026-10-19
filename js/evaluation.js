@@ -174,6 +174,12 @@ const Evaluation = (() => {
   function render_() {
     const box = $("evaluation");
     const j = job;
+    // En défense : pas d'évaluation, on dit pourquoi plutôt que de ne rien afficher.
+    if (!j && game.over && config.eval && game.types.S !== "humain" && (game.types.O === "humain" || game.types.E === "humain")) {
+      box.hidden = false;
+      box.innerHTML = `<h2>Évaluation</h2><p>Le mode évaluation ne fonctionne que quand tu joues en Sud (déclarant). En défense, ton résultat dépend aussi de ton partenaire robot : la comparaison ne serait pas juste.</p>`;
+      return;
+    }
     box.hidden = !(j && game.over);
     if (box.hidden) return;
     const names = { piperno: "Piperno", averell: "Averell", averell250: "Averell250" };
