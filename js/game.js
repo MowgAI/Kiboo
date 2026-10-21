@@ -657,6 +657,13 @@ $("btn-rules").addEventListener("click", () => $("rules").showModal());
 $("btn-rules-close").addEventListener("click", () => $("rules").close());
 $("rules").addEventListener("click", e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
 $("btn-replay").addEventListener("click", replayDeal);
+// Aide des réglages : cachée par défaut, affichée à la demande.
+$("btn-settings-help").addEventListener("click", e => {
+  const help = $("settings-help"), open = help.hidden;
+  help.hidden = !open;
+  e.currentTarget.setAttribute("aria-expanded", open);
+  e.currentTarget.textContent = open ? "Cacher l'aide" : "Aide des réglages";
+});
 
 // Première donne une fois tous les scripts chargés (exercices, cadeaux, questions).
 window.addEventListener("DOMContentLoaded", () => newGame(dealHands()));

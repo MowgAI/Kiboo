@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=2026-10-19-0856">
+<link rel="stylesheet" href="css/style.css?v=2026-10-21-1235">
 </head>
 <body>
 <div class="wrap">
@@ -173,10 +173,22 @@
     <label class="check"><input type="checkbox" id="cfg-quiz"> Questions pendant la partie</label>
     <label class="check"><input type="checkbox" id="cfg-eval" checked> Mode évaluation</label>
     <div class="btns">
+      <button class="act ghost" id="btn-settings-help" type="button" aria-expanded="false" aria-controls="settings-help">Aide des réglages</button>
       <button class="act ghost" id="btn-replay" type="button">Rejouer la donne</button>
       <button class="act" id="btn-new" type="button">Nouvelle donne</button>
     </div>
-    <p class="note">Les changements de joueurs s'appliquent à la prochaine donne. Jeux ouverts montre toutes les mains. Les meilleurs coups affichent, sur chaque carte jouable, le nombre de plis que votre camp fera si tout le monde joue parfaitement à jeux ouverts. Piperno joue avec des règles simples (cochez Explications de Piperno pour voir laquelle il applique à chaque carte) et PiperRand au hasard. Averell ne voit que sa main et le mort : à partir du deuxième pli, il simule jusqu'à 40 donnes possibles et les analyse avec le DDS ; Averell250 en simule jusqu'à 250, plus fort mais plus lent. Cheater, lui, voit toutes les cartes. En fin de donne, le DDS fait le bilan des cartes qui ont coûté des plis. Le mode évaluation compare ta donne (en Sud) à celle de Piperno, Averell et Averell250 sur les mêmes cartes : ton score duplicate s'affiche en fin de donne. Avec Questions pendant la partie, la partie s'arrête parfois sur une question (quand Sud est humain) ; toutes les 3 bonnes réponses, tu choisis un cadeau.</p>
+    <div class="note" id="settings-help" hidden>
+      <ul>
+        <li>Les changements de joueurs s'appliquent à la <strong>prochaine donne</strong>.</li>
+        <li><strong>Jeux ouverts</strong> montre toutes les mains.</li>
+        <li><strong>Meilleurs coups</strong> : sur chaque carte jouable, le nombre de plis que ton camp fera si tout le monde joue parfaitement à jeux ouverts.</li>
+        <li><strong>Piperno</strong> joue avec des règles simples (coche Explications de Piperno pour voir laquelle il applique à chaque carte), <strong>PiperRand</strong> au hasard.</li>
+        <li><strong>Averell</strong> ne voit que sa main et le mort : à partir du deuxième pli, il simule jusqu'à 40 donnes possibles et les analyse avec le DDS. <strong>Averell250</strong> en simule jusqu'à 250, plus fort mais plus lent. <strong>Cheater</strong>, lui, voit toutes les cartes.</li>
+        <li>En fin de donne, le DDS fait le <strong>bilan</strong> des cartes qui ont coûté des plis.</li>
+        <li><strong>Mode évaluation</strong> : compare ta donne (en Sud) à celle de Piperno, Averell et Averell250 sur les mêmes cartes ; ton score duplicate s'affiche en fin de donne.</li>
+        <li><strong>Questions pendant la partie</strong> : la partie s'arrête parfois sur une question (quand Sud est humain) ; toutes les 3 bonnes réponses, tu choisis un cadeau.</li>
+      </ul>
+    </div>
   </section>
 
   <main class="table" id="table">
@@ -201,16 +213,16 @@
   <section class="review" id="review" hidden aria-live="polite"></section>
 </div>
 
-<script>window.KIBOO_VERSION = "2026-10-19-0856";   // mis à jour par tools/bump-version.sh</script>
-<script src="js/dds.js?v=2026-10-19-0856"></script>
-<script src="js/pimc.js?v=2026-10-19-0856"></script>
-<script src="js/solver.js?v=2026-10-19-0856"></script>
-<script src="js/images.js?v=2026-10-19-0856"></script>
-<script src="js/game.js?v=2026-10-19-0856"></script>
-<script src="js/rewards.js?v=2026-10-19-0856"></script>
-<script src="js/exercises.js?v=2026-10-19-0856"></script>
-<script src="js/quiz.js?v=2026-10-19-0856"></script>
-<script src="js/evaluation.js?v=2026-10-19-0856"></script>
-<script src="js/feedback.js?v=2026-10-19-0856"></script>
+<script>window.KIBOO_VERSION = "2026-10-21-1235";   // mis à jour par tools/bump-version.sh</script>
+<script src="js/dds.js?v=2026-10-21-1235"></script>
+<script src="js/pimc.js?v=2026-10-21-1235"></script>
+<script src="js/solver.js?v=2026-10-21-1235"></script>
+<script src="js/images.js?v=2026-10-21-1235"></script>
+<script src="js/game.js?v=2026-10-21-1235"></script>
+<script src="js/rewards.js?v=2026-10-21-1235"></script>
+<script src="js/exercises.js?v=2026-10-21-1235"></script>
+<script src="js/quiz.js?v=2026-10-21-1235"></script>
+<script src="js/evaluation.js?v=2026-10-21-1235"></script>
+<script src="js/feedback.js?v=2026-10-21-1235"></script>
 </body>
 </html>
