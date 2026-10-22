@@ -19,7 +19,7 @@ const Feedback = (() => {
     const robots = game ? ["O", "E", "S"].map(s => `${seatName(s)} : ${PLAYER_TYPES[game.types[s]].label}`).join(", ") : "-";
     const options = [
       config.open && T("fb.opt.open"), config.hints && T("fb.opt.hints"),
-      config.explain && T("fb.opt.explain"), config.quiz && T("fb.opt.quiz"),
+      config.explain && T("fb.opt.explain"), config.quiz !== "off" && T("fb.opt.quiz") + " (" + T("setup.quiz." + config.quiz) + ")",
     ].filter(Boolean).join(", ") || T("fb.opt.none");
     const trick = !game ? "-" : game.over ? T("fb.ctx.over") : T("fb.ctx.trick", { n: game.tricksWon.NS + game.tricksWon.EO + 1, ns: game.tricksWon.NS, eo: game.tricksWon.EO });
     return [

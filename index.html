@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=2026-10-22-1008">
+<link rel="stylesheet" href="css/style.css?v=2026-10-22-1054">
 </head>
 <body>
 <div class="wrap">
@@ -32,6 +32,8 @@
       <button type="button" role="tab" data-ex="count" aria-selected="true" data-i18n="ex.tab.count">Compter sa main</button>
       <button type="button" role="tab" data-ex="longest" aria-selected="false" data-i18n="ex.tab.longest">Couleur la plus longue</button>
       <button type="button" role="tab" data-ex="legal" aria-selected="false" data-i18n="ex.tab.legal">Cartes jouables</button>
+      <button type="button" role="tab" data-ex="rest" aria-selected="false" data-i18n="ex.tab.rest">Cartes restantes</button>
+      <button type="button" role="tab" data-ex="split" aria-selected="false" data-i18n="ex.tab.split">Répartition de l'entame</button>
     </div>
     <p class="ex-score"><span id="ex-score"></span> <span class="gift-progress"></span></p>
     <div id="ex-body" role="tabpanel"></div>
@@ -170,10 +172,16 @@
         <option value="250" data-i18n="setup.fast">Rapide</option>
       </select>
     </label>
+    <label class="field"><span data-i18n="setup.quiz">Questions pendant la partie</span>
+      <select id="cfg-quiz">
+        <option value="off" selected data-i18n="setup.quiz.off">Aucune</option>
+        <option value="light" data-i18n="setup.quiz.light">Quelques-unes</option>
+        <option value="all" data-i18n="setup.quiz.all">Toutes (entraînement)</option>
+      </select>
+    </label>
     <label class="check"><input type="checkbox" id="cfg-open"> <span data-i18n="setup.open">Jeux ouverts</span></label>
     <label class="check"><input type="checkbox" id="cfg-hints"> <span data-i18n="setup.hints">Montrer les meilleurs coups</span></label>
     <label class="check"><input type="checkbox" id="cfg-explain"> <span data-i18n="setup.explain">Explications de Piperno</span></label>
-    <label class="check"><input type="checkbox" id="cfg-quiz"> <span data-i18n="setup.quiz">Questions pendant la partie</span></label>
     <label class="check"><input type="checkbox" id="cfg-eval" checked> <span data-i18n="setup.eval">Mode évaluation</span></label>
     <div class="btns">
       <button class="act ghost" id="btn-settings-help" type="button" aria-expanded="false" aria-controls="settings-help" data-i18n="help.show">Aide des réglages</button>
@@ -189,7 +197,8 @@
         <li><strong>Averell</strong> ne voit que sa main et le mort : à partir du deuxième pli, il simule jusqu'à 40 donnes possibles et les analyse avec le DDS. <strong>Averell250</strong> en simule jusqu'à 250, plus fort mais plus lent. <strong>Cheater</strong>, lui, voit toutes les cartes.</li>
         <li>En fin de donne, le DDS fait le <strong>bilan</strong> des cartes qui ont coûté des plis.</li>
         <li><strong>Mode évaluation</strong> : compare ta donne (en Sud) à celle de Piperno, Averell et Averell250 sur les mêmes cartes ; ton score duplicate s'affiche en fin de donne.</li>
-        <li><strong>Questions pendant la partie</strong> : la partie s'arrête parfois sur une question (quand Sud est humain) ; toutes les 3 bonnes réponses, tu choisis un cadeau.</li>
+        <li><strong>Questions pendant la partie</strong> (quand tu es le déclarant, en Sud) : <strong>Quelques-unes</strong> en pose au moins une par donne, tirées au sort ; <strong>Toutes</strong> les pose toutes, pour s'entraîner. Toutes les 3 bonnes réponses, tu choisis un cadeau.</li>
+        <li>Quand tu joues, chaque pli reste sur la table jusqu'à ton clic sur <strong>Pli suivant</strong> : prends le temps de retenir les cartes jouées.</li>
       </ul>
     </div>
   </section>
@@ -204,7 +213,8 @@
   </main>
 
   <div class="bar">
-    <div class="status" id="status" aria-live="polite"></div>
+    <div class="status-row"><div class="status" id="status" aria-live="polite"></div>
+      <button class="act next-trick" id="btn-next-trick" type="button" hidden data-i18n="btn.nextTrick">Pli suivant</button></div>
     <div class="score" aria-label="Plis gagnés" data-i18n-aria="score.aria">
       <div class="team"><span data-i18n="team.NS">Nord-Sud</span> <span class="pips" id="pips-NS"></span> <span class="count" id="count-NS">0</span></div>
       <div class="team"><span data-i18n="team.EO">Est-Ouest</span> <span class="pips" id="pips-EO"></span> <span class="count" id="count-EO">0</span></div>
@@ -216,20 +226,20 @@
   <section class="review" id="review" hidden aria-live="polite"></section>
 </div>
 
-<script>window.KIBOO_VERSION = "2026-10-22-1008";   // mis à jour par tools/bump-version.sh</script>
-<script src="lang/fr.js?v=2026-10-22-1008"></script>
-<script src="lang/en.js?v=2026-10-22-1008"></script>
-<script src="lang/it.js?v=2026-10-22-1008"></script>
-<script src="js/i18n.js?v=2026-10-22-1008"></script>
-<script src="js/dds.js?v=2026-10-22-1008"></script>
-<script src="js/pimc.js?v=2026-10-22-1008"></script>
-<script src="js/solver.js?v=2026-10-22-1008"></script>
-<script src="js/images.js?v=2026-10-22-1008"></script>
-<script src="js/game.js?v=2026-10-22-1008"></script>
-<script src="js/rewards.js?v=2026-10-22-1008"></script>
-<script src="js/exercises.js?v=2026-10-22-1008"></script>
-<script src="js/quiz.js?v=2026-10-22-1008"></script>
-<script src="js/evaluation.js?v=2026-10-22-1008"></script>
-<script src="js/feedback.js?v=2026-10-22-1008"></script>
+<script>window.KIBOO_VERSION = "2026-10-22-1054";   // mis à jour par tools/bump-version.sh</script>
+<script src="lang/fr.js?v=2026-10-22-1054"></script>
+<script src="lang/en.js?v=2026-10-22-1054"></script>
+<script src="lang/it.js?v=2026-10-22-1054"></script>
+<script src="js/i18n.js?v=2026-10-22-1054"></script>
+<script src="js/dds.js?v=2026-10-22-1054"></script>
+<script src="js/pimc.js?v=2026-10-22-1054"></script>
+<script src="js/solver.js?v=2026-10-22-1054"></script>
+<script src="js/images.js?v=2026-10-22-1054"></script>
+<script src="js/game.js?v=2026-10-22-1054"></script>
+<script src="js/rewards.js?v=2026-10-22-1054"></script>
+<script src="js/exercises.js?v=2026-10-22-1054"></script>
+<script src="js/quiz.js?v=2026-10-22-1054"></script>
+<script src="js/evaluation.js?v=2026-10-22-1054"></script>
+<script src="js/feedback.js?v=2026-10-22-1054"></script>
 </body>
 </html>

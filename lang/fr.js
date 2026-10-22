@@ -59,7 +59,8 @@
         <li><strong>Averell</strong> ne voit que sa main et le mort : à partir du deuxième pli, il simule jusqu'à 40 donnes possibles et les analyse avec le DDS. <strong>Averell250</strong> en simule jusqu'à 250, plus fort mais plus lent. <strong>Cheater</strong>, lui, voit toutes les cartes.</li>
         <li>En fin de donne, le DDS fait le <strong>bilan</strong> des cartes qui ont coûté des plis.</li>
         <li><strong>Mode évaluation</strong> : compare ta donne (en Sud) à celle de Piperno, Averell et Averell250 sur les mêmes cartes ; ton score duplicate s'affiche en fin de donne.</li>
-        <li><strong>Questions pendant la partie</strong> : la partie s'arrête parfois sur une question (quand Sud est humain) ; toutes les 3 bonnes réponses, tu choisis un cadeau.</li>
+        <li><strong>Questions pendant la partie</strong> (quand tu es le déclarant, en Sud) : <strong>Quelques-unes</strong> en pose au moins une par donne, tirées au sort ; <strong>Toutes</strong> les pose toutes, pour s'entraîner. Toutes les 3 bonnes réponses, tu choisis un cadeau.</li>
+        <li>Quand tu joues, chaque pli reste sur la table jusqu'à ton clic sur <strong>Pli suivant</strong> : prends le temps de retenir les cartes jouées.</li>
       </ul>`,
     "player.human": "Humain",
     "score.aria": "Plis gagnés",
@@ -207,6 +208,58 @@
     "quiz.ex.any": "Par exemple, Ouest pourrait avoir :",
     "quiz.goodAnswer": p => `La bonne réponse : ${p.answer.toLowerCase()}.`,
     "quiz.follow.result": p => (p.list.length > 1 ? "Les couleurs possibles : " : "La seule couleur possible : le ") + p.list.map(s => C[s]).join(", ") + ". Le détail est ci-dessous.",
+
+    /* ---------- Questions : modes, fin de pli, cartes restantes, répartitions, cartes maîtresses ---------- */
+    "setup.quiz.off": "Aucune",
+    "setup.quiz.light": "Quelques-unes",
+    "setup.quiz.all": "Toutes (entraînement)",
+    "btn.nextTrick": "Pli suivant",
+    "btn.endDeal": "Fin de la donne",
+    "status.holdHint": " Regarde bien les cartes, puis clique sur « Pli suivant ».",
+    "ex.tab.rest": "Cartes restantes",
+    "ex.tab.split": "Répartition de l'entame",
+    "quiz.title.trick1": "Question : après le premier pli",
+    "quiz.title.trick3": "Question : après le troisième pli",
+    "quiz.title.discard": "Question : une défausse",
+    "rest.intro.game": "La donne commence. Voici ta main et celle du mort.",
+    "rest.intro.game1": "Le premier pli est terminé. Te souviens-tu des cartes jouées ?",
+    "rest.intro.before": "Voici ta main (Sud) et celle du mort (Nord), avant l'entame.",
+    "rest.intro.trick": p => `Le premier pli vient d'être joué : ${p.list}.`,
+    "rest.q.before": "Combien de cartes de chaque couleur ont <strong>Est et Ouest</strong> à eux deux ?",
+    "rest.q.after": "Combien de cartes de chaque couleur restent dans les mains d'<strong>Est et Ouest</strong> à eux deux ? Pense aux cartes déjà jouées.",
+    "rest.col": "Chez Est et Ouest",
+    "rest.aria": p => `Cartes ${cardAdj(p.s, 2)} chez Est et Ouest`,
+    "rest.fix": p => `10 − ${p.me} (ta main) − ${p.dummy} (le mort)` +
+      (p.gone.length ? ` − ${p.gone.length} (${S(p.gone.length, "déjà jouée", "déjà jouées")} : ${p.gone.join(", ")})` : "") + ` = ${p.rest}`,
+    "split.q": p => `Il reste <strong>${p.rest}</strong> ${S(p.rest, "carte", "cartes")} ${cardAdj(p.L, p.rest)} pour Ouest et Est, le ${p.v} entamé compris. Comment peuvent-elles être <strong>réparties</strong> ? Coche toutes les répartitions possibles.`,
+    "split.choice": p => `Ouest ${p.w} – Est ${p.e}`,
+    "split.result": p => (p.list.length > 1 ? "Les répartitions possibles : " : "La seule répartition possible : ") + p.list.join(" ; ") + ". Le détail est ci-dessous.",
+    "split.detail": "Répartition par répartition :",
+    "split.possible": p => `${p.label} : <strong>possible</strong> (${p.nTxt} ${S(p.n, "main d'Ouest respecte", "mains d'Ouest respectent")} la règle d'entame).`,
+    "split.none": p => `${p.label} : <strong>impossible</strong> avec les cartes que tu vois.`,
+    "split.short": p => `${p.label} : <strong>impossible</strong>. Avec seulement ${p.w} ${S(p.w, "carte", "cartes")} ${cardAdj(p.L, p.w)}, Ouest aurait forcément une couleur plus longue` +
+      (p.pigeon ? ` (il lui resterait ${10 - p.w} cartes pour trois couleurs)` : "") + `, et il l'aurait entamée.`,
+    "split.card": p => `la règle d'entame lui aurait fait jouer une autre carte ${cardAdj(p.L, 1)} que le ${p.v}`,
+    "split.suit": p => `il aurait une autre couleur aussi longue avec plus de points que le ${C[p.L]}, et il l'aurait entamée`,
+    "split.rule": p => `${p.label} : <strong>impossible</strong>. Le ${C[p.L]} pourrait être sa couleur la plus longue, mais ${p.parts}.`,
+    "split.example": p => `Par exemple, une main possible d'Ouest (${p.label}) :`,
+    "masters.q": "Clique sur <strong>toutes les cartes maîtresses</strong> de ta main et du mort, puis vérifie. Une carte est maîtresse quand Est et Ouest n'ont plus aucune carte plus forte dans sa couleur.",
+    "masters.none": "Aucune carte n'était maîtresse. ",
+    "masters.rule": "Pour savoir si une carte est maîtresse, il faut se souvenir des cartes plus fortes déjà jouées : les autres sont encore chez Est et Ouest, sauf celles de ta main et du mort.",
+    "masters.suit": p => `${p.suit} : ` +
+      (p.top ? `la plus forte carte encore chez Est et Ouest est le <strong>${p.top}</strong>` : `Est et Ouest n'ont plus de cartes ${cardAdj(p.s, 2)}`) +
+      (p.gone.length ? ` (déjà ${S(p.gone.length, "jouée", "jouées")} : ${p.gone.join(", ")})` : " (aucune carte jouée)") +
+      (p.masters.length ? `. ${S(p.masters.length, "Maîtresse", "Maîtresses")} : ${p.masters.join(", ")}.` : ". Aucune maîtresse."),
+    "discard.intro": p => `${p.who[0].toUpperCase() + p.who.slice(1)} ne fournit pas en ${p.suit} : il défausse le <strong>${p.card}</strong>.`,
+    "discard.q": p => `Comment le ${p.suit} était-il <strong>réparti au départ</strong> ? Donne le nombre de cartes de chaque joueur, en commençant par Ouest (par exemple 4-3-2-1).`,
+    "discard.hint": "Il n'a plus de cartes de cette couleur : il en avait autant qu'il en a jouées.",
+    "discard.col.seat": "Joueur",
+    "discard.aria": p => `Cartes ${cardAdj(p.s, 2)} de ${p.seat} au départ`,
+    "discard.how.me": p => `ta main au départ : ${p.n}`,
+    "discard.how.dummy": p => `le mort au départ : ${p.n}`,
+    "discard.how.void": p => p.n ? `il n'en a plus et en a joué ${p.n} : ${p.cards.join(", ")}` : "il n'en avait aucune",
+    "discard.how.rest": p => `le reste : 10 − ${p.others.join(" − ")} = ${p.n}`,
+    "discard.result": p => `La répartition de départ du ${p.suit} : ${p.split} (Ouest, Nord, Est, Sud).`,
 
     /* ---------- Cadeaux et collection ---------- */
     "gift.next": "Prochain cadeau :",

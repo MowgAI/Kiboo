@@ -56,7 +56,8 @@
         <li><strong>Averell</strong> only sees his own hand and the dummy: from the second trick on, he simulates up to 40 possible deals and analyses them with the DDS. <strong>Averell250</strong> simulates up to 250, stronger but slower. <strong>Cheater</strong> sees every card.</li>
         <li>At the end of the deal, the DDS makes a <strong>review</strong> of the cards that cost tricks.</li>
         <li><strong>Evaluation mode</strong>: compares your deal (as South) with Piperno, Averell and Averell250 on the same cards; your duplicate score is shown at the end of the deal.</li>
-        <li><strong>Questions during play</strong>: the game sometimes stops on a question (when South is human); every 3 right answers, you choose a gift.</li>
+        <li><strong>Questions during play</strong> (when you are declarer, as South): <strong>A few</strong> asks at least one per deal, drawn at random; <strong>All</strong> asks them all, for training. Every 3 right answers, you choose a gift.</li>
+        <li>When you play, each trick stays on the table until you click <strong>Next trick</strong>: take the time to remember the cards played.</li>
       </ul>`,
     "player.human": "Human",
     "score.aria": "Tricks won",
@@ -204,6 +205,58 @@
     "quiz.ex.any": "For example, West could have:",
     "quiz.goodAnswer": p => `The right answer: ${p.answer.toLowerCase()}.`,
     "quiz.follow.result": p => (p.list.length > 1 ? "The possible suits: " : "The only possible suit: ") + p.list.map(s => C[s]).join(", ") + ". Details below.",
+
+    /* ---------- Questions: modes, end of trick, cards left, distributions, winners ---------- */
+    "setup.quiz.off": "None",
+    "setup.quiz.light": "A few",
+    "setup.quiz.all": "All (training)",
+    "btn.nextTrick": "Next trick",
+    "btn.endDeal": "End of the deal",
+    "status.holdHint": " Take a good look at the cards, then click “Next trick”.",
+    "ex.tab.rest": "Cards left",
+    "ex.tab.split": "Lead suit distribution",
+    "quiz.title.trick1": "Question: after the first trick",
+    "quiz.title.trick3": "Question: after the third trick",
+    "quiz.title.discard": "Question: a discard",
+    "rest.intro.game": "The deal begins. Here are your hand and dummy's.",
+    "rest.intro.game1": "The first trick is over. Do you remember the cards played?",
+    "rest.intro.before": "Here are your hand (South) and dummy's (North), before the opening lead.",
+    "rest.intro.trick": p => `The first trick has just been played: ${p.list}.`,
+    "rest.q.before": "How many cards of each suit do <strong>East and West</strong> hold between them?",
+    "rest.q.after": "How many cards of each suit are left in the hands of <strong>East and West</strong> between them? Think of the cards already played.",
+    "rest.col": "East and West",
+    "rest.aria": p => `${C[p.s]} cards held by East and West`,
+    "rest.fix": p => `10 − ${p.me} (your hand) − ${p.dummy} (dummy)` +
+      (p.gone.length ? ` − ${p.gone.length} (already played: ${p.gone.join(", ")})` : "") + ` = ${p.rest}`,
+    "split.q": p => `There ${S(p.rest, "is", "are")} <strong>${p.rest}</strong> ${C[p.L]} ${S(p.rest, "card", "cards")} left for West and East, including the ${p.v} led. How can they be <strong>split</strong>? Tick every possible distribution.`,
+    "split.choice": p => `West ${p.w} – East ${p.e}`,
+    "split.result": p => (p.list.length > 1 ? "The possible distributions: " : "The only possible distribution: ") + p.list.join("; ") + ". Details below.",
+    "split.detail": "Distribution by distribution:",
+    "split.possible": p => `${p.label}: <strong>possible</strong> (${p.nTxt} West ${S(p.n, "hand follows", "hands follow")} the opening lead rule).`,
+    "split.none": p => `${p.label}: <strong>impossible</strong> with the cards you can see.`,
+    "split.short": p => `${p.label}: <strong>impossible</strong>. With only ${p.w} ${C[p.L]} ${S(p.w, "card", "cards")}, West would have a longer suit` +
+      (p.pigeon ? ` (${10 - p.w} cards left for three suits)` : "") + `, and would have led it.`,
+    "split.card": p => `the opening lead rule would have made him lead another ${C[p.L]} card than the ${p.v}`,
+    "split.suit": p => `he would have another suit just as long with more points than ${C[p.L]}, and would have led it`,
+    "split.rule": p => `${p.label}: <strong>impossible</strong>. ${C[p.L][0].toUpperCase() + C[p.L].slice(1)} could be his longest suit, but ${p.parts}.`,
+    "split.example": p => `For example, a possible West hand (${p.label}):`,
+    "masters.q": "Click on <strong>every winner</strong> in your hand and in dummy, then check. A card is a winner when East and West have no higher card left in its suit.",
+    "masters.none": "None of the cards was a winner. ",
+    "masters.rule": "To know whether a card is a winner, you need to remember the higher cards already played: the others are still with East and West, except those in your hand and in dummy.",
+    "masters.suit": p => `${p.suit}: ` +
+      (p.top ? `the highest card still held by East and West is the <strong>${p.top}</strong>` : `East and West have no ${C[p.s]} cards left`) +
+      (p.gone.length ? ` (already played: ${p.gone.join(", ")})` : " (no card played)") +
+      (p.masters.length ? `. ${S(p.masters.length, "Winner", "Winners")}: ${p.masters.join(", ")}.` : ". No winner."),
+    "discard.intro": p => `${p.who[0].toUpperCase() + p.who.slice(1)} can't follow suit in ${p.suit} and discards the <strong>${p.card}</strong>.`,
+    "discard.q": p => `How was ${p.suit} <strong>split at the start</strong>? Give the number of cards of each player, starting with West (for example 4-3-2-1).`,
+    "discard.hint": "He has no cards left in this suit: he had as many as he has played.",
+    "discard.col.seat": "Player",
+    "discard.aria": p => `${p.seat}'s ${C[p.s]} cards at the start`,
+    "discard.how.me": p => `your hand at the start: ${p.n}`,
+    "discard.how.dummy": p => `dummy at the start: ${p.n}`,
+    "discard.how.void": p => p.n ? `none left, and he played ${p.n}: ${p.cards.join(", ")}` : "he had none",
+    "discard.how.rest": p => `the rest: 10 − ${p.others.join(" − ")} = ${p.n}`,
+    "discard.result": p => `The starting distribution of ${p.suit}: ${p.split} (West, North, East, South).`,
 
     /* ---------- Gifts and collection ---------- */
     "gift.next": "Next gift:",

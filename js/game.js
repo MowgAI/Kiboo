@@ -243,7 +243,7 @@ const PLAYER_TYPES = {
 };
 
 /* ===================== État de la partie ===================== */
-const config = { O: "deterministe", E: "deterministe", S: "humain", speed: 650, open: false, hints: false, explain: false, quiz: false, eval: true };
+const config = { O: "deterministe", E: "deterministe", S: "humain", speed: 650, open: false, hints: false, explain: false, quiz: "off", eval: true };
 let game = null;
 let runToken = 0;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -359,21 +359,38 @@ async function play(token) {
         await Quiz.at("lead");
         if (token !== runToken) return;
       }
+      if (card.s !== game.trick[0].card.s) {
+        await Quiz.at("discard", { seat, card });
+        if (token !== runToken) return;
+      }
       continue;
+    }
+    if (card.s !== game.trick[0].card.s) {
+      render();
+      game.trick.forEach(p => { p.fresh = false; });
+      await Quiz.at("discard", { seat, card });
+      if (token !== runToken) return;
     }
     const winner = trickWinner(game.trick);
     game.winnerSeat = winner;
+    // Avec un joueur humain, le pli reste visible jusqu'à son clic sur « Pli suivant » :
+    // le temps de bien regarder et retenir les cartes jouées.
     render();
     game.trick.forEach(p => { p.fresh = false; });
-    await sleep(Math.max(700, config.speed * 1.4));
+    if (bottomSeatHuman()) await new Promise(resolve => { game.holding = resolve; render(); });
+    else await sleep(Math.max(700, config.speed * 1.4));
     if (token !== runToken) return;
-    await Quiz.at("trick");
-    if (token !== runToken) return;
+    game.holding = null;
     game.tricksWon[team(winner)]++;
     game.lastTrick = game.trick;
     game.trick = [];
     game.winnerSeat = null;
     game.leader = game.turn = winner;
+    if (game.played.length < 40) {
+      render();
+      await Quiz.at("trick");
+      if (token !== runToken) return;
+    }
   }
   game.over = true;
   if (typeof Evaluation !== "undefined") Evaluation.dealOver();
@@ -469,6 +486,7 @@ function cardEl(card, opts = {}) {
    gauche le joueur suivant, en face le partenaire, à droite le précédent. */
 const POSITIONS = ["south", "west", "north", "east"];
 const SLOT_CLASS = { south: "s", west: "o", north: "n", east: "e" };
+const bottomSeatHuman = () => !!game && ["S", "O", "E"].some(s => game.types[s] === "humain");
 function bottomSeat() {
   if (game) for (const s of ["S", "O", "E"]) if (game.types[s] === "humain") return s;
   return "S";
@@ -562,6 +580,11 @@ function render() {
       center.appendChild(slot);
     }
   }
+  // Pli terminé : il reste affiché jusqu'au clic sur « Pli suivant » (ou sur la table).
+  const next = $("btn-next-trick"), wasHidden = next.hidden;
+  next.hidden = !game.holding;
+  next.textContent = game.played.length === 40 ? T("btn.endDeal") : T("btn.nextTrick");
+  if (game.holding && wasHidden) next.focus({ preventScroll: true });
 
   // Score
   for (const t of ["NS", "EO"]) {
@@ -581,6 +604,7 @@ function render() {
     msg = T("status.over");
   } else if (game.winnerSeat) {
     msg = T("status.trickFor", { seat: seatName(game.winnerSeat), team: teamName(team(game.winnerSeat)) });
+    if (game.holding) msg += T("status.holdHint");
   } else if (game.waiting) {
     const s = game.waiting.seat;
     msg = s === DUMMY ? T("status.dummyTurn") : T("status.yourTurn", { seat: seatName(s) });
@@ -636,7 +660,7 @@ $("cfg-speed").addEventListener("change", e => { config.speed = +e.target.value;
 $("cfg-open").addEventListener("change", e => { config.open = e.target.checked; render(); });
 $("cfg-hints").addEventListener("change", e => { config.hints = e.target.checked; render(); });
 $("cfg-explain").addEventListener("change", e => { config.explain = e.target.checked; render(); });
-$("cfg-quiz").addEventListener("change", e => { config.quiz = e.target.checked; });
+$("cfg-quiz").addEventListener("change", e => { config.quiz = e.target.value; });
 $("cfg-eval").addEventListener("change", e => { config.eval = e.target.checked; });
 $("btn-new").addEventListener("click", () => newGame(dealHands()));
 // Règles du jeu : fenêtre modale, fermée par le bouton ×, la touche Échap ou un clic à côté.
@@ -644,6 +668,8 @@ $("btn-rules").addEventListener("click", () => $("rules").showModal());
 $("btn-rules-close").addEventListener("click", () => $("rules").close());
 $("rules").addEventListener("click", e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
 $("btn-replay").addEventListener("click", replayDeal);
+$("btn-next-trick").addEventListener("click", () => game && game.holding && game.holding());
+$("table").addEventListener("click", e => { if (game && game.holding && !e.target.closest("button")) game.holding(); });
 // Aide des réglages : cachée par défaut, affichée à la demande.
 $("btn-settings-help").addEventListener("click", e => {
   const help = $("settings-help"), open = help.hidden;

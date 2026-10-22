@@ -1,17 +1,22 @@
 "use strict";
 /* =====================================================================
    QUESTIONS EN COURS DE PARTIE
-   Quand la case « Questions pendant la partie » est cochée et que Sud est
-   humain, la partie s'arrête de temps en temps sur une question. Elle
+   Réglage « Questions » : aucune, quelques-unes (tirées au sort, au moins
+   une par donne) ou toutes (mode entraînement). Seulement quand le joueur
+   humain est le déclarant (Sud). La partie s'arrête sur la question et
    reprend exactement où elle en était après la réponse (ou « Passer »).
 
-   Moments utilisés (js/game.js appelle Quiz.at(moment, token)) :
-   - "start"  : début de donne, avant l'entame -> compter sa main ;
-   - "lead"   : juste après l'entame, mort étalé -> déduction sur la main
-                d'Ouest, seulement si Ouest suit la règle d'entame (Piperno,
-                Averell, Averell250) ;
-   - "play"   : avant de jouer sur un pli déjà commencé -> cartes jouables ;
-   - "trick"  : fin de pli (prêt, aucune question pour l'instant).
+   Moments utilisés (js/game.js appelle Quiz.at(moment, ctx)) :
+   - "start"   : avant l'entame -> compter sa main ; cartes de chaque couleur
+                 chez Est et Ouest (en voyant sa main et le mort) ;
+   - "lead"    : juste après l'entame, si Ouest suit la règle d'entame
+                 (Piperno, Averell, Averell250) -> déduction sur la main
+                 d'Ouest ; répartition de la couleur entamée ;
+   - "trick"   : fin de pli -> après le 1er pli, cartes restantes chez Est
+                 et Ouest ; après le 3e pli, cartes maîtresses ;
+   - "play"    : avant de jouer sur un pli déjà commencé -> cartes jouables ;
+   - "discard" : un joueur vient de défausser -> répartition de départ de
+                 la couleur demandée (quand elle est déductible).
 
    Les questions de déduction portent sur des cartes cachées : la bonne
    réponse est calculée en passant en revue toutes les mains qu'Ouest peut
@@ -19,9 +24,6 @@
    jamais en regardant les vraies cartes d'Ouest.
    ===================================================================== */
 const Quiz = (() => {
-  // Probabilité de poser une question à chaque occasion. La question sur
-  // l'entame est la plus utile : elle est posée à chaque donne où Ouest suit la règle.
-  const CHANCE = { start: 0.5, lead: 1, play: 0.12 };
   const RULE_LEADERS = ["deterministe", "pimc", "pimc250"];   // entament selon la règle de Piperno
   const ANSWERS = [
     { key: "yes", get label() { return T("quiz.yes"); } },
@@ -33,7 +35,7 @@ const Quiz = (() => {
   let askedTrick = -1;          // au plus une question « play » par pli
 
   /* ---------- Ouvrir une question et attendre la fin ---------- */
-  async function ask(title, build) {
+  async function askOne(title, build) {
     // Si le joueur consulte les règles, les exercices ou sa collection, la question attend.
     while (document.querySelector("dialog[open]")) await sleep(300);
     return new Promise(resolve => {
@@ -83,42 +85,17 @@ const Quiz = (() => {
   }
 
   /* ---------- Moteur de déduction : les mains possibles d'Ouest ----------
-     Juste après l'entame, le joueur (Sud) voit sa main, le mort et la carte
-     d'entame, plus les cartes révélées par un cadeau. Ouest a 10 cartes :
-     l'entame, ses cartes révélées et des cartes prises parmi celles que le
-     joueur ne voit pas. On garde les mains où la règle d'entame (openingCard)
-     choisit exactement la carte entamée.
-     visit(hand, possible, entame) est appelé pour chaque main possible ; avec
-     { all: true }, aussi pour les mains que la règle d'entame exclut
-     (possible = false, entame = la carte que la règle aurait jouée). */
-  function forEachWestHand(visit, opts = {}) {
-    const lead = game.history[0].card;
-    const seen = new Set([...game.hands.S, ...game.hands.N, lead].map(cardId));
+     Voir Exercises.westHands : ce que voit le déclarant juste après l'entame
+     (sa main, le mort, l'entame et les cartes révélées par un cadeau). */
+  function westCtx() {
     const revealedW = [], revealedE = new Set();
     for (const [id, seat] of game.revealed) {
       if (seat === "O") revealedW.push(makeDeck()[id]);
       else revealedE.add(id);
     }
-    revealedW.forEach(c => seen.add(cardId(c)));
-    const unknown = makeDeck().filter(c => !seen.has(cardId(c)) && !revealedE.has(cardId(c)));
-    const fixed = [lead, ...revealedW];
-    const k = 10 - fixed.length;
-    const leadId = cardId(lead);
-    // Toutes les combinaisons de k cartes parmi `unknown`.
-    const idx = Array.from({ length: k }, (_, i) => i);
-    const n = unknown.length;
-    while (true) {
-      const hand = fixed.concat(idx.map(i => unknown[i]));
-      const chosen = openingCard(hand);
-      const possible = cardId(chosen) === leadId;
-      if (possible || opts.all) visit(hand, possible, chosen);
-      let i = k - 1;
-      while (i >= 0 && idx[i] === n - k + i) i--;
-      if (i < 0) break;
-      idx[i]++;
-      for (let j = i + 1; j < k; j++) idx[j] = idx[j - 1] + 1;
-    }
+    return { me: game.initial.S, dummy: game.initial.N, lead: game.history[0].card, revealedW, revealedE };
   }
+  const forEachWestHand = (visit, opts) => Exercises.westHands(westCtx(), visit, opts);
 
   // Les questions de déduction après l'entame. Chacune : texte, rappel de la règle, prédicat.
   function leadQuestions(lead) {
@@ -143,26 +120,6 @@ const Quiz = (() => {
       test: h => h.some(c => c.s === L && c.v < V),
     });
     return list;
-  }
-
-  // Ce que le joueur voit, couleur par couleur : ses cartes, celles du mort,
-  // et ce qui reste pour Est et Ouest (nombre de cartes et points).
-  function remainingTable(lead) {
-    const pts = cards => cards.reduce((t, c) => t + c.v, 0);
-    const rows = [0, 1, 2, 3].map(s => {
-      const seen = new Set([...game.hands.S, ...game.hands.N].filter(c => c.s === s).map(cardId));
-      const rest = makeDeck().filter(c => c.s === s && !seen.has(cardId(c)));
-      return {
-        s, rest: rest.length, pts: pts(rest), values: rest.map(c => c.v).sort((a, b) => b - a),
-        me: game.hands.S.filter(c => c.s === s).length, dummy: game.hands.N.filter(c => c.s === s).length,
-      };
-    });
-    const html = `<div class="ex-grid-wrap"><table class="ex-grid quiz-rest">
-      <thead><tr><th scope="col">${T("ex.col.color")}</th><th scope="col">${T("quiz.col.me")}</th><th scope="col">${T("quiz.col.dummy")}</th><th scope="col">${T("quiz.col.rest")}</th><th scope="col">${T("quiz.col.pts")}</th></tr></thead>
-      <tbody>${rows.map(r => `<tr><th scope="row">${Exercises.suitName(r.s)}</th><td>${r.me}</td><td>${r.dummy}</td>
-        <td><strong>${r.rest}</strong>${r.rest ? ` (${r.values.join(", ")})` : ""}${r.s === lead.s ? T("quiz.rest.lead", { v: lead.v }) : ""}</td><td>${r.pts}</td></tr>`).join("")}</tbody>
-    </table></div>`;
-    return { rows, html };
   }
 
   function leadPanel(body) {
@@ -206,8 +163,7 @@ const Quiz = (() => {
       <div class="ex-led"><div class="ex-led-cards" data-role="lead"></div>
         <p>${T("quiz.led", { bot: PLAYER_TYPES[game.types.O].label, card: cardName(lead) })}</p></div>
       <p class="ex-q">${Q.text}</p>
-      <button class="act ghost quiz-rule-btn" type="button" data-role="rule-btn" aria-expanded="true">${T("quiz.rule.hide")}</button>
-      <div class="quiz-rule" data-role="rule"></div>
+      ${Exercises.ruleBlock()}
       <p class="quiz-label">${T("quiz.dummy")}</p><div class="ex-hand quiz-mini" data-role="dummy"></div>
       <p class="quiz-label">${T("quiz.me")}</p><div class="ex-hand quiz-mini" data-role="me"></div>
       <p class="quiz-hint">${T("quiz.hint")}</p>
@@ -228,13 +184,7 @@ const Quiz = (() => {
     const q = sel => body.querySelector(sel);
     q("[data-role=lead]").appendChild(cardEl(lead));
     // La règle d'entame (la même que dans les Règles du jeu), affichée d'office pendant la question.
-    q("[data-role=rule]").innerHTML = $("lead-rule").innerHTML;
-    q("[data-role=rule-btn]").onclick = e => {
-      const box = q("[data-role=rule]"), open = box.hidden;
-      box.hidden = !open;
-      e.currentTarget.setAttribute("aria-expanded", open);
-      e.currentTarget.textContent = open ? T("quiz.rule.hide") : T("quiz.rule.show");
-    };
+    Exercises.ruleToggle(q);
     Exercises.drawHand(q("[data-role=me]"), game.hands.S, true);
     Exercises.drawHand(q("[data-role=dummy]"), game.hands.N, true);
 
@@ -258,7 +208,7 @@ const Quiz = (() => {
     function explain(ok) {
       const why = q("[data-role=why]");
       why.hidden = false;
-      const table = remainingTable(lead);
+      const table = Exercises.remainingTable(game.initial.S, game.initial.N, lead);
       why.innerHTML = `<p>${Q.rule}</p>
         <p class="quiz-label">${T("quiz.unseen")}</p>${table.html}`;
       if (Q.key === "same") {
@@ -323,42 +273,229 @@ const Quiz = (() => {
     buttons[0].focus();
   }
 
+  /* ---------- Les cartes maîtresses (fin du 3e pli) ----------
+     Une carte est maîtresse quand Est et Ouest n'ont plus aucune carte plus
+     forte dans sa couleur. Le joueur clique sur toutes les cartes maîtresses
+     de sa main et du mort ; il doit se souvenir des cartes déjà jouées. */
+  function mastersPanel(body) {
+    const me = game.hands.S, dummy = game.hands.N;
+    const seen = new Set([...me, ...dummy, ...game.played].map(cardId));
+    const opp = makeDeck().filter(c => !seen.has(cardId(c)));       // cartes encore chez Est et Ouest
+    const top = s => Math.max(0, ...opp.filter(c => c.s === s).map(c => c.v));
+    const isMaster = c => c.v > top(c.s);
+    const picked = new Set();
+    let checked = false;
+
+    body.innerHTML = `
+      <p class="ex-q">${T("masters.q")}</p>
+      <p class="quiz-label">${T("quiz.dummy")}</p><div class="ex-hand" data-role="dummy"></div>
+      <p class="quiz-label">${T("quiz.me")}</p><div class="ex-hand" data-role="me"></div>
+      <div class="ex-actions"><button class="act" data-role="check" type="button">${T("ex.check")}</button></div>
+      <p class="ex-result" data-role="result" aria-live="polite"></p>
+      <div class="quiz-why" data-role="why" hidden></div>`;
+    const q = sel => body.querySelector(sel);
+    const draw = () => {
+      for (const [role, hand] of [["dummy", dummy], ["me", me]]) Exercises.drawHand(q(`[data-role=${role}]`), hand, true, {
+        button: true,
+        decorate: (el, c) => {
+          const on = picked.has(cardId(c));
+          el.setAttribute("aria-pressed", on);
+          if (checked) {
+            el.disabled = true;
+            if (on && isMaster(c)) el.classList.add("ok");
+            else if (on) el.classList.add("ko");
+            else if (isMaster(c)) el.classList.add("missed");
+            else el.classList.add("dim");
+            return;
+          }
+          if (on) el.classList.add("picked");
+          el.onclick = () => {
+            on ? picked.delete(cardId(c)) : picked.add(cardId(c));
+            draw();
+            body.querySelector(`[aria-label="${cardName(c)}"]`)?.focus();
+          };
+        },
+      });
+    };
+    draw();
+
+    q("[data-role=check]").onclick = () => {
+      checked = true;
+      draw();
+      const mine = [...me, ...dummy];
+      const wrong = mine.filter(c => picked.has(cardId(c)) !== isMaster(c)).length;
+      const none = !mine.some(isMaster);
+      const res = q("[data-role=result]");
+      res.className = "ex-result " + (wrong ? "ko" : "ok");
+      res.textContent = (wrong ? T("ex.notQuite") : T("ex.ok")) + (none ? T("masters.none") : "") + (wrong ? T("ex.legal.legend") : "");
+      const why = q("[data-role=why]");
+      why.hidden = false;
+      const lines = [0, 1, 2, 3].filter(s => mine.some(c => c.s === s)).map(s => {
+        const gone = game.played.filter(c => c.s === s).map(c => c.v).sort((a, b) => b - a);
+        const masters = sortForDisplay(mine.filter(c => c.s === s && isMaster(c))).map(c => c.v);
+        return `<li>${T("masters.suit", { suit: Exercises.suitName(s), s, top: top(s), gone, masters })}</li>`;
+      });
+      why.innerHTML = `<p>${T("masters.rule")}</p><ul class="quiz-reasons">${lines.join("")}</ul>`;
+      onResult(!wrong, q("[data-role=check]"));
+    };
+  }
+
+  /* ---------- Une défausse : la répartition de départ de la couleur ----------
+     Un joueur ne fournit pas : il n'a plus de cartes de la couleur demandée.
+     Si c'est un défenseur, on connaît alors toute la répartition de départ :
+     la main du déclarant et le mort au départ, les cartes que le défenseur a
+     jouées dans la couleur, et le reste pour le quatrième joueur. */
+  const ORDER = ["O", "N", "E", "S"];
+  const initialCount = (seat, s) => game.initial[seat].filter(c => c.s === s).length;
+  // Défenseurs qui n'ont plus la couleur `s` (ils ont déjà défaussé dessus).
+  function voidDefenders(s) {
+    const led = {}, voids = new Set();
+    for (const h of game.history) {
+      if (!(h.trickNo in led)) led[h.trickNo] = h.card.s;
+      else if (led[h.trickNo] === s && h.card.s !== s && team(h.seat) === "EO") voids.add(h.seat);
+    }
+    return voids;
+  }
+
+  function discardPanel(body, { seat, card, led }) {
+    const s = led;
+    const expected = ORDER.map(x => initialCount(x, s));
+    const voids = voidDefenders(s);
+    body.innerHTML = `
+      <div class="ex-led"><div class="ex-led-cards" data-role="card"></div>
+        <p>${T("discard.intro", { who: seat === DUMMY ? T("who.dummy") : seatName(seat), card: cardName(card), suit: Exercises.suitName(s) })}</p></div>
+      <p class="ex-q">${T("discard.q", { suit: Exercises.suitName(s) })}</p>
+      ${seat === DUMMY || seat === DECLARER ? "" : `<p class="quiz-hint">${T("discard.hint")}</p>`}
+      <div class="ex-grid-wrap">
+        <table class="ex-grid">
+          <thead><tr><th scope="col">${T("discard.col.seat")}</th><th scope="col">${T("ex.col.cards")}</th><th scope="col">${T("ex.col.fix")}</th></tr></thead>
+          <tbody>
+            ${ORDER.map(x => `<tr>
+              <th scope="row">${seatName(x)}</th>
+              <td><input data-seat="${x}" type="number" inputmode="numeric" min="0" max="10" placeholder="${T("ex.ph.cards")}" aria-label="${T("discard.aria", { seat: seatName(x), s })}"></td>
+              <td class="ex-fix" data-fix="${x}"></td></tr>`).join("")}
+          </tbody>
+        </table>
+      </div>
+      <div class="ex-actions"><button class="act" data-role="check" type="button">${T("ex.check")}</button></div>
+      <p class="ex-result" data-role="result" aria-live="polite"></p>`;
+    const q = sel => body.querySelector(sel);
+    q("[data-role=card]").appendChild(cardEl(card));
+
+    q("[data-role=check]").onclick = () => {
+      let wrong = 0;
+      ORDER.forEach((x, i) => {
+        const input = q(`[data-seat="${x}"]`);
+        const ok = input.value.trim() !== "" && Number(input.value) === expected[i];
+        input.classList.add(ok ? "ok" : "ko");
+        input.disabled = true;
+        if (!ok) wrong++;
+        // Comment on le sait, pour chaque joueur.
+        let how;
+        if (x === "S" || x === "N") how = T(x === "S" ? "discard.how.me" : "discard.how.dummy", { n: expected[i] });
+        else if (voids.has(x)) {
+          const cards = game.history.filter(h => h.seat === x && h.card.s === s).map(h => h.card.v);
+          how = T("discard.how.void", { n: expected[i], cards });
+        } else how = T("discard.how.rest", { others: ORDER.filter(y => y !== x).map(y => expected[ORDER.indexOf(y)]), n: expected[i] });
+        q(`[data-fix="${x}"]`).innerHTML = `<span class="${ok ? "ok" : "ko"}">${ok ? "✓" : "✗"}</span> ` + how;
+      });
+      const res = q("[data-role=result]");
+      res.className = "ex-result " + (wrong ? "ko" : "ok");
+      res.textContent = (wrong ? T("ex.notQuite") : T("ex.ok")) + T("discard.result", { split: expected.join("-"), suit: colorName(s) });
+      onResult(!wrong, q("[data-role=check]"));
+    };
+    q("[data-seat='O']").focus();
+  }
+
+  /* ---------- Quelles questions pour cette donne ? ----------
+     Mode « all » (entraînement) : toutes les questions, à chaque donne.
+     Mode « light » : chaque type de question est tiré au sort, avec au moins
+     une question sûre d'arriver dans la donne. */
+  const SURE = ["count", "rest0", "rest1", "masters"];   // ces moments arrivent à chaque donne
+  const RULE_KINDS = ["lead", "split"];                  // seulement si Ouest suit la règle d'entame
+  const OTHER = ["play", "discard"];                     // dépendent du déroulement de la donne
+  let plan = null;
+  const askedSuits = new Set();                          // défausses déjà questionnées, par couleur
+  let playAsked = false;
+
+  function makePlan() {
+    const sure = SURE.concat(RULE_LEADERS.includes(game.types.O) ? RULE_KINDS : []);
+    if (config.quiz === "all") return new Set(sure.concat(OTHER));
+    const p = new Set(sure.concat(OTHER).filter(() => Math.random() < 0.3));
+    if (!sure.some(k => p.has(k))) p.add(sure[Math.floor(Math.random() * sure.length)]);
+    return p;
+  }
+
   /* ---------- Point d'entrée appelé par la boucle de jeu ---------- */
   async function at(moment, ctx = {}) {
-    if (!config.quiz || !game || game.types.S !== "humain") return;
-    if (!(moment in CHANCE) || Math.random() >= CHANCE[moment]) return;
+    // Questions seulement quand l'humain est le déclarant.
+    if (config.quiz === "off" || !game || game.types.S !== "humain") return;
+    // Deux questions de suite : la deuxième seulement si la donne n'a pas changé entre-temps.
+    const g = game;
+    const ask = async (title, build) => { if (game === g) await askOne(title, build); };
     // Pas de question pendant le dernier pli : il ne reste qu'une carte, aucun choix à faire.
-    if (game.tricksWon.NS + game.tricksWon.EO === 9) return;
+    if (game.tricksWon.NS + game.tricksWon.EO >= 9) return;
+    if (!plan) plan = makePlan();
+    const pl = plan;
+    const all = config.quiz === "all";
 
     if (moment === "start") {
-      await ask(T("quiz.title.start"), body => Exercises.countPanel(body, {
+      if (pl.has("count")) await ask(T("quiz.title.start"), body => Exercises.countPanel(body, {
         hand: game.hands.S, sorted: true, intro: T("quiz.start.intro"), onResult,
+      }));
+      if (pl.has("rest0")) await ask(T("quiz.title.start"), body => Exercises.restPanel(body, {
+        me: game.hands.S, dummy: game.hands.N, intro: T("rest.intro.game"), onResult,
       }));
     } else if (moment === "lead") {
       if (!RULE_LEADERS.includes(game.types.O) || game.history.length !== 1) return;
-      await ask(T("quiz.title.lead"), leadPanel);
+      if (pl.has("lead")) await ask(T("quiz.title.lead"), leadPanel);
+      if (pl.has("split")) await ask(T("quiz.title.lead"), body => Exercises.splitPanel(body, {
+        ...westCtx(), bot: PLAYER_TYPES[game.types.O].label, onResult,
+      }));
+    } else if (moment === "trick") {
+      const done = game.tricksWon.NS + game.tricksWon.EO;
+      if (done === 1 && pl.has("rest1")) await ask(T("quiz.title.trick1"), body => Exercises.restPanel(body, {
+        me: game.hands.S, dummy: game.hands.N, played: game.played, intro: T("rest.intro.game1"), onResult,
+      }));
+      if (done === 3 && pl.has("masters")) await ask(T("quiz.title.trick3"), mastersPanel);
     } else if (moment === "play") {
       const trickNo = game.tricksWon.NS + game.tricksWon.EO;
-      if (!game.trick.length || askedTrick === trickNo) return;
+      if (!pl.has("play") || !game.trick.length || askedTrick === trickNo) return;
       // Une seule carte jouable : la question n'aurait pas d'intérêt.
       if (legalCards(game.hands[ctx.seat], game.trick).length < 2) return;
+      // Entraînement : de temps en temps ; mode léger : une seule fois, à un moment au hasard.
+      if (all ? Math.random() >= 0.12 : (playAsked || Math.random() >= 0.25)) return;
       askedTrick = trickNo;
+      playAsked = true;
       const seat = ctx.seat;
       await ask(T("quiz.title.play"), body => Exercises.legalPanel(body, {
         hand: game.hands[seat], trick: game.trick.map(p => ({ seat: p.seat, card: p.card })), sorted: true,
         dummy: seat === DUMMY, onResult,
       }));
+    } else if (moment === "discard") {
+      const led = game.trick[0].card.s;
+      // La répartition n'est connue que si un défenseur n'a plus la couleur.
+      if (!pl.has("discard") || askedSuits.has(led) || !voidDefenders(led).size) return;
+      // Pas à chaque défausse : une fois sur deux en entraînement, une seule fois en mode léger.
+      if (all ? Math.random() >= 0.5 : askedSuits.size) return;
+      askedSuits.add(led);
+      await ask(T("quiz.title.discard"), body => discardPanel(body, { ...ctx, led }));
     }
   }
 
-  // Nouvelle donne : on ferme une question restée ouverte et on oublie le pli mémorisé.
+  // Nouvelle donne : on ferme une question restée ouverte et on oublie ce qui a été demandé.
   function reset() {
     askedTrick = -1;
+    plan = null;
+    askedSuits.clear();
+    playAsked = false;
     if (finish) finish();
   }
 
   $("quiz-skip").addEventListener("click", () => finish && finish());
-  $("quiz").addEventListener("close", () => finish && finish());   // touche Échap
+  // Touche Échap. L'événement « close » arrive un peu après la fermeture : s'il
+  // vient d'une question d'une donne précédente, une nouvelle question est déjà ouverte.
+  $("quiz").addEventListener("close", () => { if (!$("quiz").open && finish) finish(); });
 
   return { at, reset, forEachWestHand, leadPanel };
 })();

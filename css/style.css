@@ -451,3 +451,6 @@ a.act { text-decoration: none; display: inline-flex; align-items: center; }
 .review ul li:first-child { border-top: 0; }
 .review li { margin: 3px 0; }
 .review li b { font-weight: 600; }
+
+/* Bouton « Pli suivant » : le pli reste visible sur la table jusqu'au clic. */
+.status-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }

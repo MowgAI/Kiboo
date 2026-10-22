@@ -53,21 +53,32 @@ Tous les textes sont dans `lang/` : un fichier par langue, avec les mêmes clés
 
 ## Exercices
 
-Le bouton « Exercices » ouvre trois exercices sur une main de 10 cartes tirée au hasard :
+Le bouton « Exercices » ouvre cinq exercices sur des cartes tirées au hasard :
 
 - **Compter sa main** : nombre de cartes et points par couleur, puis total des points. Dans Kiboo, les points d'une couleur sont la somme des valeurs de ses cartes.
 - **Couleur la plus longue** : en cas d'égalité, toutes les couleurs les plus longues sont acceptées.
 - **Cartes jouables** : une couleur est demandée, il faut sélectionner toutes les cartes autorisées (fournir si possible, sinon défausser n'importe quelle carte).
+- **Cartes restantes** : en voyant sa main et le mort, combien de cartes de chaque couleur ont Est et Ouest ? Une fois sur deux, le premier pli est déjà joué (par des robots Piperno).
+- **Répartition de l'entame** : Ouest entame selon la règle de Piperno ; il faut cocher toutes les répartitions possibles de la couleur entamée entre Ouest et Est.
 
 Chaque réponse est corrigée avec le détail du calcul, et un compteur suit les réussites de la session. Le code est dans `js/exercises.js`.
 
 ## Questions pendant la partie, cadeaux et collection
 
-Avec la case « Questions pendant la partie » (et Sud humain), la partie s'arrête parfois sur une question, puis reprend exactement où elle en était après la réponse (ou « Passer la question ») :
+Le réglage « Questions pendant la partie » propose trois choix : **Aucune**, **Quelques-unes** (des questions tirées au sort, au moins une par donne) ou **Toutes** (mode entraînement). Les questions ne sont posées que quand le joueur humain est le déclarant (Sud). La partie s'arrête sur la question, puis reprend exactement où elle en était après la réponse (ou « Passer la question ») :
 
-- **Avant l'entame** : compter sa main (cartes et points par couleur, total).
-- **Après l'entame**, à chaque donne où Ouest est Piperno, Averell ou Averell250 : questions de déduction sur la main cachée d'Ouest (a-t-il autant de cartes dans une autre couleur ? si oui, lesquelles ? une carte plus forte, plus faible dans la couleur d'entame ?). La règle d'entame est affichée pendant la question (un bouton permet de la cacher), aussi décrite dans les Règles du jeu. Réponses : « Oui, forcément », « Non, c'est impossible » ou « On ne peut pas savoir ». La correction passe en revue toutes les mains qu'Ouest peut avoir compte tenu de ce que voit le joueur et de la règle d'entame, sans regarder les vraies cartes, et en montre des exemples.
+- **Avant l'entame** : compter sa main (cartes et points par couleur, total) ; puis, en voyant sa main et le mort, combien de cartes de chaque couleur ont Est et Ouest.
+- **Après l'entame**, quand Ouest est Piperno, Averell ou Averell250 (il suit la règle d'entame) :
+  - questions de déduction sur la main cachée d'Ouest (a-t-il autant de cartes dans une autre couleur ? si oui, lesquelles ? une carte plus forte, plus faible dans la couleur d'entame ?), avec les réponses « Oui, forcément », « Non, c'est impossible » ou « On ne peut pas savoir » ;
+  - comment les cartes de la couleur entamée peuvent-elles être réparties entre Ouest et Est ? (cocher toutes les répartitions possibles).
+
+  La règle d'entame est affichée pendant la question (un bouton permet de la cacher). La correction passe en revue toutes les mains qu'Ouest peut avoir compte tenu de ce que voit le joueur et de la règle d'entame, sans regarder les vraies cartes, et en montre des exemples.
+- **Après le premier pli** : combien de cartes de chaque couleur restent chez Est et Ouest ? Les cartes jouées ne sont pas rappelées : il faut s'en souvenir.
+- **Après le troisième pli** : cliquer sur toutes les cartes maîtresses de sa main et du mort (Est et Ouest n'ont plus de carte plus forte dans la couleur).
+- **Quand un joueur défausse** (pas à chaque fois) : comment la couleur demandée était-elle répartie au départ, en commençant par Ouest (par exemple 4-3-2-1) ? La question n'est posée que si la réponse est déductible, c'est-à-dire si un défenseur n'a plus la couleur.
 - **Avant de jouer** sur un pli commencé (jamais au dernier pli ni quand une seule carte est jouable) : quelles cartes as-tu le droit de jouer ?
+
+Quand un joueur humain est à la table, chaque pli terminé reste affiché jusqu'au clic sur « Pli suivant » (ou sur la table), pour avoir le temps de retenir les cartes jouées.
 
 Toutes les 3 bonnes réponses (cumulées, exercices compris), le joueur choisit un cadeau : voir une carte cachée d'Ouest ou d'Est (pendant une partie), ou gagner une carte pour sa collection. Le bouton « Collection » montre l'album des 40 cartes. La progression et la collection sont gardées dans le navigateur. Le code est dans `js/quiz.js` et `js/rewards.js`.
 
