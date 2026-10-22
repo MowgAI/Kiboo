@@ -25,13 +25,14 @@ const Evaluation = (() => {
   ];
   // Niveaux : faire au moins aussi bien que le robot sur 7 des 10 dernières donnes comptées.
   const WINDOW = 10, NEEDED = 7;
+  // Les noms des niveaux sont traduits à l'affichage (lang/*.js : level.N, level.who.4).
   const LEVELS = [
-    { name: "Débutant" },
-    { name: "Niveau Piperno", key: "piperno", who: "Piperno" },
-    { name: "Niveau Averell", key: "averell", who: "Averell" },
-    { name: "Niveau Averell250", key: "averell250", who: "Averell250" },
-    { name: "Expert", key: "par", who: "le jeu parfait" },
-  ];
+    {},
+    { key: "piperno", who: "Piperno" },
+    { key: "averell", who: "Averell" },
+    { key: "averell250", who: "Averell250" },
+    { key: "par" },
+  ].map((lv, i) => ({ ...lv, get name() { return T("level." + i); }, get whoText() { return lv.who || T("level.who." + i); } }));
 
   const solver = makeSolver();
   let job = null;               // évaluation de la donne en cours
@@ -146,7 +147,7 @@ const Evaluation = (() => {
       history.push({ t: Date.now(), me: j.me, piperno: j.results.piperno, averell: j.results.averell, averell250: j.results.averell250, par: j.par, pct: j.pct });
       save();
       const after = level().index;
-      if (after > before) j.levelUp = { name: LEVELS[after].name, card: Rewards.grantCard() };
+      if (after > before) j.levelUp = { index: after, card: Rewards.grantCard() };
     }
     render();
   }
@@ -161,13 +162,13 @@ const Evaluation = (() => {
     }
     const next = LEVELS[index + 1];
     const progress = next ? recent.filter(h => h.me >= h[next.key]).length : null;
-    return { index, name: LEVELS[index].name, next, progress, recent };
+    return { index, get name() { return LEVELS[index].name; }, next, progress, recent };
   }
 
   function levelText() {
     const L = level();
-    if (!L.next) return `<strong>${L.name}</strong> : le plus haut niveau. Bravo !`;
-    return `<strong>${L.name}</strong>. Pour passer au <strong>${L.next.name}</strong>, fais au moins aussi bien que ${L.next.who} sur ${NEEDED} des ${WINDOW} dernières donnes : <strong>${L.progress} sur ${NEEDED}</strong> pour l'instant.`;
+    if (!L.next) return T("eval.levelTop", { name: L.name });
+    return T("eval.levelNext", { name: L.name, next: L.next.name, who: L.next.whoText, needed: NEEDED, window: WINDOW, progress: L.progress });
   }
 
   /* ---------- Affichage en fin de donne ---------- */
@@ -177,36 +178,36 @@ const Evaluation = (() => {
     // En défense : pas d'évaluation, on dit pourquoi plutôt que de ne rien afficher.
     if (!j && game.over && config.eval && game.types.S !== "humain" && (game.types.O === "humain" || game.types.E === "humain")) {
       box.hidden = false;
-      box.innerHTML = `<h2>Évaluation</h2><p>Le mode évaluation ne fonctionne que quand tu joues en Sud (déclarant). En défense, ton résultat dépend aussi de ton partenaire robot : la comparaison ne serait pas juste.</p>`;
+      box.innerHTML = `<h2>${T("eval.title")}</h2><p>${T("eval.defense")}</p>`;
       return;
     }
     box.hidden = !(j && game.over);
     if (box.hidden) return;
     const names = { piperno: "Piperno", averell: "Averell", averell250: "Averell250" };
     if (!j.recorded) {
-      const wait = j.current ? names[j.current] : "les robots";
-      box.innerHTML = `<h2>Évaluation</h2><p>Calcul en cours : ${wait} rejoue ta donne…</p>`;
+      const wait = j.current ? names[j.current] : T("eval.theRobots");
+      box.innerHTML = `<h2>${T("eval.title")}</h2><p>${T("eval.waiting", { who: wait })}</p>`;
       return;
     }
-    const cmp = r => j.me > r ? `<span class="ok">tu fais mieux</span>` : j.me === r ? "égalité" : `<span class="ko">${r - j.me} pli${r - j.me > 1 ? "s" : ""} de plus</span>`;
+    const cmp = r => j.me > r ? `<span class="ok">${T("eval.better")}</span>` : j.me === r ? T("eval.equal") : `<span class="ko">${T("eval.more", { n: r - j.me })}</span>`;
     const rows = DECLARERS.map(d => `<tr><th scope="row">${names[d.key]}</th><td>${j.results[d.key]}</td><td>${cmp(j.results[d.key])}</td></tr>`).join("");
     const counted = j.counted
       ? ""
-      : `<p class="eval-note">Donne non comptée dans ta progression (${game.replayed ? "donne rejouée" : "aide utilisée : meilleurs coups, jeux ouverts ou carte révélée"}).</p>`;
+      : `<p class="eval-note">${T("eval.notCounted", { replayed: game.replayed })}</p>`;
     const up = j.levelUp
-      ? `<p class="eval-up">Nouveau niveau : <strong>${j.levelUp.name}</strong> !${j.levelUp.card ? ` Tu gagnes le <strong>${cardName(j.levelUp.card)}</strong> pour ta collection.` : ""}</p>`
+      ? `<p class="eval-up">${T("eval.levelUp", { name: LEVELS[j.levelUp.index].name, card: j.levelUp.card && cardName(j.levelUp.card) })}</p>`
       : "";
-    box.innerHTML = `<h2>Évaluation</h2>
-      <p class="eval-score">Ton score duplicate : <strong>${j.pct} %</strong></p>
+    box.innerHTML = `<h2>${T("eval.title")}</h2>
+      <p class="eval-score">${T("eval.score", { pct: j.pct })}</p>
       <div class="ex-grid-wrap"><table class="ex-grid eval-table">
-        <thead><tr><th scope="col">Déclarant</th><th scope="col">Plis Nord-Sud</th><th scope="col">Comparaison</th></tr></thead>
-        <tbody><tr class="eval-me"><th scope="row">Toi</th><td>${j.me}</td><td></td></tr>${rows}
-        <tr class="eval-par"><th scope="row">Jeu parfait (pour info)</th><td>${j.par}</td><td></td></tr></tbody>
+        <thead><tr><th scope="col">${T("eval.col.declarer")}</th><th scope="col">${T("eval.col.tricks")}</th><th scope="col">${T("eval.col.cmp")}</th></tr></thead>
+        <tbody><tr class="eval-me"><th scope="row">${T("eval.you")}</th><td>${j.me}</td><td></td></tr>${rows}
+        <tr class="eval-par"><th scope="row">${T("eval.par")}</th><td>${j.par}</td><td></td></tr></tbody>
       </table></div>
-      <p class="eval-how">Même donne, mêmes défenseurs. 2 points par robot battu, 1 par égalité, rapportés au maximum de ${2 * DECLARERS.length} points.</p>
+      <p class="eval-how">${T("eval.how", { max: 2 * DECLARERS.length })}</p>
       ${counted}${up}
       <p>${levelText()}</p>
-      <button class="act ghost" type="button" data-role="progress">Voir ma progression</button>`;
+      <button class="act ghost" type="button" data-role="progress">${T("eval.seeProgress")}</button>`;
     box.querySelector("[data-role=progress]").onclick = openProgress;
   }
 
@@ -219,19 +220,19 @@ const Evaluation = (() => {
     const steps = LEVELS.slice(1).map((lv, i) => {
       const n = L.recent.filter(h => h.me >= h[lv.key]).length;
       const done = L.index >= i + 1;
-      return `<li class="${done ? "done" : ""}"><strong>${lv.name}</strong> : au moins aussi bien que ${lv.who} sur ${n} des ${L.recent.length} dernières donnes${done ? " ✓" : ` (il en faut ${NEEDED} sur ${WINDOW})`}</li>`;
+      return `<li class="${done ? "done" : ""}">${T("prog.step", { name: lv.name, who: lv.whoText, n, of: L.recent.length, done, needed: NEEDED, window: WINDOW })}</li>`;
     }).join("");
     const bars = L.recent.map(h => `<span class="eval-bar" style="height:${Math.max(4, h.pct)}%" title="${h.pct} %"></span>`).join("");
     body.innerHTML = history.length ? `
       <p>${levelText()}</p>
       <ol class="eval-steps">${steps}</ol>
-      <p class="quiz-label">Score duplicate des ${L.recent.length} dernières donnes${avg !== null ? ` (moyenne ${avg} %)` : ""} :</p>
-      <div class="eval-bars" role="img" aria-label="Scores : ${L.recent.map(h => h.pct + " %").join(", ")}">${bars}</div>
+      <p class="quiz-label">${T("prog.scores", { n: L.recent.length, avg })}</p>
+      <div class="eval-bars" role="img" aria-label="${T("prog.aria", { list: L.recent.map(h => h.pct + " %").join(", ") })}">${bars}</div>
       <div class="ex-grid-wrap"><table class="ex-grid eval-table">
-        <thead><tr><th scope="col">Donne</th><th scope="col">Toi</th><th scope="col">Piperno</th><th scope="col">Averell</th><th scope="col">Averell250</th><th scope="col">Parfait</th><th scope="col">Score</th></tr></thead>
+        <thead><tr><th scope="col">${T("prog.col.deal")}</th><th scope="col">${T("eval.you")}</th><th scope="col">Piperno</th><th scope="col">Averell</th><th scope="col">Averell250</th><th scope="col">${T("prog.col.par")}</th><th scope="col">${T("prog.col.score")}</th></tr></thead>
         <tbody>${last.map((h, i) => `<tr><td>${history.length - i}</td><td><strong>${h.me}</strong></td><td>${h.piperno}</td><td>${h.averell}</td><td>${h.averell250}</td><td>${h.par}</td><td>${h.pct} %</td></tr>`).join("")}</tbody>
       </table></div>`
-      : `<p>Pas encore de donne évaluée. Joue une donne en Sud (déclarant) avec le mode évaluation : ton score s'affichera à la fin, et ta progression ici.</p>`;
+      : `<p>${T("prog.empty")}</p>`;
     $("progress").showModal();
   }
 

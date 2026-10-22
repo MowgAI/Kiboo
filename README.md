@@ -34,6 +34,8 @@ python3 -m http.server 8000
 - `js/pimc.js` : Averell, le robot PIMC (Perfect Information Monte Carlo), construit sur le DDS
 - `js/solver.js` : accès asynchrone au DDS et au PIMC via un Web Worker (`js/dds-worker.js`)
 - `js/images.js` : correspondance carte → image
+- `js/i18n.js` : choix de la langue et traduction des textes
+- `lang/fr.js`, `lang/en.js`, `lang/it.js` : tous les textes du jeu en français, anglais et italien
 - `tools/bump-version.sh` : change le numéro de version des fichiers (`?v=` dans `index.html`) pour que les navigateurs chargent la nouvelle version après une mise à jour ; à lancer avant chaque envoi sur GitHub
 - `js/evaluation.js` : mode évaluation (score duplicate), historique et niveaux
 - `js/feedback.js` : formulaire « Donner mon avis »
@@ -42,6 +44,12 @@ python3 -m http.server 8000
 - `js/exercises.js` : exercices (compter sa main, couleur la plus longue, cartes jouables)
 - `js/game.js` : règles, robots (la table tourne pour que la place du joueur humain, Sud, Ouest ou Est, soit toujours en bas), état de la partie, affichage et réglages
 - `assets/cards/` : images des 40 cartes (WebP)
+
+## Langues
+
+Kiboo existe en français, en anglais et en italien. Le menu en haut de la page change la langue ; le choix est gardé dans le navigateur. À la première visite, Kiboo prend la langue du navigateur (français si elle n'est pas disponible).
+
+Tous les textes sont dans `lang/` : un fichier par langue, avec les mêmes clés. Le français (`lang/fr.js`) sert de référence : si un texte manque dans une langue, c'est le texte français qui s'affiche. Pour relire ou corriger l'italien, il suffit de modifier `lang/it.js` (les petites fonctions en haut du fichier gèrent les accords : « il 7 blu », « l'8 rossa »…). Pour ajouter une langue, copier `lang/en.js`, traduire les textes et ajouter le fichier dans `index.html`.
 
 ## Exercices
 

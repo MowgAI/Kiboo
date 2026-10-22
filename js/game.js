@@ -8,15 +8,14 @@
    ===================================================================== */
 
 const COLORS = ["blue", "green", "red", "yellow"];
-const COLOR_NAMES = ["bleu", "vert", "rouge", "jaune"];
 const SEATS = ["N", "E", "S", "O"];               // ordre de jeu, sens horaire
-const SEAT_NAMES = { N: "Nord", E: "Est", S: "Sud", O: "Ouest" };
 const DECLARER = "S", DUMMY = "N", OPENING_LEADER = "O";
 
 const team = seat => (seat === "N" || seat === "S") ? "NS" : "EO";
 const nextSeat = seat => SEATS[(SEATS.indexOf(seat) + 1) % 4];
 const cardId = c => c.s * 10 + (c.v - 1);
-const cardName = c => `${c.v} ${COLOR_NAMES[c.s]}`;
+// Noms des couleurs, places et cartes dans la langue choisie : voir js/i18n.js et lang/*.js.
+const cardName = c => I18N.g("card")(c);
 
 function makeDeck() {
   const deck = [];
@@ -99,25 +98,24 @@ function openingChoice(hand) {
 const openingCard = hand => openingChoice(hand).card;
 
 // Piperno : robot déterministe de Samuel (src/strategy/deterministic.rs), adapté.
-// Après chaque choix, `this.reason` dit en français quelle règle a décidé.
+// Après chaque choix, `this.reason` dit quelle règle a décidé : une liste de
+// { k: clé de traduction, p: paramètres }, traduite à l'affichage (reasonText).
+const reasonText = reason => reason.map(r => T(r.k, r.p)).join(" ");
+
 class DeterministicBot {
   constructor() { this.mySuit = {}; }          // une couleur préférée par main jouée
   choose(view) {
     const { seat, hand, trick, played, legal } = view;
-    const col = s => COLOR_NAMES[s];
     if (played.length === 0 && trick.length === 0) {
       const o = openingChoice(hand);
-      this.reason = `Entame : le ${col(o.suit)} est sa couleur la plus longue (${o.len} cartes)` +
-        (o.tied ? ", la plus forte des couleurs de même longueur" : "") + ". " +
-        (o.seq ? "Il joue la plus haute carte de sa séquence."
-               : "Sans séquence d'au moins deux cartes qui se suivent, il joue la plus petite.");
+      this.reason = [{ k: "pip.opening", p: { suit: o.suit, len: o.len, tied: o.tied, seq: o.seq } }];
       return o.card;
     }
 
-    let note = "";
+    const note = [];
     if (this.mySuit[seat] === undefined || !hand.some(c => c.s === this.mySuit[seat])) {
       this.mySuit[seat] = openingCard(hand).s;
-      note = `Sa couleur préférée devient le ${col(this.mySuit[seat])} (sa couleur la plus longue). `;
+      note.push({ k: "pip.newSuit", p: { suit: this.mySuit[seat] } });
     }
     const my = this.mySuit[seat];
 
@@ -128,9 +126,7 @@ class DeterministicBot {
       for (let v = 10; v >= 1; v--) if (!gone.has(my * 10 + v - 1)) { top = v; break; }
       const mine = hand.filter(c => c.s === my).sort((a, b) => a.v - b.v);
       const strong = mine.some(c => c.v === top);
-      this.reason = note + `Il entame dans sa couleur préférée, le ${col(my)}. ` +
-        (strong ? `Il détient la plus forte carte restante (le ${top}) : il joue sa plus haute.`
-                : `Il n'a pas la plus forte carte restante (le ${top}) : il joue sa plus petite.`);
+      this.reason = [...note, { k: strong ? "pip.leadStrong" : "pip.leadWeak", p: { suit: my, top } }];
       return strong ? mine[mine.length - 1] : mine[0];
     }
 
@@ -142,25 +138,20 @@ class DeterministicBot {
     for (const c of sorted) {
       if (team(trickWinner([...trick, { seat, card: c }])) !== team(seat)) continue;
       if (partnerWins) {
-        this.reason = (follows
-          ? "Son partenaire gagne déjà le pli : il fournit sa plus petite carte."
-          : `Son partenaire gagne déjà le pli et il n'a plus de ${col(led)} : il défausse la première carte de sa main, dans l'ordre bleu, vert, rouge, jaune.`);
+        this.reason = [{ k: follows ? "pip.partnerFollow" : "pip.partnerDiscard", p: { led } }];
       } else {
-        this.reason = "Il joue la plus petite carte qui fait gagner son camp" +
-          (trick.length < 3 ? " pour l'instant." : ".");
+        this.reason = [{ k: "pip.win", p: { now: trick.length < 3 } }];
       }
       return c;
     }
     // Sinon, je fournis la plus petite.
     if (follows) {
-      this.reason = "Il ne peut pas faire gagner son camp : il fournit sa plus petite carte.";
+      this.reason = [{ k: "pip.cantWin" }];
       return sorted[0];
     }
     // Sinon, je défausse une petite carte en épargnant ma couleur préférée.
     const other = sorted.find(c => c.s !== my);
-    this.reason = note + `Il n'a plus de ${col(led)} et ne peut pas gagner le pli : ` + (other
-      ? `il défausse une petite carte en gardant sa couleur préférée (le ${col(my)}).`
-      : `il ne lui reste que sa couleur préférée (le ${col(my)}), il défausse sa plus petite.`);
+    this.reason = [...note, { k: other ? "pip.discardKeep" : "pip.discardOnly", p: { led, my } }];
     return other || sorted[0];
   }
 }
@@ -243,7 +234,7 @@ class HumanController {
 
 const PLAYER_TYPES = {
 // make(siège, env) : env = { solver, seed, rand } pour les parties rejouées par l'évaluation.
-  humain:       { label: "Humain",        make: s => new HumanController(s) },
+  humain:       { get label() { return T("player.human"); }, make: s => new HumanController(s) },
   deterministe: { label: "Piperno",       make: () => new DeterministicBot() },
   aleatoire:    { label: "PiperRand",     make: (s, env) => new RandomBot(env) },
   pimc:         { label: "Averell",       make: (s, env) => new PimcBot(AVERELL_OPTS, env) },
@@ -427,32 +418,28 @@ function renderExplanations() {
   box.hidden = !config.explain || !piperno;
   if (box.hidden) return;
   const items = game.explanations.map(e => {
-    const who = e.seat === DUMMY ? "Nord (mort)" : SEAT_NAMES[e.seat];
-    return `<li><b>Pli ${e.trickNo}</b> · ${who} joue <b>${cardName(e.card)}</b>. ${e.reason}</li>`;
+    const who = e.seat === DUMMY ? T("who.dummy") : seatName(e.seat);
+    return `<li>${T("explain.item", { trick: e.trickNo, who, card: cardName(e.card), reason: reasonText(e.reason) })}</li>`;
   }).join("");
-  box.innerHTML = "<h2>Explications de Piperno</h2>" +
-    (items ? `<ul>${items}</ul>` : "<p>Piperno n'a pas encore joué.</p>");
+  box.innerHTML = `<h2>${T("explain.title")}</h2>` +
+    (items ? `<ul>${items}</ul>` : `<p>${T("explain.none")}</p>`);
 }
 
 function renderReview() {
   const box = $("review");
   box.hidden = !game.over;
   if (!game.over) return;
-  if (!game.review) { box.innerHTML = "<p>Analyse de la donne par le DDS…</p>"; return; }
+  if (!game.review) { box.innerHTML = `<p>${T("review.pending")}</p>`; return; }
   const { par, errors } = game.review;
   const ns = game.tricksWon.NS;
-  let html = `<h2>Bilan de la donne</h2>
-    <p>Avec un jeu parfait des quatre joueurs, Nord-Sud faisait <b>${par}</b> pli${par > 1 ? "s" : ""}
-    (résultat : ${ns}).</p>`;
+  let html = `<h2>${T("review.title")}</h2><p>${T("review.par", { par, ns })}</p>`;
   if (!errors.length) {
-    html += "<p>Aucune erreur : chaque carte jouée était un meilleur coup.</p>";
+    html += `<p>${T("review.none")}</p>`;
   } else {
     html += "<ol>" + errors.map(e => {
-      const who = e.seat === DUMMY ? "Nord (mort)" : SEAT_NAMES[e.seat];
-      const camp = team(e.seat) === "NS" ? "Nord-Sud" : "Est-Ouest";
+      const who = e.seat === DUMMY ? T("who.dummy") : seatName(e.seat);
       const alt = e.best.slice(0, 3).map(cardName).join(", ") + (e.best.length > 3 ? "…" : "");
-      return `<li><b>Pli ${e.trickNo}</b> · ${who} joue ${cardName(e.card)} :
-        coûte ${e.loss} pli${e.loss > 1 ? "s" : ""} à ${camp}. Mieux : ${alt}.</li>`;
+      return `<li>${T("review.item", { trick: e.trickNo, who, card: cardName(e.card), loss: e.loss, camp: teamName(team(e.seat)), alt })}</li>`;
     }).join("") + "</ol>";
   }
   box.innerHTML = html;
@@ -514,7 +501,7 @@ function render() {
         if (game.revealed.has(cardId(c))) {
           const el = cardEl(c);
           el.classList.add("revealed");
-          el.setAttribute("aria-label", `${cardName(c)} (révélée)`);
+          el.setAttribute("aria-label", T("card.revealed", { card: cardName(c) }));
           handEl.appendChild(el);
         } else handEl.appendChild(cardEl(null));
         continue;
@@ -527,7 +514,7 @@ function render() {
         badge.className = "badge" + (h === game.hint.best ? " best" : "");
         badge.textContent = h;
         el.appendChild(badge);
-        el.setAttribute("aria-label", `${cardName(c)}, ${h} plis pour votre camp`);
+        el.setAttribute("aria-label", T("card.hint", { card: cardName(c), n: h }));
       }
       if (waitingHere) {
         if (playable) {
@@ -545,8 +532,8 @@ function render() {
     // Étiquette du siège
     const tag = $("tag-" + seat);
     const ctrl = seatController(seat);
-    const role = seat === DUMMY ? "le mort" : PLAYER_TYPES[game.types[ctrl]].label;
-    tag.innerHTML = `<b>${SEAT_NAMES[seat]}</b><small>${role}</small>`;
+    const role = seat === DUMMY ? T("tag.dummy") : PLAYER_TYPES[game.types[ctrl]].label;
+    tag.innerHTML = `<b>${seatName(seat)}</b><small>${role}</small>`;
     tag.classList.toggle("turn", !game.over && game.turn === seat);
   }
 
@@ -557,10 +544,10 @@ function render() {
     const ns = game.tricksWon.NS, eo = game.tricksWon.EO;
     const box = document.createElement("div");
     box.className = "result";
-    const title = ns === eo ? "Égalité" : (ns > eo ? "Nord-Sud gagne" : "Est-Ouest gagne");
-    box.innerHTML = `<h2>${title}</h2><p>${ns} plis à ${eo}</p>
-      <div class="btns"><button class="act ghost" type="button" data-a="replay">Rejouer</button>
-      <button class="act" type="button" data-a="new">Nouvelle donne</button></div>`;
+    const title = ns === eo ? T("result.tie") : T("result.win", { team: teamName(ns > eo ? "NS" : "EO") });
+    box.innerHTML = `<h2>${title}</h2><p>${T("result.score", { ns, eo })}</p>
+      <div class="btns"><button class="act ghost" type="button" data-a="replay">${T("btn.replayShort")}</button>
+      <button class="act" type="button" data-a="new">${T("btn.new")}</button></div>`;
     box.querySelector('[data-a="replay"]').onclick = replayDeal;
     box.querySelector('[data-a="new"]').onclick = () => newGame(dealHands());
     center.appendChild(box);
@@ -591,18 +578,18 @@ function render() {
   // Statut
   let msg = "";
   if (game.over) {
-    msg = "Donne terminée.";
+    msg = T("status.over");
   } else if (game.winnerSeat) {
-    msg = `Pli pour ${SEAT_NAMES[game.winnerSeat]} (${team(game.winnerSeat) === "NS" ? "Nord-Sud" : "Est-Ouest"}).`;
+    msg = T("status.trickFor", { seat: seatName(game.winnerSeat), team: teamName(team(game.winnerSeat)) });
   } else if (game.waiting) {
     const s = game.waiting.seat;
-    msg = s === DUMMY ? "À vous de jouer une carte du mort (Nord)." : `À ${SEAT_NAMES[s]} de jouer : choisissez une carte.`;
-    if (game.played.length === 0) msg = `${SEAT_NAMES[s]} entame : choisissez une carte.`;
+    msg = s === DUMMY ? T("status.dummyTurn") : T("status.yourTurn", { seat: seatName(s) });
+    if (game.played.length === 0) msg = T("status.lead", { seat: seatName(s) });
   } else {
-    msg = `${SEAT_NAMES[game.turn]} réfléchit…`;
+    msg = T("status.thinking", { seat: seatName(game.turn) });
   }
-  if (config.hints && game.waiting && !hintsReady()) msg += " Calcul des meilleurs coups…";
-  else if (hintsReady()) msg += " Pastilles : plis de votre camp en fin de donne.";
+  if (config.hints && game.waiting && !hintsReady()) msg += T("status.hintsPending");
+  else if (hintsReady()) msg += T("status.hintsReady");
   $("status").textContent = msg;
   renderExplanations();
   if (typeof Evaluation !== "undefined") Evaluation.render();
@@ -662,7 +649,14 @@ $("btn-settings-help").addEventListener("click", e => {
   const help = $("settings-help"), open = help.hidden;
   help.hidden = !open;
   e.currentTarget.setAttribute("aria-expanded", open);
-  e.currentTarget.textContent = open ? "Cacher l'aide" : "Aide des réglages";
+  e.currentTarget.textContent = open ? T("help.hide") : T("help.show");
+});
+
+// Changement de langue : libellés des menus, bouton d'aide, puis la table.
+document.addEventListener("kiboo-lang", () => {
+  for (const s of ["O", "E", "S"]) for (const o of $("cfg-" + s).options) o.textContent = PLAYER_TYPES[o.value].label;
+  $("btn-settings-help").textContent = $("settings-help").hidden ? T("help.show") : T("help.hide");
+  render();
 });
 
 // Première donne une fois tous les scripts chargés (exercices, cadeaux, questions).

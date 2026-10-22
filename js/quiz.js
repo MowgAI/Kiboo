@@ -24,9 +24,9 @@ const Quiz = (() => {
   const CHANCE = { start: 0.5, lead: 1, play: 0.12 };
   const RULE_LEADERS = ["deterministe", "pimc", "pimc250"];   // entament selon la règle de Piperno
   const ANSWERS = [
-    { key: "yes", label: "Oui, forcément" },
-    { key: "no", label: "Non, c'est impossible" },
-    { key: "maybe", label: "On ne peut pas savoir" },
+    { key: "yes", get label() { return T("quiz.yes"); } },
+    { key: "no", get label() { return T("quiz.no"); } },
+    { key: "maybe", get label() { return T("quiz.maybe"); } },
   ];
 
   let finish = null;            // résout la promesse de la question ouverte
@@ -55,16 +55,16 @@ const Quiz = (() => {
   function onResult(ok, btn) {
     $("quiz-skip").hidden = true;
     Rewards.answered(ok);
-    const resume = () => { btn.textContent = "Reprendre la partie"; btn.onclick = () => finish && finish(); btn.focus(); };
+    const resume = () => { btn.textContent = T("quiz.resume"); btn.onclick = () => finish && finish(); btn.focus(); };
     const giftOpts = {
       canReveal: canReveal(),
       revealable: seat => hiddenCards(seat).length > 0,
       reveal,
-      doneLabel: "Reprendre la partie",
+      doneLabel: T("quiz.resume"),
       onDone: () => finish && finish(),
     };
     if (Rewards.giftReady(giftOpts)) {
-      btn.textContent = "Ouvrir ton cadeau";
+      btn.textContent = T("ex.openGift");
       btn.onclick = () => Rewards.giftPanel($("quiz-body"), giftOpts);
       btn.focus();
     } else resume();
@@ -122,24 +122,24 @@ const Quiz = (() => {
 
   // Les questions de déduction après l'entame. Chacune : texte, rappel de la règle, prédicat.
   function leadQuestions(lead) {
-    const L = lead.s, V = lead.v, col = COLOR_NAMES[L];
+    const L = lead.s, V = lead.v;
     const count = (h, s) => h.filter(c => c.s === s).length;
     const list = [
       {
         key: "same",
-        text: `Ouest peut-il avoir <strong>autant de cartes</strong> dans une autre couleur que le ${Exercises.suitName(L)} ?`,
-        rule: "À longueur égale, la règle d'entame choisit la couleur qui a le plus de points (à points égaux, la dernière dans l'ordre bleu, vert, rouge, jaune). Une autre couleur aussi longue est donc possible si elle a moins de points.",
+        text: T("quiz.q.same", { suit: Exercises.suitName(L) }),
+        rule: T("quiz.rule.same"),
         test: h => [0, 1, 2, 3].some(s => s !== L && count(h, s) === count(h, L)),
       },
     ];
     if (V < 10) list.push({
-      text: `Ouest a entamé le ${V} ${col}. Peut-il avoir une <strong>carte ${Exercises.adj(L, 1)} plus forte</strong> que le ${V} ?`,
-      rule: "La règle d'entame fait jouer la plus haute carte d'une séquence (au moins deux cartes qui se suivent) ; sans séquence, la plus petite carte de la couleur.",
+      text: T("quiz.q.higher", { v: V, s: L }),
+      rule: T("quiz.rule.seq"),
       test: h => h.some(c => c.s === L && c.v > V),
     });
     if (V > 1) list.push({
-      text: `Ouest a entamé le ${V} ${col}. Peut-il avoir une <strong>carte ${Exercises.adj(L, 1)} plus faible</strong> que le ${V} ?`,
-      rule: "La règle d'entame fait jouer la plus haute carte d'une séquence (au moins deux cartes qui se suivent) ; sans séquence, la plus petite carte de la couleur.",
+      text: T("quiz.q.lower", { v: V, s: L }),
+      rule: T("quiz.rule.seq"),
       test: h => h.some(c => c.s === L && c.v < V),
     });
     return list;
@@ -158,9 +158,9 @@ const Quiz = (() => {
       };
     });
     const html = `<div class="ex-grid-wrap"><table class="ex-grid quiz-rest">
-      <thead><tr><th scope="col">Couleur</th><th scope="col">Ta main</th><th scope="col">Le mort</th><th scope="col">Restent pour Est et Ouest</th><th scope="col">Points restants</th></tr></thead>
+      <thead><tr><th scope="col">${T("ex.col.color")}</th><th scope="col">${T("quiz.col.me")}</th><th scope="col">${T("quiz.col.dummy")}</th><th scope="col">${T("quiz.col.rest")}</th><th scope="col">${T("quiz.col.pts")}</th></tr></thead>
       <tbody>${rows.map(r => `<tr><th scope="row">${Exercises.suitName(r.s)}</th><td>${r.me}</td><td>${r.dummy}</td>
-        <td><strong>${r.rest}</strong>${r.rest ? ` (${r.values.join(", ")})` : ""}${r.s === lead.s ? `, dont le ${lead.v} entamé` : ""}</td><td>${r.pts}</td></tr>`).join("")}</tbody>
+        <td><strong>${r.rest}</strong>${r.rest ? ` (${r.values.join(", ")})` : ""}${r.s === lead.s ? T("quiz.rest.lead", { v: lead.v }) : ""}</td><td>${r.pts}</td></tr>`).join("")}</tbody>
     </table></div>`;
     return { rows, html };
   }
@@ -204,23 +204,23 @@ const Quiz = (() => {
 
     body.innerHTML = `
       <div class="ex-led"><div class="ex-led-cards" data-role="lead"></div>
-        <p>Ouest (${PLAYER_TYPES[game.types.O].label}) a entamé le <strong>${cardName(lead)}</strong>. Il suit la règle d'entame de Piperno.</p></div>
+        <p>${T("quiz.led", { bot: PLAYER_TYPES[game.types.O].label, card: cardName(lead) })}</p></div>
       <p class="ex-q">${Q.text}</p>
-      <button class="act ghost quiz-rule-btn" type="button" data-role="rule-btn" aria-expanded="true">Cacher la règle d'entame</button>
+      <button class="act ghost quiz-rule-btn" type="button" data-role="rule-btn" aria-expanded="true">${T("quiz.rule.hide")}</button>
       <div class="quiz-rule" data-role="rule"></div>
-      <p class="quiz-label">Le mort (Nord)</p><div class="ex-hand quiz-mini" data-role="dummy"></div>
-      <p class="quiz-label">Ta main (Sud, déclarant)</p><div class="ex-hand quiz-mini" data-role="me"></div>
-      <p class="quiz-hint">Ouest a 10 cartes, choisies parmi les 20 que tu ne vois pas (ni dans ta main, ni chez le mort).</p>
-      <div class="ex-choices" role="group" aria-label="Réponses">
+      <p class="quiz-label">${T("quiz.dummy")}</p><div class="ex-hand quiz-mini" data-role="dummy"></div>
+      <p class="quiz-label">${T("quiz.me")}</p><div class="ex-hand quiz-mini" data-role="me"></div>
+      <p class="quiz-hint">${T("quiz.hint")}</p>
+      <div class="ex-choices" role="group" aria-label="${T("quiz.aria.answers")}">
         ${ANSWERS.map(a => `<button class="ex-choice" type="button" data-a="${a.key}">${a.label}</button>`).join("")}
       </div>
       <p class="ex-result" data-role="result" aria-live="polite"></p>
       <div class="quiz-follow" data-role="follow" hidden>
-        <p class="ex-q">Quelles couleurs peuvent avoir <strong>autant de cartes</strong> que le ${Exercises.suitName(L)} dans la main d'Ouest ? Coche toutes les bonnes réponses.</p>
-        <div class="ex-choices" role="group" aria-label="Couleurs">
+        <p class="ex-q">${T("quiz.follow.q", { suit: Exercises.suitName(L) })}</p>
+        <div class="ex-choices" role="group" aria-label="${T("ex.aria.colors")}">
           ${others.map(s2 => `<button class="ex-choice" type="button" data-s="${s2}" aria-pressed="false">${Exercises.suitName(s2)}</button>`).join("")}
         </div>
-        <div class="ex-actions"><button class="act" type="button" data-role="follow-check">Vérifier</button></div>
+        <div class="ex-actions"><button class="act" type="button" data-role="follow-check">${T("ex.check")}</button></div>
         <p class="ex-result" data-role="follow-result" aria-live="polite"></p>
       </div>
       <div class="ex-actions" hidden data-role="next"><button class="act" data-role="check" type="button"></button></div>
@@ -233,7 +233,7 @@ const Quiz = (() => {
       const box = q("[data-role=rule]"), open = box.hidden;
       box.hidden = !open;
       e.currentTarget.setAttribute("aria-expanded", open);
-      e.currentTarget.textContent = open ? "Cacher la règle d'entame" : "Voir la règle d'entame";
+      e.currentTarget.textContent = open ? T("quiz.rule.hide") : T("quiz.rule.show");
     };
     Exercises.drawHand(q("[data-role=me]"), game.hands.S, true);
     Exercises.drawHand(q("[data-role=dummy]"), game.hands.N, true);
@@ -243,8 +243,7 @@ const Quiz = (() => {
       res.className = "ex-result " + (ok ? "ok" : "ko");
       res.textContent = text;
     };
-    const fmt = n => n.toLocaleString("fr-FR");
-    const name = s2 => COLOR_NAMES[s2];
+    const fmt = n => I18N.g("num")(n);
     const example = (h, label) => {
       const p = document.createElement("p");
       p.className = "quiz-label";
@@ -261,35 +260,31 @@ const Quiz = (() => {
       why.hidden = false;
       const table = remainingTable(lead);
       why.innerHTML = `<p>${Q.rule}</p>
-        <p class="quiz-label">Les cartes que tu ne vois pas, couleur par couleur :</p>${table.html}`;
+        <p class="quiz-label">${T("quiz.unseen")}</p>${table.html}`;
       if (Q.key === "same") {
         const lines = others.map(s2 => {
           const st = per[s2], r = table.rows[s2];
           if (st.possible) {
             const h = st.example, k = count(h, L);
-            const tie = points(h, s2) === points(h, L) ? ` (autant de points, mais le ${name(L)} passe après le ${name(s2)} dans l'ordre bleu, vert, rouge, jaune)` : "";
-            return `<li>${Exercises.suitName(s2)} : <strong>possible</strong>. Par exemple ${k} cartes ${Exercises.adj(L, k)} (${points(h, L)} points) et ${k} cartes ${Exercises.adj(s2, k)} (${points(h, s2)} points) : Ouest entame bien le ${name(L)}${tie}.</li>`;
+            return `<li>${T("quiz.same.possible", { suit: Exercises.suitName(s2), k, L, s: s2, pL: points(h, L), pS: points(h, s2), tie: points(h, s2) === points(h, L) })}</li>`;
           }
           if (!st.feasible) {
             // Pas assez de cartes pour égaler la couleur la plus longue d'Ouest.
-            const left = r.rest === 0 ? `il ne reste aucune carte ${Exercises.adj(s2, 1)}`
-              : `il ne reste que ${Exercises.plural(r.rest, "carte")} ${Exercises.adj(s2, r.rest)} pour Est et Ouest`;
-            return `<li>${Exercises.suitName(s2)} : <strong>impossible</strong>. Le ${name(L)} est la couleur la plus longue d'Ouest : il en a au moins ${minL} cartes. Or ${left} : pas assez pour en avoir autant.</li>`;
+            return `<li>${T("quiz.same.short", { suit: Exercises.suitName(s2), L, s: s2, minL, rest: r.rest })}</li>`;
           }
           // Assez de cartes, mais la règle d'entame aurait fait jouer autre chose.
           const parts = [];
-          if (st.chosen.has(s2)) parts.push(`à longueur égale, le ${name(s2)} aurait plus de points que le ${name(L)} (les cartes ${Exercises.adj(s2, 2)} qui restent valent ${r.pts} points en tout), et Ouest aurait entamé le ${name(s2)}`);
-          if (st.chosen.has("card")) parts.push(`à longueur égale, Ouest aurait aussi une séquence ou une carte ${Exercises.adj(L, 1)} plus petite, et n'aurait pas entamé le ${lead.v}`);
-          if (!parts.length) parts.push(`la règle d'entame lui aurait fait jouer une autre carte que le ${lead.v} ${name(L)}`);
-          return `<li>${Exercises.suitName(s2)} : <strong>impossible</strong>. Il reste assez de cartes ${Exercises.adj(s2, 2)}, mais ${parts.join(" ; ou bien ")}.</li>`;
+          if (st.chosen.has(s2)) parts.push(T("quiz.same.points", { s: s2, L, pts: r.pts }));
+          if (st.chosen.has("card")) parts.push(T("quiz.same.card", { L, v: lead.v }));
+          if (!parts.length) parts.push(T("quiz.same.other", { L, v: lead.v }));
+          return `<li>${T("quiz.same.rule", { suit: Exercises.suitName(s2), s: s2, parts: parts.join(T("quiz.same.or")) })}</li>`;
         });
-        why.insertAdjacentHTML("beforeend", `<p class="quiz-label">Couleur par couleur :</p><ul class="quiz-reasons">${lines.join("")}</ul>`);
+        why.insertAdjacentHTML("beforeend", `<p class="quiz-label">${T("quiz.perSuit")}</p><ul class="quiz-reasons">${lines.join("")}</ul>`);
       }
-      why.insertAdjacentHTML("beforeend", `<p>En tout, Ouest peut avoir <strong>${fmt(total)}</strong> main${total > 1 ? "s" : ""} différente${total > 1 ? "s" : ""} qui respecte${total > 1 ? "nt" : ""} la règle d'entame.
-        La réponse à la question est oui dans <strong>${fmt(yes)}</strong> d'entre elles${truth === "maybe" ? ` et non dans ${fmt(total - yes)}` : ""}.</p>`);
+      why.insertAdjacentHTML("beforeend", `<p>${T("quiz.total", { total, totalTxt: fmt(total), yesTxt: fmt(yes), noTxt: fmt(total - yes), maybe: truth === "maybe" })}</p>`);
       if (Q.key !== "same") {
-        if (exYes) example(exYes, truth === "maybe" ? "Une main possible d'Ouest où la réponse est oui :" : "Par exemple, Ouest pourrait avoir :");
-        if (exNo) example(exNo, truth === "maybe" ? "Une main possible d'Ouest où la réponse est non :" : "Par exemple, Ouest pourrait avoir :");
+        if (exYes) example(exYes, truth === "maybe" ? T("quiz.ex.yes") : T("quiz.ex.any"));
+        if (exNo) example(exNo, truth === "maybe" ? T("quiz.ex.no") : T("quiz.ex.any"));
       }
       q("[data-role=next]").hidden = false;
       onResult(ok, q("[data-role=check]"));
@@ -301,7 +296,7 @@ const Quiz = (() => {
       buttons.forEach(x => { x.disabled = true; if (x.dataset.a === truth) x.classList.add("ok"); });
       if (!ok) b.classList.add("ko");
       const answer = ANSWERS.find(a => a.key === truth).label;
-      setResult("[data-role=result]", ok, (ok ? "Bravo ! " : "Pas tout à fait. ") + `La bonne réponse : ${answer.toLowerCase()}.`);
+      setResult("[data-role=result]", ok, (ok ? T("ex.ok") : T("ex.notQuite")) + T("quiz.goodAnswer", { answer }));
       if (!followUp) return explain(ok);
 
       // Deuxième question : lesquelles ?
@@ -319,9 +314,8 @@ const Quiz = (() => {
           if (on !== good) ok2 = false;
         }
         q("[data-role=follow-check]").hidden = true;
-        const goods = others.filter(s2 => per[s2].possible).map(name);
-        setResult("[data-role=follow-result]", ok2, (ok2 ? "Bravo ! " : "Pas tout à fait. ") +
-          `${goods.length > 1 ? "Les couleurs possibles : " : "La seule couleur possible : le "}${goods.join(", ")}. Le détail est ci-dessous.`);
+        const goods = others.filter(s2 => per[s2].possible);
+        setResult("[data-role=follow-result]", ok2, (ok2 ? T("ex.ok") : T("ex.notQuite")) + T("quiz.follow.result", { list: goods }));
         explain(ok && ok2);
       };
       picks[0].focus();
@@ -337,12 +331,12 @@ const Quiz = (() => {
     if (game.tricksWon.NS + game.tricksWon.EO === 9) return;
 
     if (moment === "start") {
-      await ask("Question : avant l'entame", body => Exercises.countPanel(body, {
-        hand: game.hands.S, sorted: true, intro: "La donne commence. Voici ta main.", onResult,
+      await ask(T("quiz.title.start"), body => Exercises.countPanel(body, {
+        hand: game.hands.S, sorted: true, intro: T("quiz.start.intro"), onResult,
       }));
     } else if (moment === "lead") {
       if (!RULE_LEADERS.includes(game.types.O) || game.history.length !== 1) return;
-      await ask("Question : après l'entame", leadPanel);
+      await ask(T("quiz.title.lead"), leadPanel);
     } else if (moment === "play") {
       const trickNo = game.tricksWon.NS + game.tricksWon.EO;
       if (!game.trick.length || askedTrick === trickNo) return;
@@ -350,9 +344,9 @@ const Quiz = (() => {
       if (legalCards(game.hands[ctx.seat], game.trick).length < 2) return;
       askedTrick = trickNo;
       const seat = ctx.seat;
-      await ask("Question : avant de jouer", body => Exercises.legalPanel(body, {
+      await ask(T("quiz.title.play"), body => Exercises.legalPanel(body, {
         hand: game.hands[seat], trick: game.trick.map(p => ({ seat: p.seat, card: p.card })), sorted: true,
-        whose: seat === DUMMY ? "que le mort a" : "que tu as", onResult,
+        dummy: seat === DUMMY, onResult,
       }));
     }
   }

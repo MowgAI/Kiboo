@@ -7,30 +7,31 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=2026-10-21-1235">
+<link rel="stylesheet" href="css/style.css?v=2026-10-22-1008">
 </head>
 <body>
 <div class="wrap">
   <header>
     <h1 class="logo kiboo" aria-label="Kiboo"><span>K</span><span>i</span><span>b</span><span>o</span><span>o</span></h1>
     <div class="head-btns">
-      <button class="act ghost" id="btn-feedback" type="button" aria-haspopup="dialog">Donner mon avis</button>
-      <button class="act ghost" id="btn-progress" type="button" aria-haspopup="dialog">Progression</button>
+      <select id="lang" class="lang" aria-label="Langue" data-i18n-aria="head.lang"></select>
+      <button class="act ghost" id="btn-feedback" type="button" aria-haspopup="dialog" data-i18n="head.feedback">Donner mon avis</button>
+      <button class="act ghost" id="btn-progress" type="button" aria-haspopup="dialog" data-i18n="head.progress">Progression</button>
       <button class="act ghost" id="btn-album" type="button" aria-haspopup="dialog">Collection 0/40</button>
-      <button class="act ghost" id="btn-exercises" type="button" aria-haspopup="dialog">Exercices</button>
-      <button class="act ghost" id="btn-rules" type="button" aria-haspopup="dialog">Règles du jeu</button>
+      <button class="act ghost" id="btn-exercises" type="button" aria-haspopup="dialog" data-i18n="head.exercises">Exercices</button>
+      <button class="act ghost" id="btn-rules" type="button" aria-haspopup="dialog" data-i18n="head.rules">Règles du jeu</button>
     </div>
   </header>
 
   <dialog class="rules exercises" id="exercises" aria-labelledby="ex-title">
     <div class="rules-head">
-      <h2 id="ex-title">Exercices</h2>
-      <button class="close" id="btn-ex-close" type="button" aria-label="Fermer les exercices">×</button>
+      <h2 id="ex-title" data-i18n="ex.title">Exercices</h2>
+      <button class="close" id="btn-ex-close" type="button" aria-label="Fermer les exercices" data-i18n-aria="ex.close">×</button>
     </div>
-    <div class="ex-tabs" role="tablist" aria-label="Choix de l'exercice">
-      <button type="button" role="tab" data-ex="count" aria-selected="true">Compter sa main</button>
-      <button type="button" role="tab" data-ex="longest" aria-selected="false">Couleur la plus longue</button>
-      <button type="button" role="tab" data-ex="legal" aria-selected="false">Cartes jouables</button>
+    <div class="ex-tabs" role="tablist" aria-label="Choix de l'exercice" data-i18n-aria="ex.tabs">
+      <button type="button" role="tab" data-ex="count" aria-selected="true" data-i18n="ex.tab.count">Compter sa main</button>
+      <button type="button" role="tab" data-ex="longest" aria-selected="false" data-i18n="ex.tab.longest">Couleur la plus longue</button>
+      <button type="button" role="tab" data-ex="legal" aria-selected="false" data-i18n="ex.tab.legal">Cartes jouables</button>
     </div>
     <p class="ex-score"><span id="ex-score"></span> <span class="gift-progress"></span></p>
     <div id="ex-body" role="tabpanel"></div>
@@ -38,59 +39,59 @@
 
   <dialog class="rules exercises" id="quiz" aria-labelledby="quiz-title">
     <div class="rules-head">
-      <h2 id="quiz-title">Question</h2>
+      <h2 id="quiz-title" data-i18n="quiz.title">Question</h2>
       <p class="gift-progress"></p>
     </div>
     <div id="quiz-body"></div>
-    <div class="ex-actions"><button class="act ghost" id="quiz-skip" type="button">Passer la question</button></div>
+    <div class="ex-actions"><button class="act ghost" id="quiz-skip" type="button" data-i18n="quiz.skip">Passer la question</button></div>
   </dialog>
 
   <dialog class="rules" id="feedback" aria-labelledby="fb-title">
     <div class="rules-head">
-      <h2 id="fb-title">Donner mon avis</h2>
-      <button class="close" id="btn-fb-close" type="button" aria-label="Fermer">×</button>
+      <h2 id="fb-title" data-i18n="fb.title">Donner mon avis</h2>
+      <button class="close" id="btn-fb-close" type="button" aria-label="Fermer" data-i18n-aria="btn.close">×</button>
     </div>
-    <p>Merci de tester Kiboo ! Ton retour aide à améliorer le jeu.</p>
-    <div class="fb-row" role="group" aria-label="Type de retour">
-      <button class="ex-choice" type="button" data-kind="bug">Un problème</button>
-      <button class="ex-choice" type="button" data-kind="idee">Une idée</button>
-      <button class="ex-choice" type="button" data-kind="avis">Mon avis</button>
+    <p data-i18n="fb.intro">Merci de tester Kiboo ! Ton retour aide à améliorer le jeu.</p>
+    <div class="fb-row" role="group" aria-label="Type de retour" data-i18n-aria="fb.kinds">
+      <button class="ex-choice" type="button" data-kind="bug" data-i18n="fb.kind.bug">Un problème</button>
+      <button class="ex-choice" type="button" data-kind="idee" data-i18n="fb.kind.idee">Une idée</button>
+      <button class="ex-choice" type="button" data-kind="avis" data-i18n="fb.kind.avis">Mon avis</button>
     </div>
-    <div class="fb-row fb-stars" role="group" aria-label="Note sur 5">
-      <span>Ta note :</span>
-      <button type="button" data-star="1" aria-label="1 sur 5">★</button><button type="button" data-star="2" aria-label="2 sur 5">★</button><button type="button" data-star="3" aria-label="3 sur 5">★</button><button type="button" data-star="4" aria-label="4 sur 5">★</button><button type="button" data-star="5" aria-label="5 sur 5">★</button>
+    <div class="fb-row fb-stars" role="group" aria-label="Note sur 5" data-i18n-aria="fb.stars">
+      <span data-i18n="fb.yourNote">Ta note :</span>
+      <button type="button" data-star="1" aria-label="1 sur 5" data-i18n-aria="fb.star1">★</button><button type="button" data-star="2" aria-label="2 sur 5" data-i18n-aria="fb.star2">★</button><button type="button" data-star="3" aria-label="3 sur 5" data-i18n-aria="fb.star3">★</button><button type="button" data-star="4" aria-label="4 sur 5" data-i18n-aria="fb.star4">★</button><button type="button" data-star="5" aria-label="5 sur 5" data-i18n-aria="fb.star5">★</button>
     </div>
-    <label class="fb-field" for="fb-text">Ton message
-      <textarea id="fb-text" rows="5" placeholder="Ce qui t'a plu, ce qui ne marche pas, ce que tu faisais quand le problème est arrivé…"></textarea>
+    <label class="fb-field" for="fb-text"><span data-i18n="fb.message">Ton message</span>
+      <textarea id="fb-text" rows="5" placeholder="Ce qui t'a plu, ce qui ne marche pas, ce que tu faisais quand le problème est arrivé…" data-i18n-ph="fb.messagePh"></textarea>
     </label>
-    <label class="fb-field" for="fb-name">Ton prénom (facultatif)
+    <label class="fb-field" for="fb-name"><span data-i18n="fb.name">Ton prénom (facultatif)</span>
       <input id="fb-name" type="text" autocomplete="given-name">
     </label>
     <details class="fb-context">
-      <summary>Informations ajoutées automatiquement</summary>
+      <summary data-i18n="fb.auto">Informations ajoutées automatiquement</summary>
       <pre id="fb-context"></pre>
     </details>
     <div class="ex-actions">
-      <button class="act" id="fb-copy" type="button">Copier mon avis</button>
-      <a class="act ghost" id="fb-github" href="https://github.com/MowgAI/Kiboo/issues/new" target="_blank" rel="noopener">Envoyer sur GitHub</a>
+      <button class="act" id="fb-copy" type="button" data-i18n="fb.copy">Copier mon avis</button>
+      <a class="act ghost" id="fb-github" href="https://github.com/MowgAI/Kiboo/issues/new" target="_blank" rel="noopener" data-i18n="fb.github">Envoyer sur GitHub</a>
     </div>
-    <p class="fb-hint">« Copier mon avis » : colle-le ensuite dans un message à la personne qui t'a envoyé le lien. « Envoyer sur GitHub » demande un compte GitHub.</p>
+    <p class="fb-hint" data-i18n="fb.hint">« Copier mon avis » : colle-le ensuite dans un message à la personne qui t'a envoyé le lien. « Envoyer sur GitHub » demande un compte GitHub.</p>
     <p class="ex-result" id="fb-status" aria-live="polite"></p>
-    <textarea id="fb-fallback" rows="6" hidden aria-label="Texte de ton avis à copier"></textarea>
+    <textarea id="fb-fallback" rows="6" hidden aria-label="Texte de ton avis à copier" data-i18n-aria="fb.fallbackAria"></textarea>
   </dialog>
 
   <dialog class="rules exercises" id="progress" aria-labelledby="progress-title">
     <div class="rules-head">
-      <h2 id="progress-title">Ma progression</h2>
-      <button class="close" id="btn-progress-close" type="button" aria-label="Fermer">×</button>
+      <h2 id="progress-title" data-i18n="prog.title">Ma progression</h2>
+      <button class="close" id="btn-progress-close" type="button" aria-label="Fermer" data-i18n-aria="btn.close">×</button>
     </div>
     <div id="progress-body"></div>
   </dialog>
 
   <dialog class="rules exercises" id="album" aria-labelledby="album-title">
     <div class="rules-head">
-      <h2 id="album-title">Ma collection</h2>
-      <button class="close" id="btn-album-close" type="button" aria-label="Fermer la collection">×</button>
+      <h2 id="album-title" data-i18n="album.title">Ma collection</h2>
+      <button class="close" id="btn-album-close" type="button" aria-label="Fermer la collection" data-i18n-aria="album.close">×</button>
     </div>
     <p class="ex-score" id="album-count"></p>
     <div id="album-body"></div>
@@ -98,9 +99,10 @@
 
   <dialog class="rules" id="rules" aria-labelledby="rules-title">
     <div class="rules-head">
-      <h2 id="rules-title">Règles de <span class="kiboo" aria-label="Kiboo"><span>K</span><span>i</span><span>b</span><span>o</span><span>o</span></span></h2>
-      <button class="close" id="btn-rules-close" type="button" aria-label="Fermer les règles">×</button>
+      <h2 id="rules-title" data-i18n-html="rules.title">Règles de <span class="kiboo" aria-label="Kiboo"><span>K</span><span>i</span><span>b</span><span>o</span><span>o</span></span></h2>
+      <button class="close" id="btn-rules-close" type="button" aria-label="Fermer les règles" data-i18n-aria="rules.close">×</button>
     </div>
+    <div data-i18n-html="rules.body">
     <p><span class="kiboo" aria-label="Kiboo"><span>K</span><span>i</span><span>b</span><span>o</span><span>o</span></span> est un jeu de cartes <strong>inspiré du jeu de bridge</strong>. Il se joue à <strong>4 joueurs</strong>, séparés en <strong>2 équipes</strong> représentées par leur place : <strong>Nord-Sud</strong> contre <strong>Est-Ouest</strong>. Les partenaires sont assis l'un en face de l'autre. Comme le bridge, Kiboo est un <strong>jeu de plis</strong> : un <dfn>pli</dfn> est l'ensemble des quatre cartes jouées à tour de rôle par chacun des quatre joueurs autour de la table.</p>
 
     <h3>Les cartes</h3>
@@ -145,39 +147,40 @@
       <li>Quand c'est votre tour, <strong>cliquez sur une carte mise en avant</strong>. Les cartes que vous n'avez pas le droit de jouer sont grisées.</li>
       <li><strong>Rejouer la donne</strong> redistribue les mêmes cartes, pour essayer une autre façon de jouer.</li>
     </ul>
+    </div>
   </dialog>
 
-  <section class="setup" aria-label="Réglages de la table">
-    <label class="field">Ouest
+  <section class="setup" aria-label="Réglages de la table" data-i18n-aria="setup.aria">
+    <label class="field"><span data-i18n="setup.west">Ouest</span>
       <select id="cfg-O"></select>
     </label>
-    <div class="field">Nord
-      <span class="fixed">le mort, joué par Sud</span>
+    <div class="field"><span data-i18n="setup.north">Nord</span>
+      <span class="fixed" data-i18n="setup.northFixed">le mort, joué par Sud</span>
     </div>
-    <label class="field">Est
+    <label class="field"><span data-i18n="setup.east">Est</span>
       <select id="cfg-E"></select>
     </label>
-    <label class="field">Sud (déclarant)
+    <label class="field"><span data-i18n="setup.south">Sud (déclarant)</span>
       <select id="cfg-S"></select>
     </label>
-    <label class="field">Vitesse des robots
+    <label class="field"><span data-i18n="setup.speed">Vitesse des robots</span>
       <select id="cfg-speed">
-        <option value="1100">Lente</option>
-        <option value="650" selected>Normale</option>
-        <option value="250">Rapide</option>
+        <option value="1100" data-i18n="setup.slow">Lente</option>
+        <option value="650" selected data-i18n="setup.normal">Normale</option>
+        <option value="250" data-i18n="setup.fast">Rapide</option>
       </select>
     </label>
-    <label class="check"><input type="checkbox" id="cfg-open"> Jeux ouverts</label>
-    <label class="check"><input type="checkbox" id="cfg-hints"> Montrer les meilleurs coups</label>
-    <label class="check"><input type="checkbox" id="cfg-explain"> Explications de Piperno</label>
-    <label class="check"><input type="checkbox" id="cfg-quiz"> Questions pendant la partie</label>
-    <label class="check"><input type="checkbox" id="cfg-eval" checked> Mode évaluation</label>
+    <label class="check"><input type="checkbox" id="cfg-open"> <span data-i18n="setup.open">Jeux ouverts</span></label>
+    <label class="check"><input type="checkbox" id="cfg-hints"> <span data-i18n="setup.hints">Montrer les meilleurs coups</span></label>
+    <label class="check"><input type="checkbox" id="cfg-explain"> <span data-i18n="setup.explain">Explications de Piperno</span></label>
+    <label class="check"><input type="checkbox" id="cfg-quiz"> <span data-i18n="setup.quiz">Questions pendant la partie</span></label>
+    <label class="check"><input type="checkbox" id="cfg-eval" checked> <span data-i18n="setup.eval">Mode évaluation</span></label>
     <div class="btns">
-      <button class="act ghost" id="btn-settings-help" type="button" aria-expanded="false" aria-controls="settings-help">Aide des réglages</button>
-      <button class="act ghost" id="btn-replay" type="button">Rejouer la donne</button>
-      <button class="act" id="btn-new" type="button">Nouvelle donne</button>
+      <button class="act ghost" id="btn-settings-help" type="button" aria-expanded="false" aria-controls="settings-help" data-i18n="help.show">Aide des réglages</button>
+      <button class="act ghost" id="btn-replay" type="button" data-i18n="btn.replay">Rejouer la donne</button>
+      <button class="act" id="btn-new" type="button" data-i18n="btn.new">Nouvelle donne</button>
     </div>
-    <div class="note" id="settings-help" hidden>
+    <div class="note" id="settings-help" hidden data-i18n-html="help.list">
       <ul>
         <li>Les changements de joueurs s'appliquent à la <strong>prochaine donne</strong>.</li>
         <li><strong>Jeux ouverts</strong> montre toutes les mains.</li>
@@ -202,9 +205,9 @@
 
   <div class="bar">
     <div class="status" id="status" aria-live="polite"></div>
-    <div class="score" aria-label="Plis gagnés">
-      <div class="team">Nord-Sud <span class="pips" id="pips-NS"></span> <span class="count" id="count-NS">0</span></div>
-      <div class="team">Est-Ouest <span class="pips" id="pips-EO"></span> <span class="count" id="count-EO">0</span></div>
+    <div class="score" aria-label="Plis gagnés" data-i18n-aria="score.aria">
+      <div class="team"><span data-i18n="team.NS">Nord-Sud</span> <span class="pips" id="pips-NS"></span> <span class="count" id="count-NS">0</span></div>
+      <div class="team"><span data-i18n="team.EO">Est-Ouest</span> <span class="pips" id="pips-EO"></span> <span class="count" id="count-EO">0</span></div>
     </div>
   </div>
 
@@ -213,16 +216,20 @@
   <section class="review" id="review" hidden aria-live="polite"></section>
 </div>
 
-<script>window.KIBOO_VERSION = "2026-10-21-1235";   // mis à jour par tools/bump-version.sh</script>
-<script src="js/dds.js?v=2026-10-21-1235"></script>
-<script src="js/pimc.js?v=2026-10-21-1235"></script>
-<script src="js/solver.js?v=2026-10-21-1235"></script>
-<script src="js/images.js?v=2026-10-21-1235"></script>
-<script src="js/game.js?v=2026-10-21-1235"></script>
-<script src="js/rewards.js?v=2026-10-21-1235"></script>
-<script src="js/exercises.js?v=2026-10-21-1235"></script>
-<script src="js/quiz.js?v=2026-10-21-1235"></script>
-<script src="js/evaluation.js?v=2026-10-21-1235"></script>
-<script src="js/feedback.js?v=2026-10-21-1235"></script>
+<script>window.KIBOO_VERSION = "2026-10-22-1008";   // mis à jour par tools/bump-version.sh</script>
+<script src="lang/fr.js?v=2026-10-22-1008"></script>
+<script src="lang/en.js?v=2026-10-22-1008"></script>
+<script src="lang/it.js?v=2026-10-22-1008"></script>
+<script src="js/i18n.js?v=2026-10-22-1008"></script>
+<script src="js/dds.js?v=2026-10-22-1008"></script>
+<script src="js/pimc.js?v=2026-10-22-1008"></script>
+<script src="js/solver.js?v=2026-10-22-1008"></script>
+<script src="js/images.js?v=2026-10-22-1008"></script>
+<script src="js/game.js?v=2026-10-22-1008"></script>
+<script src="js/rewards.js?v=2026-10-22-1008"></script>
+<script src="js/exercises.js?v=2026-10-22-1008"></script>
+<script src="js/quiz.js?v=2026-10-22-1008"></script>
+<script src="js/evaluation.js?v=2026-10-22-1008"></script>
+<script src="js/feedback.js?v=2026-10-22-1008"></script>
 </body>
 </html>

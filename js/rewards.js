@@ -11,7 +11,6 @@
 const Rewards = (() => {
   const KEY = "kiboo.rewards.v1";
   const GOAL = 3;
-  const FAMILIES = ["animaux", "dinosaures", "robots", "métiers"];
   let state = { progress: 0, collection: [] };
 
   try {
@@ -43,11 +42,11 @@ const Rewards = (() => {
   function refresh() {
     for (const el of document.querySelectorAll(".gift-progress")) {
       const dots = "●".repeat(state.progress) + "○".repeat(GOAL - state.progress);
-      el.innerHTML = `Prochain cadeau : <span class="dots" aria-hidden="true">${dots}</span>`;
-      el.setAttribute("aria-label", `Prochain cadeau : ${state.progress} bonne${state.progress > 1 ? "s" : ""} réponse${state.progress > 1 ? "s" : ""} sur ${GOAL}`);
+      el.innerHTML = `${T("gift.next")} <span class="dots" aria-hidden="true">${dots}</span>`;
+      el.setAttribute("aria-label", T("gift.aria", { n: state.progress, goal: GOAL }));
     }
     const btn = $("btn-album");
-    if (btn) btn.textContent = `Collection ${state.collection.length}/40`;
+    if (btn) btn.textContent = T("album.btn", { n: state.collection.length });
   }
 
   // Ajoute à la collection une carte qu'on n'a pas encore (null si elle est complète).
@@ -69,11 +68,11 @@ const Rewards = (() => {
     const canE = opts.canReveal && opts.revealable("E");
     box.innerHTML = `
       <div class="gift">
-        <h3>Bravo, ${GOAL} bonnes réponses ! Choisis ton cadeau.</h3>
+        <h3>${T("gift.title", { goal: GOAL })}</h3>
         <div class="ex-choices" data-role="choices">
-          ${canO ? `<button class="ex-choice" type="button" data-g="O">Voir une carte cachée d'Ouest</button>` : ""}
-          ${canE ? `<button class="ex-choice" type="button" data-g="E">Voir une carte cachée d'Est</button>` : ""}
-          ${complete() ? "" : `<button class="ex-choice" type="button" data-g="col">Gagner une carte pour ma collection</button>`}
+          ${canO ? `<button class="ex-choice" type="button" data-g="O">${T("gift.revealO")}</button>` : ""}
+          ${canE ? `<button class="ex-choice" type="button" data-g="E">${T("gift.revealE")}</button>` : ""}
+          ${complete() ? "" : `<button class="ex-choice" type="button" data-g="col">${T("gift.collect")}</button>`}
         </div>
         <div class="gift-won" data-role="won" hidden></div>
         <div class="ex-actions" data-role="next" hidden><button class="act" type="button" data-role="done">${opts.doneLabel}</button></div>
@@ -101,13 +100,11 @@ const Rewards = (() => {
           const card = grantCard();
           const n = state.collection.length;
           const fam = state.collection.filter(id => Math.floor(id / 10) === card.s).length;
-          show(card, `Nouvelle carte pour ta collection : le <strong>${cardName(card)}</strong> de la famille des ${FAMILIES[card.s]}. ` +
-            `Tu as maintenant ${n} carte${n > 1 ? "s" : ""} sur 40` +
-            (fam === 10 ? `, et la famille des ${FAMILIES[card.s]} est complète !` : ` (${fam} sur 10 chez les ${FAMILIES[card.s]}).`));
+          show(card, T("gift.won", { card: cardName(card), s: card.s, n, fam }));
         } else {
           const seat = b.dataset.g;
           const card = opts.reveal(seat);
-          show(card, `Carte d'${SEAT_NAMES[seat]} révélée : le <strong>${cardName(card)}</strong>. Elle reste visible, entourée de jaune, jusqu'à ce qu'elle soit jouée.`);
+          show(card, T("gift.revealed", { seat, card: cardName(card) }));
         }
       };
     }
@@ -123,7 +120,7 @@ const Rewards = (() => {
       const n = [...have].filter(id => Math.floor(id / 10) === s).length;
       const row = document.createElement("section");
       row.className = "album-row";
-      row.innerHTML = `<h3><span class="fam ${COLORS[s]}">${FAMILIES[s]}</span> <small>${n} sur 10</small></h3><div class="album-cards"></div>`;
+      row.innerHTML = `<h3><span class="fam ${COLORS[s]}">${familyName(s)}</span> <small>${T("album.famCount", { n })}</small></h3><div class="album-cards"></div>`;
       const cards = row.querySelector(".album-cards");
       for (let v = 1; v <= 10; v++) {
         const c = { s, v };
@@ -133,22 +130,21 @@ const Rewards = (() => {
           const slot = document.createElement("div");
           slot.className = "card missing";
           slot.textContent = v;
-          slot.setAttribute("aria-label", `${cardName(c)} : pas encore gagnée`);
+          slot.setAttribute("aria-label", T("album.missing", { card: cardName(c) }));
           slot.setAttribute("role", "img");
           cards.appendChild(slot);
         }
       }
       body.appendChild(row);
     }
-    $("album-count").textContent = complete()
-      ? "Bravo, ta collection est complète !"
-      : `${state.collection.length} carte${state.collection.length > 1 ? "s" : ""} sur 40. Gagne-en de nouvelles avec 3 bonnes réponses aux exercices ou aux questions pendant la partie.`;
+    $("album-count").textContent = complete() ? T("album.complete") : T("album.count", { n: state.collection.length });
   }
 
   $("btn-album").addEventListener("click", () => { renderAlbum(); refresh(); $("album").showModal(); });
   $("btn-album-close").addEventListener("click", () => $("album").close());
   $("album").addEventListener("click", e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
   refresh();
+  document.addEventListener("kiboo-lang", refresh);
 
-  return { answered, giftReady, giftPanel, grantCard, refresh, FAMILIES };
+  return { answered, giftReady, giftPanel, grantCard, refresh };
 })();

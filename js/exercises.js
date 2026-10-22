@@ -14,19 +14,15 @@
    Après la vérification, onResult reçoit le bouton d'action pour en
    faire « Nouvelle main », « Reprendre la partie » ou « Ouvrir ton cadeau ».
    Utilise makeDeck, shuffle, cardEl, cardId, cardName, sortForDisplay,
-   COLORS, COLOR_NAMES et SEAT_NAMES de js/game.js.
+   COLORS de js/game.js, et les textes de lang/*.js (T, colorName, cardAdj…).
    ===================================================================== */
 const Exercises = (() => {
   const score = { done: 0, ok: 0 };
   let current = "count";
 
   const randomHand = () => shuffle(makeDeck()).slice(0, 10);
-  const suitName = s => `<span class="fam ${COLORS[s]}">${COLOR_NAMES[s]}</span>`;
+  const suitName = s => `<span class="fam ${COLORS[s]}">${colorName(s)}</span>`;
   const bySuit = (hand, s) => hand.filter(c => c.s === s).sort((a, b) => b.v - a.v);
-  const plural = (n, word) => `${n} ${word}${n > 1 ? "s" : ""}`;
-  // Couleur accordée avec « carte » : une carte bleue, des cartes bleues.
-  const ADJ = ["bleue", "verte", "rouge", "jaune"];
-  const adj = (s, n) => ADJ[s] + (n > 1 ? "s" : "");
 
   // Affiche une main ; `sorted` la range par couleur, `decorate(el, card)` personnalise chaque carte.
   function drawHand(box, hand, sorted, opts = {}) {
@@ -40,7 +36,7 @@ const Exercises = (() => {
 
   // Case « Ranger la main par couleur » (cochée d'office pour une vraie main de jeu).
   const sortBox = checked =>
-    `<label class="check ex-sort"><input type="checkbox" data-role="sort"${checked ? " checked" : ""}> Ranger la main par couleur</label>`;
+    `<label class="check ex-sort"><input type="checkbox" data-role="sort"${checked ? " checked" : ""}> ${T("ex.sort")}</label>`;
 
   function setResult(body, ok, text) {
     const res = body.querySelector("[data-role=result]");
@@ -52,26 +48,26 @@ const Exercises = (() => {
   function countPanel(body, opts) {
     const hand = opts.hand;
     body.innerHTML = `
-      <p class="ex-q">${opts.intro || "Voici une main de 10 cartes."} Pour chaque couleur, combien as-tu de <strong>cartes</strong> et combien de <strong>points</strong> ? Les points d'une couleur sont la somme des valeurs de ses cartes.</p>
+      <p class="ex-q">${T("ex.count.q", { intro: opts.intro || T("ex.count.intro") })}</p>
       ${sortBox(opts.sorted)}
       <div class="ex-hand" data-role="hand"></div>
       <div class="ex-grid-wrap">
         <table class="ex-grid">
-          <thead><tr><th scope="col">Couleur</th><th scope="col">Cartes</th><th scope="col">Points</th><th scope="col">Correction</th></tr></thead>
+          <thead><tr><th scope="col">${T("ex.col.color")}</th><th scope="col">${T("ex.col.cards")}</th><th scope="col">${T("ex.col.points")}</th><th scope="col">${T("ex.col.fix")}</th></tr></thead>
           <tbody>
             ${[0, 1, 2, 3].map(s => `<tr>
               <th scope="row">${suitName(s)}</th>
-              <td><input data-n="${s}" type="number" inputmode="numeric" min="0" max="10" placeholder="cartes" aria-label="Nombre de cartes ${COLOR_NAMES[s]}"></td>
-              <td><input data-p="${s}" type="number" inputmode="numeric" min="0" max="55" placeholder="points" aria-label="Points ${COLOR_NAMES[s]}"></td>
+              <td><input data-n="${s}" type="number" inputmode="numeric" min="0" max="10" placeholder="${T("ex.ph.cards")}" aria-label="${T("ex.aria.cards", { s })}"></td>
+              <td><input data-p="${s}" type="number" inputmode="numeric" min="0" max="55" placeholder="${T("ex.ph.points")}" aria-label="${T("ex.aria.points", { s })}"></td>
               <td class="ex-fix" data-fix="${s}"></td></tr>`).join("")}
             <tr class="ex-total">
-              <th scope="row">Total des points</th><td></td>
-              <td><input data-total type="number" inputmode="numeric" min="0" max="100" placeholder="points" aria-label="Total des points"></td>
+              <th scope="row">${T("ex.total")}</th><td></td>
+              <td><input data-total type="number" inputmode="numeric" min="0" max="100" placeholder="${T("ex.ph.points")}" aria-label="${T("ex.total")}"></td>
               <td class="ex-fix" data-fix="t"></td></tr>
           </tbody>
         </table>
       </div>
-      <div class="ex-actions"><button class="act" data-role="check" type="button">Vérifier</button></div>
+      <div class="ex-actions"><button class="act" data-role="check" type="button">${T("ex.check")}</button></div>
       <p class="ex-result" data-role="result" aria-live="polite"></p>`;
 
     const q = sel => body.querySelector(sel);
@@ -97,15 +93,13 @@ const Exercises = (() => {
         const okN = mark(q(`[data-n="${s}"]`), cards.length);
         const okP = mark(q(`[data-p="${s}"]`), pts);
         q(`[data-fix="${s}"]`).innerHTML = tick(okN && okP) + (cards.length
-          ? `${plural(cards.length, "carte")} : ${cards.map(c => c.v).join(" + ")} = ${plural(pts, "point")}`
-          : "0 carte : 0 point");
+          ? T("ex.count.fix", { n: cards.length, values: cards.map(c => c.v).join(" + "), pts })
+          : T("ex.count.fixNone"));
       }
       const total = sums.reduce((a, b) => a + b, 0);
       const okT = mark(q("[data-total]"), total);
-      q('[data-fix="t"]').innerHTML = tick(okT) + `${sums.join(" + ")} = ${plural(total, "point")}`;
-      setResult(body, !wrong, wrong
-        ? `${plural(wrong, "réponse")} à revoir : la correction est indiquée pour chaque ligne.`
-        : "Bravo, tout est juste !");
+      q('[data-fix="t"]').innerHTML = tick(okT) + T("ex.count.fixTotal", { sums: sums.join(" + "), total });
+      setResult(body, !wrong, wrong ? T("ex.count.wrong", { n: wrong }) : T("ex.allRight"));
       opts.onResult(!wrong, q("[data-role=check]"));
     };
     q("[data-n='0']").focus();
@@ -115,10 +109,10 @@ const Exercises = (() => {
   function longestPanel(body, opts) {
     const hand = opts.hand;
     body.innerHTML = `
-      <p class="ex-q">Quelle est ta <strong>couleur la plus longue</strong>, c'est-à-dire celle où tu as le plus de cartes ?</p>
+      <p class="ex-q">${T("ex.longest.q")}</p>
       ${sortBox(opts.sorted)}
       <div class="ex-hand" data-role="hand"></div>
-      <div class="ex-choices" role="group" aria-label="Couleurs">
+      <div class="ex-choices" role="group" aria-label="${T("ex.aria.colors")}">
         ${[0, 1, 2, 3].map(s => `<button class="ex-choice" type="button" data-s="${s}">${suitName(s)}</button>`).join("")}
       </div>
       <div class="ex-actions" hidden data-role="next"><button class="act" data-role="check" type="button"></button></div>
@@ -141,12 +135,7 @@ const Exercises = (() => {
           if (longest.includes(+b.dataset.s)) b.classList.add("ok");
         });
         if (!ok) btn.classList.add("ko");
-        const detail = [0, 1, 2, 3].map(s => `${COLOR_NAMES[s]} ${counts[s]}`).join(", ");
-        const tie = longest.length > 1
-          ? ` ${longest.map(s => COLOR_NAMES[s]).join(" et ")} ont chacune ${max} cartes : ${longest.length === 2 ? "les deux réponses sont justes" : "toutes ces réponses sont justes"}.`
-          : "";
-        setResult(body, ok, (ok ? "Bravo ! " : `Pas tout à fait : ta couleur la plus longue est le ${longest.map(s => COLOR_NAMES[s]).join(" ou le ")}. `) +
-          `Nombre de cartes : ${detail}.` + tie);
+        setResult(body, ok, T("ex.longest.result", { ok, longest, counts, max }));
         q("[data-role=next]").hidden = false;
         opts.onResult(ok, q("[data-role=check]"));
       };
@@ -164,15 +153,15 @@ const Exercises = (() => {
     const picked = new Set();
     let checked = false;
 
-    const played = trick.map(p => `${SEAT_NAMES[p.seat]} : <strong>${cardName(p.card)}</strong>`).join(", ");
+    const played = trick.map(p => T("ex.legal.playedItem", { seat: seatName(p.seat), card: cardName(p.card) })).join(", ");
     body.innerHTML = `
       <div class="ex-led"><div class="ex-led-cards" data-role="trick"></div>
-        <p>${trick.length === 1 ? `${SEAT_NAMES[trick[0].seat]} entame le <strong>${cardName(trick[0].card)}</strong>` : `Déjà joué dans ce pli : ${played}`}.
-        La couleur demandée est le ${suitName(led)}.</p></div>
-      <p class="ex-q">Clique sur <strong>toutes les cartes</strong> ${opts.whose || "que tu as"} le droit de jouer, puis vérifie.</p>
+        <p>${trick.length === 1 ? T("ex.legal.lead", { seat: seatName(trick[0].seat), card: cardName(trick[0].card) }) : T("ex.legal.played", { list: played })}.
+        ${T("ex.legal.ledSuit", { suit: suitName(led) })}</p></div>
+      <p class="ex-q">${opts.dummy ? T("ex.legal.q.dummy") : T("ex.legal.q.me")}</p>
       ${sortBox(opts.sorted)}
       <div class="ex-hand" data-role="hand"></div>
-      <div class="ex-actions"><button class="act" data-role="check" type="button">Vérifier</button></div>
+      <div class="ex-actions"><button class="act" data-role="check" type="button">${T("ex.check")}</button></div>
       <p class="ex-result" data-role="result" aria-live="polite"></p>`;
     const q = sel => body.querySelector(sel);
     for (const p of trick) q("[data-role=trick]").appendChild(cardEl(p.card));
@@ -208,13 +197,8 @@ const Exercises = (() => {
       draw();
       const legal = hand.filter(isLegal);
       const wrong = hand.filter(c => picked.has(cardId(c)) !== isLegal(c)).length;
-      const why = follows
-        ? `Tu as du ${COLOR_NAMES[led]} : tu dois fournir. ` + (legal.length === 1
-          ? `Seule ta carte ${adj(led, 1)} est jouable.`
-          : `Seules tes ${legal.length} cartes ${adj(led, 2)} sont jouables.`)
-        : `Tu n'as pas de ${COLOR_NAMES[led]} : tu peux défausser n'importe quelle carte. ${hand.length === 1 ? "Ta carte est jouable." : `Les ${hand.length} sont jouables.`}`;
-      setResult(body, !wrong, (wrong ? "Pas tout à fait. " : "Bravo ! ") + why +
-        (wrong ? " Les cartes entourées en pointillés étaient jouables mais non choisies ; celles entourées de rouge ne l'étaient pas." : ""));
+      const why = T("ex.legal.why", { follows, led, n: legal.length, hand: hand.length });
+      setResult(body, !wrong, (wrong ? T("ex.notQuite") : T("ex.ok")) + why + (wrong ? T("ex.legal.legend") : ""));
       opts.onResult(!wrong, q("[data-role=check]"));
     };
   }
@@ -244,20 +228,18 @@ const Exercises = (() => {
     if (ok) score.ok++;
     renderScore();
     Rewards.answered(ok);
-    const next = btn => { btn.textContent = "Nouvelle main"; btn.onclick = render; btn.focus(); };
+    const next = btn => { btn.textContent = T("ex.newHand"); btn.onclick = render; btn.focus(); };
     if (Rewards.giftReady({ canReveal: false })) {
-      btn.textContent = "Ouvrir ton cadeau";
+      btn.textContent = T("ex.openGift");
       btn.onclick = () => Rewards.giftPanel($("ex-body"), {
-        canReveal: false, doneLabel: "Continuer les exercices", onDone: render,
+        canReveal: false, doneLabel: T("ex.continue"), onDone: render,
       });
       btn.focus();
     } else next(btn);
   }
 
   function renderScore() {
-    $("ex-score").textContent = score.done
-      ? `Exercices réussis : ${score.ok} sur ${score.done}`
-      : "Choisis un exercice. Tes réussites s'affichent ici.";
+    $("ex-score").textContent = score.done ? T("ex.score", score) : T("ex.scoreNone");
   }
 
   function render() {
@@ -280,6 +262,8 @@ const Exercises = (() => {
   $("btn-exercises").addEventListener("click", open);
   $("btn-ex-close").addEventListener("click", () => $("exercises").close());
   $("exercises").addEventListener("click", e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
+  // Changement de langue : l'exercice affiché sera recréé à la prochaine ouverture.
+  document.addEventListener("kiboo-lang", () => { $("ex-body").innerHTML = ""; });
 
-  return { countPanel, longestPanel, legalPanel, drawHand, suitName, plural, adj };
+  return { countPanel, longestPanel, legalPanel, drawHand, suitName };
 })();

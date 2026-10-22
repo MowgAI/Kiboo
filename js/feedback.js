@@ -11,24 +11,25 @@
 const Feedback = (() => {
   const VERSION = window.KIBOO_VERSION || "?";
   const ISSUES = "https://github.com/MowgAI/Kiboo/issues/new";
-  const KINDS = { bug: "Un problème", idee: "Une idée", avis: "Mon avis" };
+  const kindName = k => T("fb.kind." + k);
   let kind = "avis", stars = 0;
 
   // Ce qui aide à comprendre un retour, sans rien de personnel.
   function context() {
-    const robots = game ? ["O", "E", "S"].map(s => `${SEAT_NAMES[s]} : ${PLAYER_TYPES[game.types[s]].label}`).join(", ") : "-";
+    const robots = game ? ["O", "E", "S"].map(s => `${seatName(s)} : ${PLAYER_TYPES[game.types[s]].label}`).join(", ") : "-";
     const options = [
-      config.open && "jeux ouverts", config.hints && "meilleurs coups",
-      config.explain && "explications de Piperno", config.quiz && "questions pendant la partie",
-    ].filter(Boolean).join(", ") || "aucune";
-    const trick = !game ? "-" : game.over ? "donne terminée" : `pli ${game.tricksWon.NS + game.tricksWon.EO + 1}, Nord-Sud ${game.tricksWon.NS} - Est-Ouest ${game.tricksWon.EO}`;
+      config.open && T("fb.opt.open"), config.hints && T("fb.opt.hints"),
+      config.explain && T("fb.opt.explain"), config.quiz && T("fb.opt.quiz"),
+    ].filter(Boolean).join(", ") || T("fb.opt.none");
+    const trick = !game ? "-" : game.over ? T("fb.ctx.over") : T("fb.ctx.trick", { n: game.tricksWon.NS + game.tricksWon.EO + 1, ns: game.tricksWon.NS, eo: game.tricksWon.EO });
     return [
-      `Version : ${VERSION}`,
-      `Écran : ${window.innerWidth} × ${window.innerHeight}${matchMedia("(pointer: coarse)").matches ? " (tactile)" : ""}`,
-      `Navigateur : ${navigator.userAgent}`,
-      `Joueurs : ${robots}`,
-      `Options : ${options}`,
-      `Partie : ${trick}`,
+      `${T("fb.ctx.version")} : ${VERSION}`,
+      `${T("fb.ctx.lang")} : ${I18N.lang}`,
+      `${T("fb.ctx.screen")} : ${window.innerWidth} × ${window.innerHeight}${matchMedia("(pointer: coarse)").matches ? T("fb.ctx.touch") : ""}`,
+      `${T("fb.ctx.browser")} : ${navigator.userAgent}`,
+      `${T("fb.ctx.players")} : ${robots}`,
+      `${T("fb.ctx.options")} : ${options}`,
+      `${T("fb.ctx.game")} : ${trick}`,
     ].join("\n");
   }
 
@@ -36,11 +37,11 @@ const Feedback = (() => {
     const text = $("fb-text").value.trim();
     const who = $("fb-name").value.trim();
     return [
-      `Avis sur Kiboo : ${KINDS[kind].toLowerCase()}`,
-      stars ? `Note : ${"★".repeat(stars)}${"☆".repeat(5 - stars)} (${stars}/5)` : null,
-      who ? `De : ${who}` : null,
+      T("fb.msg.title", { kind: kindName(kind) }),
+      stars ? `${T("fb.msg.note")} : ${"★".repeat(stars)}${"☆".repeat(5 - stars)} (${stars}/5)` : null,
+      who ? `${T("fb.msg.from")} : ${who}` : null,
       "",
-      text || "(pas de message)",
+      text || T("fb.msg.empty"),
       "",
       "---",
       context(),
@@ -51,7 +52,7 @@ const Feedback = (() => {
     for (const b of document.querySelectorAll("#feedback [data-kind]")) b.setAttribute("aria-pressed", b.dataset.kind === kind);
     for (const b of document.querySelectorAll("#feedback [data-star]")) b.classList.toggle("on", +b.dataset.star <= stars);
     $("fb-context").textContent = context();
-    const title = `[${KINDS[kind]}] ${$("fb-text").value.trim().split("\n")[0].slice(0, 70) || "Avis sur Kiboo"}`;
+    const title = `[${kindName(kind)}] ${$("fb-text").value.trim().split("\n")[0].slice(0, 70) || T("fb.issueDefault")}`;
     $("fb-github").href = `${ISSUES}?title=${encodeURIComponent(title)}&body=${encodeURIComponent(message())}`;
   }
 
@@ -61,14 +62,14 @@ const Feedback = (() => {
     const text = message();
     try {
       await navigator.clipboard.writeText(text);
-      status("Avis copié. Colle-le dans un message (e-mail, SMS…) à la personne qui t'a envoyé le lien. Merci !");
+      status(T("fb.copied"));
     } catch (e) {
       // Presse-papiers refusé : on montre le texte sélectionné pour une copie à la main.
       const area = $("fb-fallback");
       area.hidden = false;
       area.value = text;
       area.select();
-      status("La copie automatique n'a pas marché : le texte est sélectionné ci-dessous, copie-le avec Ctrl+C (ou un appui long).");
+      status(T("fb.copyFailed"));
     }
   }
 
