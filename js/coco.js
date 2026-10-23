@@ -16,6 +16,11 @@
      que les cases déjà déductibles : un défenseur qui ne fournit pas avait
      autant de cartes de la couleur qu'il en a jouées, et les totaux à 10
      font le reste. En fin de donne, le vrai carré est montré.
+   - Mode Goat (même réglage, choix « Goat ») : le programme remplit le
+     carré tout seul pendant la donne et explique chaque déduction. Une case
+     encore inconnue montre « ≥ n » quand le défenseur a déjà joué n cartes
+     de la couleur. Goat est une aide : la donne n'est pas comptée dans
+     l'évaluation.
    ===================================================================== */
 const Coco = (() => {
   const ORDER = ["O", "N", "E", "S"];                  // colonnes, en commençant par Ouest
@@ -234,12 +239,96 @@ const Coco = (() => {
     state.revealed = true;
   }
 
+  /* ---------- Mode Goat : le carré se remplit tout seul ---------- */
+  // Rejoue l'historique de la donne : chaque défausse d'un défenseur fixe une
+  // case, puis les totaux à 10 en donnent d'autres. Chaque déduction est notée.
+  function goatAnalyse(g) {
+    const M = matrix(g.initial);
+    let known = [0, 1, 2, 3].map(() => ORDER.map(x => x === "N" || x === "S"));
+    const fresh = new Set();                         // cases trouvées au dernier coup
+    const log = [{ trick: 0, k: "goat.start", p: { rest: [0, 1, 2, 3].map(s => M[s][0] + M[s][2]) } }];
+    const led = {}, played = { O: [[], [], [], []], E: [[], [], [], []] };
+    const lower = (s, j) => (ORDER[j] in played ? played[ORDER[j]][s].length : 0);
+    // Une ligne ou une colonne dont les cases connues plus les « au moins » font
+    // déjà 10 : chaque case inconnue vaut exactement son « au moins ».
+    function bounds(trick, last) {
+      const lines = [];
+      for (let s = 0; s < 4; s++) lines.push({ kind: "row", s, cells: [0, 1, 2, 3].map(j => [s, j]) });
+      for (let j = 0; j < 4; j++) lines.push({ kind: "col", j, cells: [0, 1, 2, 3].map(s => [s, j]) });
+      for (const ln of lines) {
+        const miss = ln.cells.filter(([s, j]) => !known[s][j]);
+        if (miss.length < 2) continue;                 // une seule case : les totaux s'en chargent
+        const sum = ln.cells.reduce((t, [s, j]) => t + (known[s][j] ? M[s][j] : lower(s, j)), 0);
+        if (sum !== 10) continue;
+        const cells = miss.map(([s, j]) => ({ s, seat: ORDER[j], n: lower(s, j) }));
+        miss.forEach(([s, j]) => { known[s][j] = true; if (last) fresh.add(s + "-" + j); });
+        log.push({ trick, k: ln.kind === "row" ? "goat.bound.row" : "goat.bound.col", p: { s: ln.s, seat: ORDER[ln.j], cells, known: ln.cells.filter(c => !miss.includes(c)).map(([s, j]) => M[s][j]) } });
+        return true;
+      }
+      return false;
+    }
+    function close(trick, last) {
+      for (let again = true; again;) {
+        const res = propagate(M, known);
+        for (const st of res.steps) {
+          log.push({ trick, k: st.k, p: st.p });
+          if (last) fresh.add(st.p.s + "-" + ORDER.indexOf(st.p.seat));
+        }
+        known = res.known;
+        again = bounds(trick, last);
+      }
+    }
+    g.history.forEach((h, i) => {
+      const last = i === g.history.length - 1;
+      if (!(h.trickNo in led)) led[h.trickNo] = h.card.s;
+      if (h.seat in played) played[h.seat][h.card.s].push(h.card.v);
+      const L = led[h.trickNo], j = ORDER.indexOf(h.seat);
+      if (h.card.s !== L && h.seat in played && !known[L][j]) {
+        known[L][j] = true;
+        if (last) fresh.add(L + "-" + j);
+        log.push({ trick: h.trickNo, k: "goat.void", p: { seat: h.seat, card: h.card, s: L, n: M[L][j], cards: played[h.seat][L].slice() } });
+      }
+      close(h.trickNo, last);
+    });
+    return { M, known, fresh, log, played, done: known.every(r => r.every(Boolean)) };
+  }
+
+  function goatRender() {
+    const box = $("coco");
+    const A = goatAnalyse(game);
+    const cell = (s, j) => {
+      const x = ORDER[j], id = s + "-" + j;
+      if (A.known[s][j]) return `<td class="given${A.fresh.has(id) ? " fresh" : ""}">${A.M[s][j]}</td>`;
+      const n = A.played[x][s].length;
+      return `<td class="unknown">${n ? "≥ " + n : "?"}</td>`;
+    };
+    const head = `<tr><th class="corner"></th>${ORDER.map(x => `<th scope="col"><span class="seat-name ${TEAM[x]}">${seatName(x)}</span></th>`).join("")}<th class="corner" scope="col">${T("coco.total")}</th></tr>`;
+    const rows = [0, 1, 2, 3].map(s => `<tr><th scope="row">${Exercises.suitName(s)}</th>${[0, 1, 2, 3].map(j => cell(s, j)).join("")}<td class="corner">10</td></tr>`).join("");
+    const foot = `<tr><th class="corner" scope="row">${T("coco.total")}</th>${ORDER.map(() => `<td class="corner">10</td>`).join("")}<td class="corner"></td></tr>`;
+    const items = A.log.slice().reverse().map(e =>
+      `<li>${e.trick ? `<b>${T("goat.trick", { n: e.trick })}</b> · ` : ""}${T(e.k, e.p)}</li>`).join("");
+    box.innerHTML = `<h2>${T("goat.title")}</h2>
+      <p>${T("goat.intro")}</p>
+      <div class="ex-grid-wrap"><table class="coco goat"><thead>${head}</thead><tbody>${rows}${foot}</tbody></table></div>
+      ${A.done ? `<p class="ex-result ok">${T("goat.done")}</p>` : A.log.length === 1 ? `<p class="coco-legend">${T("goat.none")}</p>` : ""}
+      <p class="quiz-label">${T("goat.why")}</p><ul class="goat-log">${items}</ul>`;
+  }
+
   // Appelé à chaque affichage de la table (js/game.js).
   function render() {
     const box = $("coco");
-    const on = config.coco && !!game && game.types.S === "humain";
+    const on = config.coco !== "off" && !!game && game.types.S === "humain";
     box.hidden = !on;
     if (!on) return;
+    if (config.coco === "goat") {
+      // Goat est une aide : la donne ne compte pas pour l'évaluation.
+      game.assisted = true;
+      state = null;
+      const key = game.history.length + (game.over ? "!" : "") + I18N.lang;
+      if (box.dataset.goat !== key) { box.dataset.goat = key; goatRender(); }
+      return;
+    }
+    box.dataset.goat = "";
     if (!state || state.g !== game) build();
     if (game.over && !state.revealed) reveal();
   }
@@ -249,7 +338,7 @@ const Coco = (() => {
     if (!state || !game) return;
     const entries = state.entries, wasRevealed = state.revealed;
     state = null;
-    if (!config.coco || game.types.S !== "humain") return;
+    if (config.coco !== "manual" || game.types.S !== "humain") return;
     build();
     for (const [k, v] of entries) {
       const [s, j] = k.split("-").map(Number);

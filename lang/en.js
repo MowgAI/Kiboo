@@ -57,7 +57,7 @@
         <li>At the end of the deal, the DDS makes a <strong>review</strong> of the cards that cost tricks.</li>
         <li><strong>Evaluation mode</strong>: compares your deal (as South) with Piperno, Averell and Averell250 on the same cards; your duplicate score is shown at the end of the deal.</li>
         <li><strong>Questions during play</strong> (when you are declarer, as South): <strong>A few</strong> asks at least one per deal, drawn at random; <strong>All</strong> asks them all, for training. Every 3 right answers, you choose a gift.</li>
-        <li><strong>Coco's square</strong>: during the deal, a table of each player's starting cards in each suit (North and South filled in for you), to complete for West and East as the tricks go by.</li>
+        <li><strong>Coco's square</strong>: during the deal, a table of each player's starting cards in each suit (North and South filled in for you), to complete for West and East as the tricks go by. With <strong>Goat</strong>, the square fills in by itself and each deduction is explained (it's a help: the deal isn't evaluated).</li>
         <li>When you play, each trick stays on the table until you click <strong>Next trick</strong>: take the time to remember the cards played.</li>
       </ul>`,
     "player.human": "Human",
@@ -207,7 +207,21 @@
     "quiz.goodAnswer": p => `The right answer: ${p.answer.toLowerCase()}.`,
     "quiz.follow.result": p => (p.list.length > 1 ? "The possible suits: " : "The only possible suit: ") + p.list.map(s => C[s]).join(", ") + ". Details below.",
     /* ---------- Coco's square ---------- */
-    "setup.coco": "Fill in Coco's square",
+    "setup.coco": "Coco's square",
+    "setup.coco.off": "Off",
+    "setup.coco.manual": "I fill it in",
+    "setup.coco.goat": "Goat (automatic)",
+    "goat.title": "Coco's square, Goat mode",
+    "goat.intro": "Goat fills in the square by itself during the deal and explains each deduction. In yellow: what it has just found. “≥ 2”: at least 2 (the defender has already played 2).",
+    "goat.why": "Goat's deductions (most recent first):",
+    "goat.trick": p => `Trick ${p.n}`,
+    "goat.start": p => `Start of the deal: North (dummy) and South (your hand) are counted. Between them, West and East have ${p.rest.map((n, s) => `${n} ${C[s]} ${S(n, "card", "cards")}`).join(", ")}.`,
+    "goat.void": p => `${seatName(p.seat)} can't follow in ${C[p.s]} (he discards the ${cardName(p.card)}): he has none left. ` +
+      (p.n ? `He has played ${p.n} (${p.cards.join(", ")}): so he had <strong>${p.n}</strong> ${C[p.s]} ${S(p.n, "card", "cards")} at the start.` : `He had <strong>none</strong> at the start.`),
+    "goat.bound.row": p => `Row ${C[p.s]}: ${p.known.length ? `${10 - p.known.reduce((a, b) => a + b, 0)} cards are left for ` : ""}${p.cells.map(c => seatName(c.seat)).join(" and ")}, and ${p.cells.length > 1 ? "each has already played that many" : "he has already played that many"}: ${p.cells.map(c => `<strong>${c.n}</strong> for ${seatName(c.seat)}`).join(", ")}.`,
+    "goat.bound.col": p => `Column ${seatName(p.seat)}: his known cards and the ones already played already make 10: ${p.cells.map(c => `<strong>${c.n}</strong> ${C[c.s]} ${S(c.n, "card", "cards")}`).join(", ")}.`,
+    "goat.none": "No deduction yet: Goat is waiting for a defender who can't follow suit.",
+    "goat.done": "The square is complete: Goat knows the whole starting distribution!",
     "ex.tab.coco": "Coco's square",
     "coco.title": "Coco's square",
     "coco.intro": "At the start, each player has <strong>10 cards</strong>, and each suit also has <strong>10 cards</strong>. In Coco's square, each box gives the number of cards of a suit (the row) held by a player (the column) at the start of the deal: so every row and every column adds up to <strong>10</strong>. Fill in the empty boxes.",
@@ -318,7 +332,7 @@
     "eval.better": "you did better",
     "eval.equal": "tie",
     "eval.more": p => `${p.n} more ${S(p.n, "trick", "tricks")}`,
-    "eval.notCounted": p => `Deal not counted in your progress (${p.replayed ? "replayed deal" : "help used: best plays, open hands or revealed card"}).`,
+    "eval.notCounted": p => `Deal not counted in your progress (${p.replayed ? "replayed deal" : "help used: best plays, open hands, revealed card or Goat"}).`,
     "eval.levelUp": p => `New level: <strong>${p.name}</strong>!${p.card ? ` You win the <strong>${p.card}</strong> for your collection.` : ""}`,
     "eval.score": p => `Your duplicate score: <strong>${p.pct}%</strong>`,
     "eval.col.declarer": "Declarer",

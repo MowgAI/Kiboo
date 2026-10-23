@@ -60,7 +60,7 @@
         <li>En fin de donne, le DDS fait le <strong>bilan</strong> des cartes qui ont coûté des plis.</li>
         <li><strong>Mode évaluation</strong> : compare ta donne (en Sud) à celle de Piperno, Averell et Averell250 sur les mêmes cartes ; ton score duplicate s'affiche en fin de donne.</li>
         <li><strong>Questions pendant la partie</strong> (quand tu es le déclarant, en Sud) : <strong>Quelques-unes</strong> en pose au moins une par donne, tirées au sort ; <strong>Toutes</strong> les pose toutes, pour s'entraîner. Toutes les 3 bonnes réponses, tu choisis un cadeau.</li>
-        <li><strong>Carré de Coco</strong> : pendant la donne, un tableau des cartes de départ de chaque couleur chez chaque joueur (Nord et Sud remplis d'office), à compléter pour Ouest et Est au fil des plis.</li>
+        <li><strong>Carré de Coco</strong> : pendant la donne, un tableau des cartes de départ de chaque couleur chez chaque joueur (Nord et Sud remplis d'office), à compléter pour Ouest et Est au fil des plis. Avec <strong>Goat</strong>, le carré se remplit tout seul et chaque déduction est expliquée (c'est une aide : la donne n'est pas évaluée).</li>
         <li>Quand tu joues, chaque pli reste sur la table jusqu'à ton clic sur <strong>Pli suivant</strong> : prends le temps de retenir les cartes jouées.</li>
       </ul>`,
     "player.human": "Humain",
@@ -210,7 +210,21 @@
     "quiz.goodAnswer": p => `La bonne réponse : ${p.answer.toLowerCase()}.`,
     "quiz.follow.result": p => (p.list.length > 1 ? "Les couleurs possibles : " : "La seule couleur possible : le ") + p.list.map(s => C[s]).join(", ") + ". Le détail est ci-dessous.",
     /* ---------- Carré de Coco ---------- */
-    "setup.coco": "Remplir le carré de Coco",
+    "setup.coco": "Carré de Coco",
+    "setup.coco.off": "Non",
+    "setup.coco.manual": "Je le remplis",
+    "setup.coco.goat": "Goat (automatique)",
+    "goat.title": "Le carré de Coco, mode Goat",
+    "goat.intro": "Goat remplit le carré tout seul pendant la donne et explique chaque déduction. En jaune : ce qu'il vient de trouver. « ≥ 2 » : au moins 2 (le défenseur en a déjà joué 2).",
+    "goat.why": "Les déductions de Goat (la plus récente en haut) :",
+    "goat.trick": p => `Pli ${p.n}`,
+    "goat.start": p => `Début de la donne : Nord (le mort) et Sud (ta main) sont comptés. Ouest et Est ont ensemble ${p.rest.map((n, s) => `${n} ${S(n, "carte", "cartes")} ${cardAdj(s, n)}`).join(", ")}.`,
+    "goat.void": p => `${seatName(p.seat)} ne fournit pas en ${C[p.s]} (il défausse le ${cardName(p.card)}) : il n'en a plus. ` +
+      (p.n ? `Il en a joué ${p.n} (${p.cards.join(", ")}) : il avait donc <strong>${p.n}</strong> ${S(p.n, "carte", "cartes")} ${cardAdj(p.s, p.n)} au départ.` : `Il n'en avait <strong>aucune</strong> au départ.`),
+    "goat.bound.row": p => `Ligne ${C[p.s]} : ${p.known.length ? `il reste ${10 - p.known.reduce((a, b) => a + b, 0)} cartes ${cardAdj(p.s, 2)} pour ` : ""}${p.cells.map(c => seatName(c.seat)).join(" et ")}, et ${p.cells.length > 1 ? "chacun en a déjà joué autant" : "il en a déjà joué autant"} : ${p.cells.map(c => `<strong>${c.n}</strong> chez ${seatName(c.seat)}`).join(", ")}.`,
+    "goat.bound.col": p => `Colonne ${seatName(p.seat)} : ses cartes connues et celles déjà jouées font déjà 10 : ${p.cells.map(c => `<strong>${c.n}</strong> ${S(c.n, "carte", "cartes")} ${cardAdj(c.s, c.n)}`).join(", ")}.`,
+    "goat.none": "Pas encore de déduction : Goat attend qu'un défenseur ne fournisse pas.",
+    "goat.done": "Le carré est complet : Goat connaît toute la distribution de départ !",
     "ex.tab.coco": "Carré de Coco",
     "coco.title": "Le carré de Coco",
     "coco.intro": "Au départ, chaque joueur a <strong>10 cartes</strong>, et chaque couleur a aussi <strong>10 cartes</strong>. Dans le carré de Coco, chaque case donne le nombre de cartes d'une couleur (la ligne) chez un joueur (la colonne) au départ de la donne : chaque ligne et chaque colonne font donc <strong>10</strong>. Complète les cases vides.",
@@ -321,7 +335,7 @@
     "eval.better": "tu fais mieux",
     "eval.equal": "égalité",
     "eval.more": p => `${p.n} ${S(p.n, "pli", "plis")} de plus`,
-    "eval.notCounted": p => `Donne non comptée dans ta progression (${p.replayed ? "donne rejouée" : "aide utilisée : meilleurs coups, jeux ouverts ou carte révélée"}).`,
+    "eval.notCounted": p => `Donne non comptée dans ta progression (${p.replayed ? "donne rejouée" : "aide utilisée : meilleurs coups, jeux ouverts, carte révélée ou Goat"}).`,
     "eval.levelUp": p => `Nouveau niveau : <strong>${p.name}</strong> !${p.card ? ` Tu gagnes le <strong>${p.card}</strong> pour ta collection.` : ""}`,
     "eval.score": p => `Ton score duplicate : <strong>${p.pct} %</strong>`,
     "eval.col.declarer": "Déclarant",

@@ -245,7 +245,7 @@ const PLAYER_TYPES = {
 };
 
 /* ===================== État de la partie ===================== */
-const config = { O: "deterministe", E: "deterministe", S: "humain", speed: 650, open: false, hints: false, explain: false, quiz: "off", eval: true, coco: false };
+const config = { O: "deterministe", E: "deterministe", S: "humain", speed: 650, open: false, hints: false, explain: false, quiz: "off", eval: true, coco: "off" };
 let game = null;
 let runToken = 0;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -669,7 +669,7 @@ $("cfg-hints").addEventListener("change", e => { config.hints = e.target.checked
 $("cfg-explain").addEventListener("change", e => { config.explain = e.target.checked; render(); });
 $("cfg-quiz").addEventListener("change", e => { config.quiz = e.target.value; });
 $("cfg-eval").addEventListener("change", e => { config.eval = e.target.checked; });
-$("cfg-coco").addEventListener("change", e => { config.coco = e.target.checked; render(); });
+$("cfg-coco").addEventListener("change", e => { config.coco = e.target.value; render(); });
 $("btn-new").addEventListener("click", () => newGame(dealHands()));
 // Règles du jeu : fenêtre modale, fermée par le bouton ×, la touche Échap ou un clic à côté.
 $("btn-rules").addEventListener("click", () => $("rules").showModal());

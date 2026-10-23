@@ -64,7 +64,7 @@
         <li>A fine smazzata, il DDS fa il <strong>bilancio</strong> delle carte che sono costate prese.</li>
         <li><strong>Modalità valutazione</strong>: confronta la tua smazzata (in Sud) con quella di Piperno, Averell e Averell250 con le stesse carte; il tuo punteggio duplicato appare a fine smazzata.</li>
         <li><strong>Domande durante la partita</strong> (quando sei il dichiarante, in Sud): <strong>Alcune</strong> ne pone almeno una per smazzata, estratte a sorte; <strong>Tutte</strong> le pone tutte, per allenarsi. Ogni 3 risposte giuste, scegli un regalo.</li>
-        <li><strong>Quadrato di Coco</strong>: durante la smazzata, una tabella delle carte iniziali di ogni colore per ogni giocatore (Nord e Sud già riempiti), da completare per Ovest ed Est presa dopo presa.</li>
+        <li><strong>Quadrato di Coco</strong>: durante la smazzata, una tabella delle carte iniziali di ogni colore per ogni giocatore (Nord e Sud già riempiti), da completare per Ovest ed Est presa dopo presa. Con <strong>Goat</strong>, il quadrato si riempie da solo e ogni deduzione è spiegata (è un aiuto: la smazzata non viene valutata).</li>
         <li>Quando giochi, ogni presa resta sul tavolo finché non clicchi su <strong>Presa successiva</strong>: prenditi il tempo di ricordare le carte giocate.</li>
       </ul>`,
     "player.human": "Umano",
@@ -214,7 +214,21 @@
     "quiz.goodAnswer": p => `La risposta giusta: ${p.answer.toLowerCase()}.`,
     "quiz.follow.result": p => (p.list.length > 1 ? "I colori possibili: " : "L'unico colore possibile: il ") + p.list.map(s => C[s]).join(", ") + ". I dettagli sono qui sotto.",
     /* ---------- Il quadrato di Coco ---------- */
-    "setup.coco": "Riempi il quadrato di Coco",
+    "setup.coco": "Quadrato di Coco",
+    "setup.coco.off": "No",
+    "setup.coco.manual": "Lo riempio io",
+    "setup.coco.goat": "Goat (automatico)",
+    "goat.title": "Il quadrato di Coco, modalità Goat",
+    "goat.intro": "Goat riempie il quadrato da solo durante la smazzata e spiega ogni deduzione. In giallo: quello che ha appena trovato. «≥ 2»: almeno 2 (il difensore ne ha già giocate 2).",
+    "goat.why": "Le deduzioni di Goat (la più recente in alto):",
+    "goat.trick": p => `Presa ${p.n}`,
+    "goat.start": p => `Inizio della smazzata: Nord (il morto) e Sud (la tua mano) sono contati. Ovest ed Est hanno in tutto ${p.rest.map((n, s) => `${n} ${S(n, "carta", "carte")} ${(n === 1 ? F1 : FN)[s]}`).join(", ")}.`,
+    "goat.void": p => `${seatName(p.seat)} non risponde al ${C[p.s]} (scarta ${artc(cardName(p.card))}): non ne ha più. ` +
+      (p.n ? `Ne ha ${S(p.n, "giocata", "giocate")} ${p.n} (${p.cards.join(", ")}): quindi ne aveva <strong>${p.n}</strong> all'inizio.` : `Non ne aveva <strong>nessuna</strong> all'inizio.`),
+    "goat.bound.row": p => `Riga ${C[p.s]}: ${p.known.length ? `restano ${10 - p.known.reduce((a, b) => a + b, 0)} carte per ` : ""}${p.cells.map(c => seatName(c.seat)).join(" ed ")}, e ${p.cells.length > 1 ? "ognuno ne ha già giocate altrettante" : "ne ha già giocate altrettante"}: ${p.cells.map(c => `<strong>${c.n}</strong> a ${seatName(c.seat)}`).join(", ")}.`,
+    "goat.bound.col": p => `Colonna ${seatName(p.seat)}: le sue carte note e quelle già giocate fanno già 10: ${p.cells.map(c => `<strong>${c.n}</strong> ${S(c.n, "carta", "carte")} ${(c.n === 1 ? F1 : FN)[c.s]}`).join(", ")}.`,
+    "goat.none": "Ancora nessuna deduzione: Goat aspetta che un difensore non risponda al colore.",
+    "goat.done": "Il quadrato è completo: Goat conosce tutta la distribuzione iniziale!",
     "ex.tab.coco": "Quadrato di Coco",
     "coco.title": "Il quadrato di Coco",
     "coco.intro": "All'inizio, ogni giocatore ha <strong>10 carte</strong>, e anche ogni colore ha <strong>10 carte</strong>. Nel quadrato di Coco, ogni casella indica il numero di carte di un colore (la riga) in mano a un giocatore (la colonna) all'inizio della smazzata: ogni riga e ogni colonna fanno quindi <strong>10</strong>. Completa le caselle vuote.",
@@ -325,7 +339,7 @@
     "eval.better": "hai fatto meglio",
     "eval.equal": "pareggio",
     "eval.more": p => `${p.n} ${S(p.n, "presa", "prese")} in più`,
-    "eval.notCounted": p => `Smazzata non contata nei tuoi progressi (${p.replayed ? "smazzata rigiocata" : "aiuto usato: giocate migliori, carte scoperte o carta scoperta in regalo"}).`,
+    "eval.notCounted": p => `Smazzata non contata nei tuoi progressi (${p.replayed ? "smazzata rigiocata" : "aiuto usato: giocate migliori, carte scoperte, carta scoperta in regalo o Goat"}).`,
     "eval.levelUp": p => `Nuovo livello: <strong>${p.name}</strong>!${p.card ? ` Vinci <strong>${artc(p.card)}</strong> per la tua collezione.` : ""}`,
     "eval.score": p => `Il tuo punteggio duplicato: <strong>${p.pct}%</strong>`,
     "eval.col.declarer": "Dichiarante",
