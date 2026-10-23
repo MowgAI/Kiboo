@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kiboo : propositions visuelles</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #2A1F3D; --ink-soft: #6A5C80; --page: #F4F0FA; --panel: #FFFFFF; --line: #E2DAEE;
+  --felt: #3B2A55; --felt-ring: #4E3A70; --felt-ink: #F3EDFB;
+  --c-blue: #1F6FE5; --c-green: #22A45D; --c-red: #E5383B; --c-yellow: #F2B705; --sun: #FFC93C;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink); font-family: "Fredoka", system-ui, sans-serif; }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 24px 16px 60px; }
+h1 { font-size: 1.8rem; margin: 0 0 6px; }
+h2 { font-size: 1.35rem; margin: 36px 0 6px; }
+h3 { font-size: 1.1rem; margin: 0 0 4px; }
+p.lead { color: var(--ink-soft); margin: 0 0 16px; }
+.kiboo span:nth-child(1), .kiboo span:nth-child(5) { color: var(--c-blue); }
+.kiboo span:nth-child(2) { color: var(--c-green); }
+.kiboo span:nth-child(3) { color: var(--c-red); }
+.kiboo span:nth-child(4) { color: var(--c-yellow); }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(440px, 100%), 1fr)); gap: 16px; }
+.felt { overflow: hidden; }
+.opt { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+.opt p { margin: 4px 0 10px; color: var(--ink-soft); font-size: 0.92rem; }
+.tag { display: inline-block; font-weight: 700; background: var(--ink); color: #fff; border-radius: 8px; padding: 0 8px; margin-right: 6px; }
+
+/* ---------- Cartes ---------- */
+.felt { background: radial-gradient(ellipse at 50% 45%, var(--felt-ring) 0%, var(--felt) 70%); border-radius: 12px; padding: 14px 12px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.row { display: flex; padding-left: calc(var(--w) * 0.45); }
+.card { --w: 60px; width: var(--w); aspect-ratio: 145 / 220; border-radius: calc(var(--w) * 0.09); margin-left: calc(var(--w) * -0.45); box-shadow: 0 1px 3px rgba(0,0,0,0.35); position: relative; overflow: hidden; flex: none; }
+.row.side { padding-left: calc(var(--w) * 0.62); }
+.row.side .card { margin-left: calc(var(--w) * -0.62); --w: 46px; }
+.single .card { --w: 96px; margin: 0; }
+.single { display: flex; gap: 10px; align-items: flex-end; }
+
+/* A : logo Kiboo vertical */
+.backA { background: #fff; border: 3px solid var(--felt); }
+.backA::before { content: ""; position: absolute; inset: 6%; border: 2px solid var(--line); border-radius: calc(var(--w) * 0.06); }
+.backA .logo { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 700; line-height: 0.95; font-size: calc(var(--w) * 0.27); }
+/* B : rayures */
+.backB { background: repeating-linear-gradient(135deg, var(--c-blue) 0 6%, #fff 6% 12%, var(--c-green) 12% 18%, #fff 18% 24%, var(--c-red) 24% 30%, #fff 30% 36%, var(--c-yellow) 36% 42%, #fff 42% 48%); border: calc(var(--w) * 0.06) solid #fff; }
+/* C : petits K */
+.backC { background-color: var(--felt); border: calc(var(--w) * 0.05) solid #fff; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Ctext x='3' y='12' font-family='Arial Black,Arial' font-weight='900' font-size='11' fill='%231F6FE5'%3EK%3C/text%3E%3Ctext x='17' y='12' font-family='Arial Black,Arial' font-weight='900' font-size='11' fill='%2322A45D'%3EK%3C/text%3E%3Ctext x='3' y='26' font-family='Arial Black,Arial' font-weight='900' font-size='11' fill='%23F2B705'%3EK%3C/text%3E%3Ctext x='17' y='26' font-family='Arial Black,Arial' font-weight='900' font-size='11' fill='%23E5383B'%3EK%3C/text%3E%3C/svg%3E"); background-size: calc(var(--w) * 0.62); }
+/* D : sobre, un seul K */
+.backD { background: linear-gradient(160deg, #4E3A70, #2A1F3D); border: calc(var(--w) * 0.05) solid #fff; }
+.backD::before { content: ""; position: absolute; inset: 7%; border: 2px solid var(--sun); border-radius: calc(var(--w) * 0.05); }
+.backD .k { position: absolute; inset: 0; display: grid; place-items: center; font-weight: 700; font-size: calc(var(--w) * 0.55); color: var(--sun); }
+
+/* ---------- Icônes ---------- */
+.bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btn { font: inherit; font-weight: 600; font-size: 0.95rem; border-radius: 10px; padding: 7px 12px; border: 2px solid var(--ink); background: transparent; color: var(--ink); display: inline-flex; align-items: center; gap: 7px; }
+.btn.fill { background: var(--ink); color: #fff; }
+.btn.round { padding: 7px; }
+.btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.btn .emo { font-size: 1.15rem; line-height: 1; }
+.checks { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 12px; font-size: 0.95rem; }
+.checks label { display: inline-flex; align-items: center; gap: 6px; }
+.checks svg { width: 18px; height: 18px; stroke: var(--ink-soft); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.phone { width: 360px; max-width: 100%; border: 1px solid var(--line); border-radius: 18px; padding: 12px; background: var(--page); }
+.legend { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px 14px; margin-top: 12px; font-size: 0.9rem; color: var(--ink-soft); }
+.legend span { display: inline-flex; align-items: center; gap: 8px; }
+.legend svg { width: 18px; height: 18px; stroke: var(--ink); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.colored svg.i-blue { stroke: var(--c-blue); } .colored svg.i-green { stroke: var(--c-green); }
+.colored svg.i-red { stroke: var(--c-red); } .colored svg.i-yellow { stroke: #D49C00; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-feedback" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+  <symbol id="i-progress" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></symbol>
+  <symbol id="i-album" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+  <symbol id="i-exercises" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></symbol>
+  <symbol id="i-rules" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+  <symbol id="i-lang" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></symbol>
+  <symbol id="i-replay" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol>
+  <symbol id="i-new" viewBox="0 0 24 24"><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/><path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/><path d="m18 14 4 4-4 4"/></symbol>
+  <symbol id="i-next" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+  <symbol id="i-open" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-hints" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></symbol>
+  <symbol id="i-explain" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+  <symbol id="i-eval" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></symbol>
+  <symbol id="i-quiz" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></symbol>
+  <symbol id="i-speed" viewBox="0 0 24 24"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></symbol>
+</svg>
+
+<div class="wrap">
+  <h1>Propositions visuelles pour <span class="kiboo"><span>K</span><span>i</span><span>b</span><span>o</span><span>o</span></span></h1>
+  <p class="lead">Rien n'est encore changé dans le jeu. Choisis un dos de carte et un style d'icônes (ou dis-moi ce qu'il faut mélanger).</p>
+
+  <h2>1. Le dos des cartes</h2>
+  <p class="lead">Dans le jeu, les cartes se chevauchent : on ne voit souvent qu'une bande à gauche de chaque carte. Le motif doit donc rester joli même coupé. Chaque proposition est montrée seule, puis en main (en bas de la table) et sur le côté (Ouest/Est), plus serrée.</p>
+  <div class="grid" id="backs"></div>
+
+  <h2>2. Des icônes sur les boutons et les options</h2>
+  <p class="lead">Les icônes aident à reconnaître les boutons, surtout pour les enfants et sur téléphone. Deux styles possibles.</p>
+
+  <div class="opt">
+    <h3><span class="tag">I1</span>Icônes à traits, une couleur (sobres, dans le style du jeu)</h3>
+    <p>Icône + texte sur ordinateur. Sur téléphone, les boutons du haut ne gardent que l'icône (le texte reste lu par les lecteurs d'écran et apparaît au survol).</p>
+    <div class="bar">
+      <button class="btn"><svg><use href="#i-lang"/></svg>Français</button>
+      <button class="btn"><svg><use href="#i-feedback"/></svg>Donner mon avis</button>
+      <button class="btn"><svg><use href="#i-progress"/></svg>Progression</button>
+      <button class="btn"><svg><use href="#i-album"/></svg>Collection 12/40</button>
+      <button class="btn"><svg><use href="#i-exercises"/></svg>Exercices</button>
+      <button class="btn"><svg><use href="#i-rules"/></svg>Règles du jeu</button>
+    </div>
+    <div class="checks">
+      <label><input type="checkbox"><svg><use href="#i-open"/></svg>Jeux ouverts</label>
+      <label><input type="checkbox"><svg><use href="#i-hints"/></svg>Montrer les meilleurs coups</label>
+      <label><input type="checkbox"><svg><use href="#i-explain"/></svg>Explications de Piperno</label>
+      <label><input type="checkbox" checked><svg><use href="#i-eval"/></svg>Mode évaluation</label>
+    </div>
+    <div class="bar" style="margin-top:12px">
+      <button class="btn"><svg><use href="#i-help"/></svg>Aide des réglages</button>
+      <button class="btn"><svg><use href="#i-replay"/></svg>Rejouer la donne</button>
+      <button class="btn fill"><svg><use href="#i-new"/></svg>Nouvelle donne</button>
+      <button class="btn fill"><svg><use href="#i-next"/></svg>Pli suivant</button>
+    </div>
+    <p style="margin-top:14px"><strong>Sur téléphone :</strong></p>
+    <div class="phone">
+      <div class="bar">
+        <button class="btn round" aria-label="Langue"><svg><use href="#i-lang"/></svg></button>
+        <button class="btn round" aria-label="Donner mon avis"><svg><use href="#i-feedback"/></svg></button>
+        <button class="btn round" aria-label="Progression"><svg><use href="#i-progress"/></svg></button>
+        <button class="btn" aria-label="Collection"><svg><use href="#i-album"/></svg>12</button>
+        <button class="btn round" aria-label="Exercices"><svg><use href="#i-exercises"/></svg></button>
+        <button class="btn round" aria-label="Règles"><svg><use href="#i-rules"/></svg></button>
+      </div>
+    </div>
+    <div class="legend">
+      <span><svg><use href="#i-lang"/></svg>Langue : globe</span>
+      <span><svg><use href="#i-feedback"/></svg>Avis : bulle</span>
+      <span><svg><use href="#i-progress"/></svg>Progression : graphique</span>
+      <span><svg><use href="#i-album"/></svg>Collection : étoile</span>
+      <span><svg><use href="#i-exercises"/></svg>Exercices : crayon</span>
+      <span><svg><use href="#i-rules"/></svg>Règles : livre</span>
+      <span><svg><use href="#i-speed"/></svg>Vitesse : compteur</span>
+      <span><svg><use href="#i-quiz"/></svg>Questions : bulle « ? »</span>
+      <span><svg><use href="#i-open"/></svg>Jeux ouverts : œil</span>
+      <span><svg><use href="#i-hints"/></svg>Meilleurs coups : ampoule</span>
+      <span><svg><use href="#i-explain"/></svg>Explications : « i »</span>
+      <span><svg><use href="#i-eval"/></svg>Évaluation : coupe</span>
+      <span><svg><use href="#i-help"/></svg>Aide : « ? »</span>
+      <span><svg><use href="#i-replay"/></svg>Rejouer : flèche qui revient</span>
+      <span><svg><use href="#i-new"/></svg>Nouvelle donne : mélanger</span>
+      <span><svg><use href="#i-next"/></svg>Pli suivant : flèche</span>
+    </div>
+  </div>
+
+  <div class="opt colored" style="margin-top:16px">
+    <h3><span class="tag">I2</span>Les mêmes icônes, aux couleurs de Kiboo</h3>
+    <p>Plus gai : chaque icône prend une des quatre couleurs du jeu.</p>
+    <div class="bar">
+      <button class="btn"><svg class="i-blue"><use href="#i-lang"/></svg>Français</button>
+      <button class="btn"><svg class="i-green"><use href="#i-feedback"/></svg>Donner mon avis</button>
+      <button class="btn"><svg class="i-red"><use href="#i-progress"/></svg>Progression</button>
+      <button class="btn"><svg class="i-yellow"><use href="#i-album"/></svg>Collection 12/40</button>
+      <button class="btn"><svg class="i-blue"><use href="#i-exercises"/></svg>Exercices</button>
+      <button class="btn"><svg class="i-green"><use href="#i-rules"/></svg>Règles du jeu</button>
+    </div>
+    <div class="checks">
+      <label><input type="checkbox"><svg class="i-blue"><use href="#i-open"/></svg>Jeux ouverts</label>
+      <label><input type="checkbox"><svg class="i-yellow"><use href="#i-hints"/></svg>Montrer les meilleurs coups</label>
+      <label><input type="checkbox"><svg class="i-green"><use href="#i-explain"/></svg>Explications de Piperno</label>
+      <label><input type="checkbox" checked><svg class="i-red"><use href="#i-eval"/></svg>Mode évaluation</label>
+    </div>
+  </div>
+
+  <div class="opt" style="margin-top:16px">
+    <h3><span class="tag">I3</span>Emoji</h3>
+    <p>Le plus simple et très parlant pour les enfants, mais leur dessin change selon le téléphone ou l'ordinateur (Apple, Android, Windows).</p>
+    <div class="bar">
+      <button class="btn"><span class="emo">🌐</span>Français</button>
+      <button class="btn"><span class="emo">💬</span>Donner mon avis</button>
+      <button class="btn"><span class="emo">📈</span>Progression</button>
+      <button class="btn"><span class="emo">⭐</span>Collection 12/40</button>
+      <button class="btn"><span class="emo">✏️</span>Exercices</button>
+      <button class="btn"><span class="emo">📖</span>Règles du jeu</button>
+    </div>
+    <div class="checks">
+      <label><input type="checkbox"><span class="emo">👀</span>Jeux ouverts</label>
+      <label><input type="checkbox"><span class="emo">💡</span>Montrer les meilleurs coups</label>
+      <label><input type="checkbox"><span class="emo">🧑‍🏫</span>Explications de Piperno</label>
+      <label><input type="checkbox" checked><span class="emo">🏆</span>Mode évaluation</label>
+    </div>
+    <div class="bar" style="margin-top:12px">
+      <button class="btn"><span class="emo">❓</span>Aide des réglages</button>
+      <button class="btn"><span class="emo">🔁</span>Rejouer la donne</button>
+      <button class="btn fill"><span class="emo">🃏</span>Nouvelle donne</button>
+      <button class="btn fill"><span class="emo">➡️</span>Pli suivant</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const BACKS = [
+  { id: "A", cls: "backA", title: "Le logo Kiboo, vertical", text: "Fond blanc, bord violet, les lettres K-i-b-o-o empilées au milieu dans leurs couleurs. On reconnaît le jeu même quand les cartes se chevauchent.", inner: '<div class="logo kiboo"><span>K</span><span>i</span><span>b</span><span>o</span><span>o</span></div>' },
+  { id: "B", cls: "backB", title: "Rayures aux quatre couleurs", text: "Rayures en biais bleu, vert, rouge, jaune sur fond blanc. Très simple, et le motif reste le même quelle que soit la partie visible.", inner: "" },
+  { id: "C", cls: "backC", title: "Petits K sur fond violet", text: "Le fond violet de la table, semé de petits K colorés. Discret, et les mains cachées se distinguent bien des cartes visibles.", inner: "" },
+  { id: "D", cls: "backD", title: "Sobre : un grand K doré", text: "Dégradé violet, cadre doré et un seul grand K. Élégant, mais le K est en partie caché quand les cartes se chevauchent.", inner: '<div class="k">K</div>' },
+];
+const card = b => `<div class="card ${b.cls}">${b.inner}</div>`;
+document.getElementById("backs").innerHTML = BACKS.map(b => `
+  <div class="opt">
+    <h3><span class="tag">${b.id}</span>${b.title}</h3>
+    <p>${b.text}</p>
+    <div class="felt">
+      <div class="single">${card(b)}</div>
+      <div class="row">${Array(10).fill(card(b)).join("")}</div>
+      <div class="row side">${Array(10).fill(card(b)).join("")}</div>
+    </div>
+  </div>`).join("");
+</script>
+</body>
+</html>
