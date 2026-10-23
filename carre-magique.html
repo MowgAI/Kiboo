@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kiboo : le carré magique</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+/* Prototype de l'exercice « carré magique à somme 10 » (pas encore dans le jeu). */
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-top: 14px; }
+.panel h2 { margin: 0 0 6px; font-size: 1.3rem; }
+.levels { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 4px; }
+.levels button { font: inherit; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 999px; border: 2px solid var(--line); background: var(--page); color: var(--ink); }
+.levels button[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--page); }
+.magic { border-collapse: separate; border-spacing: 6px; margin-top: 10px; font-variant-numeric: tabular-nums; }
+.magic th { font-weight: 600; padding: 0 4px; text-align: center; }
+.magic tbody th { text-align: left; white-space: nowrap; }
+.magic td { width: 3.4em; height: 2.8em; text-align: center; border-radius: 10px; background: var(--page); border: 2px solid var(--line); font-size: 1.2rem; font-weight: 600; }
+.magic td.given { background: var(--setup); border-color: transparent; }
+.magic td.counted { background: transparent; }
+.magic td input { font: inherit; width: 100%; height: 100%; border: 0; background: transparent; text-align: center; color: var(--ink); padding: 0; }
+.magic td input:focus { outline: none; }
+.magic td:focus-within { border-color: var(--ink); }
+.magic td.ok { border-color: var(--ok); }
+.magic td.ko { border-color: var(--ko); }
+.magic td.ko .fix { color: var(--ko); }
+.magic td.ko .was { font-size: 0.8rem; color: var(--ink-soft); font-weight: 400; margin-right: 4px; }
+.magic td input { -moz-appearance: textfield; appearance: textfield; }
+.magic td input::-webkit-inner-spin-button, .magic td input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.magic .sum { background: transparent; border: 2px dashed var(--line); color: var(--ink-soft); font-size: 1rem; }
+.magic .sum.done { border-color: var(--ok); color: var(--ok); }
+.magic .sum.over { border-color: var(--ko); color: var(--ko); }
+.magic .corner { background: transparent; border: 0; color: var(--ink-soft); font-size: 0.85rem; }
+.hands { display: grid; gap: 4px; margin-top: 8px; }
+.clues { margin: 8px 0 0; padding-left: 1.2em; }
+.steps { margin: 6px 0 0; padding-left: 1.4em; }
+.steps li { margin: 3px 0; }
+.fam { font-weight: 600; white-space: nowrap; }
+.fam::before { content: ""; display: inline-block; width: 0.7em; height: 0.7em; border-radius: 50%; margin-right: 0.35em; }
+.fam.blue::before { background: var(--c-blue); } .fam.green::before { background: var(--c-green); }
+.fam.red::before { background: var(--c-red); } .fam.yellow::before { background: var(--c-yellow); }
+.legend { font-size: 0.88rem; color: var(--ink-soft); margin-top: 6px; }
+.legend span { display: inline-block; width: 1.1em; height: 1.1em; border-radius: 4px; vertical-align: -0.15em; margin: 0 4px 0 10px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="logo kiboo" aria-label="Kiboo"><span>K</span><span>i</span><span>b</span><span>o</span><span>o</span></h1>
+  <div class="panel">
+    <h2>Le carré magique à somme 10</h2>
+    <p>Au départ, chaque joueur a <strong>10 cartes</strong>, et chaque couleur a aussi <strong>10 cartes</strong>. Dans le tableau, chaque case donne le nombre de cartes d'une couleur (la ligne) chez un joueur (la colonne), au départ de la donne. Chaque ligne et chaque colonne font donc <strong>10</strong> : c'est un carré magique ! Complète les cases vides.</p>
+    <div class="levels" role="group" aria-label="Niveau">
+      <button type="button" data-level="easy" aria-pressed="true">Facile</button>
+      <button type="button" data-level="medium" aria-pressed="false">Moyen</button>
+      <button type="button" data-level="table" aria-pressed="false">Comme à la table</button>
+    </div>
+    <div id="body"></div>
+  </div>
+</div>
+
+<script src="js/images.js"></script>
+<script>
+"use strict";
+const COLORS = ["blue", "green", "red", "yellow"];
+const SUITS = ["bleu", "vert", "rouge", "jaune"];
+const ADJ = ["bleues", "vertes", "rouges", "jaunes"];
+const SEATS = ["O", "N", "E", "S"];                       // colonnes, en commençant par Ouest
+const NAMES = { O: "Ouest", N: "Nord", E: "Est", S: "Sud" };
+const TEAM = { O: "eo", N: "ns", E: "eo", S: "ns" };
+const $ = id => document.getElementById(id);
+
+function deal() {
+  const deck = [];
+  for (let s = 0; s < 4; s++) for (let v = 1; v <= 10; v++) deck.push({ s, v });
+  for (let i = deck.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [deck[i], deck[j]] = [deck[j], deck[i]]; }
+  const hands = {};
+  SEATS.forEach((x, i) => { hands[x] = deck.slice(i * 10, i * 10 + 10).sort((a, b) => a.s - b.s || b.v - a.v); });
+  return hands;
+}
+// M[s][j] : cartes de la couleur s chez le joueur SEATS[j].
+const matrix = hands => [0, 1, 2, 3].map(s => SEATS.map(x => hands[x].filter(c => c.s === s).length));
+
+/* Déduction pas à pas : tant qu'une ligne ou une colonne n'a plus qu'une case
+   inconnue, elle vaut 10 moins les autres. Renvoie les étapes, ou null si on
+   reste bloqué (la grille n'aurait pas une seule solution par ce raisonnement). */
+function solve(M, known) {
+  known = known.map(r => r.slice());
+  const steps = [];
+  for (let moved = true; moved;) {
+    moved = false;
+    for (let s = 0; s < 4; s++) {
+      const miss = [0, 1, 2, 3].filter(j => !known[s][j]);
+      if (miss.length === 1) {
+        const j = miss[0], others = [0, 1, 2, 3].filter(k => k !== j).map(k => M[s][k]);
+        steps.push(`Ligne <strong>${SUITS[s]}</strong> : 10 − ${others.join(" − ")} = <strong>${M[s][j]}</strong> carte${M[s][j] > 1 ? "s" : ""} ${M[s][j] > 1 ? ADJ[s] : ADJ[s].slice(0, -1)} chez ${NAMES[SEATS[j]]}.`);
+        known[s][j] = true; moved = true;
+      }
+    }
+    for (let j = 0; j < 4; j++) {
+      const miss = [0, 1, 2, 3].filter(s => !known[s][j]);
+      if (miss.length === 1) {
+        const s = miss[0], others = [0, 1, 2, 3].filter(k => k !== s).map(k => M[k][j]);
+        steps.push(`Colonne <strong>${NAMES[SEATS[j]]}</strong> : 10 − ${others.join(" − ")} = <strong>${M[s][j]}</strong> carte${M[s][j] > 1 ? "s" : ""} ${M[s][j] > 1 ? ADJ[s] : ADJ[s].slice(0, -1)}.`);
+        known[s][j] = true; moved = true;
+      }
+    }
+  }
+  return known.every(r => r.every(Boolean)) ? steps : null;
+}
+
+// Choisit les cases à cacher : `count` cases parmi `pool`, et la grille doit rester déductible.
+function hide(M, pool, count, base) {
+  for (let t = 0; t < 500; t++) {
+    const known = base.map(r => r.slice());
+    const cells = pool.slice().sort(() => Math.random() - 0.5).slice(0, count);
+    cells.forEach(([s, j]) => { known[s][j] = false; });
+    const steps = solve(M, known);
+    if (steps) return { known, steps };
+  }
+  return null;
+}
+
+let level = "easy";
+function render() {
+  const hands = deal(), M = matrix(hands);
+  const all = [], full = [0, 1, 2, 3].map(() => [true, true, true, true]);
+  for (let s = 0; s < 4; s++) for (let j = 0; j < 4; j++) all.push([s, j]);
+  let puzzle, counted = new Set(), intro = "";
+  if (level === "easy") puzzle = hide(M, all, 4, full);
+  else if (level === "medium") puzzle = hide(M, all, 7, full);        // 7 : le maximum pour une seule solution
+  else {
+    // Comme à la table : tu comptes ta main (Sud) et le mort (Nord) ; on te donne
+    // quelques cases d'Ouest et d'Est (ce que tu as appris pendant le jeu), à toi de déduire le reste.
+    const base = [0, 1, 2, 3].map(() => [false, true, false, false]);   // N connu... pour le calcul
+    for (let s = 0; s < 4; s++) base[s] = [false, true, false, true];
+    const we = all.filter(([s, j]) => SEATS[j] === "O" || SEATS[j] === "E");
+    // On garde 3 indices sur les 8 cases d'Ouest et d'Est.
+    for (let t = 0; t < 500 && !puzzle; t++) {
+      const clues = we.slice().sort(() => Math.random() - 0.5).slice(0, 3);
+      const known = base.map(r => r.slice());
+      clues.forEach(([s, j]) => { known[s][j] = true; });
+      const steps = solve(M, known);
+      if (steps) puzzle = { known: [0, 1, 2, 3].map(s => [0, 1, 2, 3].map(j => known[s][j] && SEATS[j] !== "N" && SEATS[j] !== "S")), steps, clues };
+    }
+    counted = new Set(["N", "S"]);
+    intro = `<p>Compte les cartes de chaque couleur dans ta main (Sud) et chez le mort (Nord), puis sers-toi de ce que tu as appris pendant la donne :</p>
+      <ul class="clues">${puzzle.clues.map(([s, j]) => `<li>${NAMES[SEATS[j]]} avait <strong>${M[s][j]}</strong> carte${M[s][j] > 1 ? "s" : ""} ${M[s][j] > 1 ? ADJ[s] : ADJ[s].slice(0, -1)} au départ.</li>`).join("")}</ul>
+      <div class="hands">
+        <p class="quiz-label">Le mort (Nord)</p><div class="ex-hand quiz-mini" data-hand="N"></div>
+        <p class="quiz-label">Ta main (Sud, déclarant)</p><div class="ex-hand quiz-mini" data-hand="S"></div>
+      </div>`;
+  }
+  const { known } = puzzle;
+
+  const head = `<tr><th class="corner"></th>${SEATS.map(x => `<th><span class="seat-name ${TEAM[x]}">${NAMES[x]}</span></th>`).join("")}<th class="corner">Total</th></tr>`;
+  const rows = [0, 1, 2, 3].map(s => `<tr><th scope="row"><span class="fam ${COLORS[s]}">${SUITS[s]}</span></th>${
+    SEATS.map((x, j) => known[s][j]
+      ? `<td class="given">${M[s][j]}</td>`
+      : `<td class="${counted.has(x) ? "counted" : ""}"><input type="number" inputmode="numeric" min="0" max="10" data-s="${s}" data-j="${j}" aria-label="${NAMES[x]}, cartes ${ADJ[s]}"></td>`).join("")
+  }<td class="sum" data-row="${s}"></td></tr>`).join("");
+  const foot = `<tr><th class="corner">Total</th>${SEATS.map((x, j) => `<td class="sum" data-col="${j}"></td>`).join("")}<td class="corner">10</td></tr>`;
+
+  $("body").innerHTML = `${intro}
+    <table class="magic"><thead>${head}</thead><tbody>${rows}${foot}</tbody></table>
+    <p class="legend">Cases bleues : données. Les totaux se remplissent pendant que tu écris : ils deviennent verts à 10.</p>
+    <label class="check"><input type="checkbox" data-role="totals" checked> Afficher les totaux pendant que je remplis</label>
+    <div class="ex-actions"><button class="act" type="button" data-role="check">Vérifier</button>
+      <button class="act ghost" type="button" data-role="new">Nouvelle grille</button></div>
+    <p class="ex-result" data-role="result" aria-live="polite"></p>
+    <div class="quiz-why" data-role="why" hidden></div>`;
+  const q = sel => $("body").querySelector(sel);
+  for (const x of counted) {
+    const box = q(`[data-hand=${x}]`);
+    for (const c of hands[x]) {
+      const el = document.createElement("div");
+      el.className = "card"; el.setAttribute("role", "img"); el.setAttribute("aria-label", `${c.v} ${SUITS[c.s]}`);
+      el.style.backgroundImage = `url(${IMAGES[COLORS[c.s] + "-" + c.v]})`;
+      box.appendChild(el);
+    }
+  }
+
+  // Totaux en direct : ce que le joueur a écrit plus les cases données.
+  const value = (s, j) => {
+    if (known[s][j]) return M[s][j];
+    const v = q(`input[data-s="${s}"][data-j="${j}"]`).value.trim();
+    return v === "" ? null : Number(v);
+  };
+  function totals() {
+    const show = q("[data-role=totals]").checked;
+    const paint = (el, vals) => {
+      const sum = vals.reduce((t, v) => t + (v || 0), 0), full = vals.every(v => v !== null);
+      el.textContent = show ? sum : "";
+      el.className = "sum" + (show && full && sum === 10 ? " done" : show && sum > 10 ? " over" : "");
+    };
+    for (let s = 0; s < 4; s++) paint(q(`[data-row="${s}"]`), [0, 1, 2, 3].map(j => value(s, j)));
+    for (let j = 0; j < 4; j++) paint(q(`[data-col="${j}"]`), [0, 1, 2, 3].map(s => value(s, j)));
+  }
+  $("body").querySelectorAll("input[data-s]").forEach(i => i.addEventListener("input", totals));
+  q("[data-role=totals]").onchange = totals;
+  totals();
+
+  q("[data-role=new]").onclick = render;
+  q("[data-role=check]").onclick = () => {
+    let wrong = 0;
+    $("body").querySelectorAll("input[data-s]").forEach(input => {
+      const s = +input.dataset.s, j = +input.dataset.j, td = input.parentElement;
+      const ok = input.value.trim() !== "" && Number(input.value) === M[s][j];
+      td.classList.add(ok ? "ok" : "ko");
+      input.disabled = true;
+      // Case fausse : la réponse du joueur barrée, puis la bonne.
+      if (!ok) { wrong++; td.innerHTML = (input.value.trim() ? `<s class="was">${input.value}</s>` : "") + `<span class="fix">${M[s][j]}</span>`; }
+    });
+    // Après correction, le carré est complet : tous les totaux font 10.
+    $("body").querySelectorAll(".sum").forEach(el => { el.textContent = "10"; el.className = "sum done"; });
+    q("[data-role=totals]").disabled = true;
+    const res = q("[data-role=result]");
+    res.className = "ex-result " + (wrong ? "ko" : "ok");
+    res.textContent = wrong ? `Pas tout à fait : ${wrong} case${wrong > 1 ? "s" : ""} à revoir (en rouge, la bonne réponse).` : "Bravo, le carré magique est complet !";
+    const why = q("[data-role=why]");
+    why.hidden = false;
+    const countSteps = level === "table"
+      ? [..."NS"].map(x => `<li>On compte ${x === "S" ? "ta main" : "le mort"} : ${[0, 1, 2, 3].map(s => `${M[s][SEATS.indexOf(x)]} ${SUITS[s]}`).join(", ")}.</li>`).join("")
+      : "";
+    why.innerHTML = `<p class="quiz-label">Comment déduire les cases, dans l'ordre :</p><ol class="steps">${countSteps}${puzzle.steps.map(t => `<li>${t}</li>`).join("")}</ol>`;
+    q("[data-role=check]").hidden = true;
+  };
+  $("body").querySelector("input[data-s]").focus();
+}
+
+for (const b of document.querySelectorAll("[data-level]")) b.onclick = () => {
+  level = b.dataset.level;
+  document.querySelectorAll("[data-level]").forEach(x => x.setAttribute("aria-pressed", x === b));
+  render();
+};
+render();
+</script>
+</body>
+</html>
