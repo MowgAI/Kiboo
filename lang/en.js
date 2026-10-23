@@ -42,7 +42,7 @@
     "setup.explain": "Piperno's explanations",
     "setup.quiz": "Questions during play",
     "setup.eval": "Evaluation mode",
-    "help.show": "Settings help",
+    "help.show": "Help",
     "help.hide": "Hide help",
     "btn.replay": "Replay the deal",
     "btn.new": "New deal",
@@ -87,7 +87,7 @@
     "explain.item": p => `<b>Trick ${p.trick}</b> · ${p.who} plays <b>${p.card}</b>. ${p.reason}`,
     "pip.opening": p => `Opening lead: ${C[p.suit]} is his longest suit (${p.len} cards)` +
       (p.tied ? ", the strongest of the suits of the same length" : "") + ". " +
-      (p.seq ? "He plays the top card of his sequence." : "Without a sequence of at least two touching cards, he plays the lowest one."),
+      (p.seq ? "He plays the top card of his sequence." : "Without a sequence (at least two touching cards, the top one at least a 7), he plays the lowest one."),
     "pip.newSuit": p => `His favourite suit becomes ${C[p.suit]} (his longest suit).`,
     "pip.leadStrong": p => `He leads his favourite suit, ${C[p.suit]}. He holds the highest card left (the ${p.top}): he plays his highest.`,
     "pip.leadWeak": p => `He leads his favourite suit, ${C[p.suit]}. He doesn't hold the highest card left (the ${p.top}): he plays his lowest.`,
@@ -172,7 +172,7 @@
     "quiz.rule.same": "With suits of equal length, the opening lead rule chooses the one with the most points (with equal points too, the last one in the order blue, green, red, yellow). So another suit of the same length is possible if it has fewer points.",
     "quiz.q.higher": p => `West led the ${C[p.s]} ${p.v}. Can he have a <strong>higher ${C[p.s]} card</strong> than the ${p.v}?`,
     "quiz.q.lower": p => `West led the ${C[p.s]} ${p.v}. Can he have a <strong>lower ${C[p.s]} card</strong> than the ${p.v}?`,
-    "quiz.rule.seq": "The opening lead rule plays the top card of a sequence (at least two touching cards); without a sequence, the lowest card of the suit.",
+    "quiz.rule.seq": "The opening lead rule plays the top card of a sequence (at least two touching cards, the top one at least a 7); otherwise, the lowest card of the suit.",
     "quiz.col.me": "Your hand",
     "quiz.col.dummy": "Dummy",
     "quiz.col.rest": "Left for East and West",
@@ -240,7 +240,7 @@
     "split.suit": p => `he would have another suit just as long with more points than ${C[p.L]}, and would have led it`,
     "split.rule": p => `${p.label}: <strong>impossible</strong>. ${C[p.L][0].toUpperCase() + C[p.L].slice(1)} could be his longest suit, but ${p.parts}.`,
     "split.example": p => `For example, a possible West hand (${p.label}):`,
-    "masters.q": "Click on <strong>every winner</strong> in your hand and in dummy, then check. A card is a winner when East and West have no higher card left in its suit.",
+    "masters.q": "Click on <strong>every winner</strong> in your hand and in dummy, then check. A card is a winner when East and West have no higher card left in its suit. Look at your hand and dummy <strong>together</strong>: with 10 9 8 3 in dummy and 7 6 4 in your hand, if East and West only have 5, 2, 1 left, the winners are 10 9 8 7 6.",
     "masters.none": "None of the cards was a winner. ",
     "masters.rule": "To know whether a card is a winner, you need to remember the higher cards already played: the others are still with East and West, except those in your hand and in dummy.",
     "masters.suit": p => `${p.suit}: ` +
@@ -298,7 +298,6 @@
     "eval.col.tricks": "North-South tricks",
     "eval.col.cmp": "Comparison",
     "eval.you": "You",
-    "eval.par": "Perfect play (for info)",
     "eval.how": p => `Same deal, same defenders. 2 points per robot beaten, 1 per tie, out of a maximum of ${p.max} points.`,
     "eval.seeProgress": "See my progress",
     "eval.levelTop": p => `<strong>${p.name}</strong>: the highest level. Well done!`,
@@ -308,7 +307,6 @@
     "prog.scores": p => `Duplicate score of your last ${p.n} deals${p.avg !== null ? ` (average ${p.avg}%)` : ""}:`,
     "prog.aria": p => `Scores: ${p.list}`,
     "prog.col.deal": "Deal",
-    "prog.col.par": "Perfect",
     "prog.col.score": "Score",
     "prog.empty": "No deal evaluated yet. Play a deal as South (declarer) with evaluation mode on: your score will appear at the end, and your progress here.",
 
@@ -377,10 +375,10 @@
       <ol>
         <li>They take their <strong>longest suit</strong>, the one in which they have the most cards.</li>
         <li>If two suits have <strong>as many cards</strong>, they take the one with the <strong>most points</strong> (the sum of the values). With equal points too, they take the last one in the order blue, green, red, yellow.</li>
-        <li>In that suit, if they have a <dfn>sequence</dfn> (at least two touching cards, like the 7 and the 8), they play the <strong>top card of the sequence</strong>. If they have several sequences, they take the highest.</li>
-        <li>Without a sequence, they play the <strong>lowest card</strong> of the suit.</li>
+        <li>In that suit, if they have a <dfn>sequence</dfn> (at least two touching cards, like the 7 and the 8), they play the <strong>top card of the sequence</strong>, but only if that card is <strong>at least a 7</strong>. If they have several sequences, they take the highest.</li>
+        <li>Without a sequence (or with a sequence that is too low, like the 3 and the 4), they play the <strong>lowest card</strong> of the suit.</li>
       </ol>
-      <p>Examples: with the blue 2, 7 and 8, they lead the blue 8 (sequence 7-8). With the blue 2, 5 and 9, they lead the blue 2 (no sequence).</p>
+      <p>Examples: with the blue 2, 7 and 8, they lead the blue 8 (sequence 7-8). With the blue 2, 5 and 9, they lead the blue 2 (no sequence). With the blue 3, 4 and 9, they lead the blue 3 (the 3-4 sequence doesn't reach the 7).</p>
     </div>
 
     <h3>How a trick is played</h3>

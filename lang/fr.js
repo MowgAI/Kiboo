@@ -45,7 +45,7 @@
     "setup.explain": "Explications de Piperno",
     "setup.quiz": "Questions pendant la partie",
     "setup.eval": "Mode évaluation",
-    "help.show": "Aide des réglages",
+    "help.show": "Aide",
     "help.hide": "Cacher l'aide",
     "btn.replay": "Rejouer la donne",
     "btn.new": "Nouvelle donne",
@@ -90,7 +90,7 @@
     "explain.item": p => `<b>Pli ${p.trick}</b> · ${p.who} joue <b>${p.card}</b>. ${p.reason}`,
     "pip.opening": p => `Entame : ${theColor(p.suit)} est sa couleur la plus longue (${p.len} cartes)` +
       (p.tied ? ", la plus forte des couleurs de même longueur" : "") + ". " +
-      (p.seq ? "Il joue la plus haute carte de sa séquence." : "Sans séquence d'au moins deux cartes qui se suivent, il joue la plus petite."),
+      (p.seq ? "Il joue la plus haute carte de sa séquence." : "Sans séquence (au moins deux cartes qui se suivent, la plus haute valant au moins 7), il joue la plus petite."),
     "pip.newSuit": p => `Sa couleur préférée devient ${theColor(p.suit)} (sa couleur la plus longue).`,
     "pip.leadStrong": p => `Il entame dans sa couleur préférée, ${theColor(p.suit)}. Il détient la plus forte carte restante (le ${p.top}) : il joue sa plus haute.`,
     "pip.leadWeak": p => `Il entame dans sa couleur préférée, ${theColor(p.suit)}. Il n'a pas la plus forte carte restante (le ${p.top}) : il joue sa plus petite.`,
@@ -175,7 +175,7 @@
     "quiz.rule.same": "À longueur égale, la règle d'entame choisit la couleur qui a le plus de points (à points égaux, la dernière dans l'ordre bleu, vert, rouge, jaune). Une autre couleur aussi longue est donc possible si elle a moins de points.",
     "quiz.q.higher": p => `Ouest a entamé le ${p.v} ${C[p.s]}. Peut-il avoir une <strong>carte ${cardAdj(p.s, 1)} plus forte</strong> que le ${p.v} ?`,
     "quiz.q.lower": p => `Ouest a entamé le ${p.v} ${C[p.s]}. Peut-il avoir une <strong>carte ${cardAdj(p.s, 1)} plus faible</strong> que le ${p.v} ?`,
-    "quiz.rule.seq": "La règle d'entame fait jouer la plus haute carte d'une séquence (au moins deux cartes qui se suivent) ; sans séquence, la plus petite carte de la couleur.",
+    "quiz.rule.seq": "La règle d'entame fait jouer la plus haute carte d'une séquence (au moins deux cartes qui se suivent, la plus haute valant au moins 7) ; sinon, la plus petite carte de la couleur.",
     "quiz.col.me": "Ta main",
     "quiz.col.dummy": "Le mort",
     "quiz.col.rest": "Restent pour Est et Ouest",
@@ -243,7 +243,7 @@
     "split.suit": p => `il aurait une autre couleur aussi longue avec plus de points que le ${C[p.L]}, et il l'aurait entamée`,
     "split.rule": p => `${p.label} : <strong>impossible</strong>. Le ${C[p.L]} pourrait être sa couleur la plus longue, mais ${p.parts}.`,
     "split.example": p => `Par exemple, une main possible d'Ouest (${p.label}) :`,
-    "masters.q": "Clique sur <strong>toutes les cartes maîtresses</strong> de ta main et du mort, puis vérifie. Une carte est maîtresse quand Est et Ouest n'ont plus aucune carte plus forte dans sa couleur.",
+    "masters.q": "Clique sur <strong>toutes les cartes maîtresses</strong> de ta main et du mort, puis vérifie. Une carte est maîtresse quand Est et Ouest n'ont plus aucune carte plus forte dans sa couleur. Regarde ta main et le mort <strong>ensemble</strong> : avec 10 9 8 3 au mort et 7 6 4 dans ta main, si Est et Ouest n'ont plus que le 5, le 2 et le 1, les maîtresses sont 10 9 8 7 6.",
     "masters.none": "Aucune carte n'était maîtresse. ",
     "masters.rule": "Pour savoir si une carte est maîtresse, il faut se souvenir des cartes plus fortes déjà jouées : les autres sont encore chez Est et Ouest, sauf celles de ta main et du mort.",
     "masters.suit": p => `${p.suit} : ` +
@@ -301,7 +301,6 @@
     "eval.col.tricks": "Plis Nord-Sud",
     "eval.col.cmp": "Comparaison",
     "eval.you": "Toi",
-    "eval.par": "Jeu parfait (pour info)",
     "eval.how": p => `Même donne, mêmes défenseurs. 2 points par robot battu, 1 par égalité, rapportés au maximum de ${p.max} points.`,
     "eval.seeProgress": "Voir ma progression",
     "eval.levelTop": p => `<strong>${p.name}</strong> : le plus haut niveau. Bravo !`,
@@ -311,7 +310,6 @@
     "prog.scores": p => `Score duplicate des ${p.n} dernières donnes${p.avg !== null ? ` (moyenne ${p.avg} %)` : ""} :`,
     "prog.aria": p => `Scores : ${p.list}`,
     "prog.col.deal": "Donne",
-    "prog.col.par": "Parfait",
     "prog.col.score": "Score",
     "prog.empty": "Pas encore de donne évaluée. Joue une donne en Sud (déclarant) avec le mode évaluation : ton score s'affichera à la fin, et ta progression ici.",
 
@@ -380,10 +378,10 @@
       <ol>
         <li>Ils prennent leur <strong>couleur la plus longue</strong>, celle où ils ont le plus de cartes.</li>
         <li>Si deux couleurs ont <strong>autant de cartes</strong>, ils prennent celle qui a le <strong>plus de points</strong> (la somme des valeurs). À points égaux aussi, ils prennent la dernière dans l'ordre bleu, vert, rouge, jaune.</li>
-        <li>Dans cette couleur, s'ils ont une <dfn>séquence</dfn> (au moins deux cartes qui se suivent, comme le 7 et le 8), ils jouent la <strong>plus haute carte de la séquence</strong>. S'ils ont plusieurs séquences, ils prennent la plus haute.</li>
-        <li>Sans séquence, ils jouent la <strong>plus petite carte</strong> de la couleur.</li>
+        <li>Dans cette couleur, s'ils ont une <dfn>séquence</dfn> (au moins deux cartes qui se suivent, comme le 7 et le 8), ils jouent la <strong>plus haute carte de la séquence</strong>, mais seulement si cette carte vaut <strong>au moins 7</strong>. S'ils ont plusieurs séquences, ils prennent la plus haute.</li>
+        <li>Sans séquence (ou avec une séquence trop petite, comme le 3 et le 4), ils jouent la <strong>plus petite carte</strong> de la couleur.</li>
       </ol>
-      <p>Exemples : avec le 2, le 7 et le 8 bleus, ils entament le 8 bleu (séquence 7-8). Avec le 2, le 5 et le 9 bleus, ils entament le 2 bleu (pas de séquence).</p>
+      <p>Exemples : avec le 2, le 7 et le 8 bleus, ils entament le 8 bleu (séquence 7-8). Avec le 2, le 5 et le 9 bleus, ils entament le 2 bleu (pas de séquence). Avec le 3, le 4 et le 9 bleus, ils entament le 3 bleu (la séquence 3-4 n'atteint pas le 7).</p>
     </div>
 
     <h3>Le déroulement d'un pli</h3>

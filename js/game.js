@@ -75,7 +75,8 @@ class RandomBot {
 
 // Règle d'entame du rapport (section 3.1) : couleur la plus longue
 // (à égalité, la plus forte somme), puis la plus haute d'une séquence
-// d'au moins deux cartes, sinon la plus petite.
+// d'au moins deux cartes dont la plus haute vaut au moins 7, sinon la plus petite.
+const SEQ_MIN = 7;
 // Renvoie aussi les éléments qui ont décidé du choix, pour les explications.
 function openingChoice(hand) {
   const bySuit = [0, 1, 2, 3].map(s => hand.filter(c => c.s === s).sort((a, b) => a.v - b.v));
@@ -92,6 +93,7 @@ function openingChoice(hand) {
     const endsSeq = i === cards.length - 1 || cards[i + 1].v !== cards[i].v + 1;
     if (cards[i].v === cards[i - 1].v + 1 && endsSeq) top = cards[i];
   }
+  if (top && top.v < SEQ_MIN) top = null;           // séquence trop petite (plus haute carte sous le 7) : ignorée
   const tied = bySuit.filter(x => x.length === maxLen).length > 1;
   return { card: top || cards[0], suit, len: maxLen, tied, seq: !!top };
 }
@@ -499,6 +501,8 @@ function position(seat) {
 function seatController(seat) { return seat === DUMMY ? DECLARER : seat; }
 function isHumanSeat(seat) { return game.types[seatController(seat)] === "humain"; }
 function faceUp(seat) {
+  // Partie entre robots : on regarde du côté du déclarant (Sud et Nord), les défenseurs restent cachés.
+  if (!bottomSeatHuman() && (seat === DECLARER || seat === DUMMY)) return true;
   return config.open || isHumanSeat(seat) || (seat === DUMMY && game.dummyShown);
 }
 
@@ -554,6 +558,7 @@ function render() {
     const role = seat === DUMMY ? T("tag.dummy") : PLAYER_TYPES[game.types[ctrl]].label;
     tag.innerHTML = `<b>${seatName(seat)}</b><small>${role}</small>`;
     tag.classList.toggle("turn", !game.over && game.turn === seat);
+    tag.dataset.team = team(seat);
   }
 
   // Centre : pli en cours ou résultat

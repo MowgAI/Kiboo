@@ -49,7 +49,7 @@
     "setup.explain": "Spiegazioni di Piperno",
     "setup.quiz": "Domande durante la partita",
     "setup.eval": "Modalità valutazione",
-    "help.show": "Aiuto impostazioni",
+    "help.show": "Aiuto",
     "help.hide": "Nascondi l'aiuto",
     "btn.replay": "Rigioca la smazzata",
     "btn.new": "Nuova smazzata",
@@ -94,7 +94,7 @@
     "explain.item": p => `<b>Presa ${p.trick}</b> · ${p.who} gioca <b>${p.card}</b>. ${p.reason}`,
     "pip.opening": p => `Attacco: il ${C[p.suit]} è il suo colore più lungo (${p.len} carte)` +
       (p.tied ? ", il più forte tra i colori della stessa lunghezza" : "") + ". " +
-      (p.seq ? "Gioca la carta più alta della sua sequenza." : "Senza una sequenza di almeno due carte consecutive, gioca la più bassa."),
+      (p.seq ? "Gioca la carta più alta della sua sequenza." : "Senza una sequenza (almeno due carte consecutive, la più alta almeno 7), gioca la più bassa."),
     "pip.newSuit": p => `Il suo colore preferito diventa il ${C[p.suit]} (il suo colore più lungo).`,
     "pip.leadStrong": p => `Attacca nel suo colore preferito, il ${C[p.suit]}. Ha la carta più alta rimasta (${art(p.top)}): gioca la sua più alta.`,
     "pip.leadWeak": p => `Attacca nel suo colore preferito, il ${C[p.suit]}. Non ha la carta più alta rimasta (${art(p.top)}): gioca la sua più bassa.`,
@@ -179,7 +179,7 @@
     "quiz.rule.same": "A parità di lunghezza, la regola d'attacco sceglie il colore con più punti (a parità di punti, l'ultimo nell'ordine blu, verde, rosso, giallo). Un altro colore altrettanto lungo è quindi possibile se ha meno punti.",
     "quiz.q.higher": p => `Ovest ha attaccato con ${art(p.v)} ${C[p.s]}. Può avere una <strong>carta ${F1[p.s]} più alta</strong> ${del(p.v)}?`,
     "quiz.q.lower": p => `Ovest ha attaccato con ${art(p.v)} ${C[p.s]}. Può avere una <strong>carta ${F1[p.s]} più bassa</strong> ${del(p.v)}?`,
-    "quiz.rule.seq": "La regola d'attacco fa giocare la carta più alta di una sequenza (almeno due carte consecutive); senza sequenza, la carta più bassa del colore.",
+    "quiz.rule.seq": "La regola d'attacco fa giocare la carta più alta di una sequenza (almeno due carte consecutive, la più alta almeno 7); altrimenti, la carta più bassa del colore.",
     "quiz.col.me": "La tua mano",
     "quiz.col.dummy": "Il morto",
     "quiz.col.rest": "Restano per Est e Ovest",
@@ -247,7 +247,7 @@
     "split.suit": p => `avrebbe un altro colore altrettanto lungo con più punti del ${C[p.L]}, e avrebbe attaccato in quel colore`,
     "split.rule": p => `${p.label}: <strong>impossibile</strong>. Il ${C[p.L]} potrebbe essere il suo colore più lungo, ma ${p.parts}.`,
     "split.example": p => `Per esempio, una mano possibile di Ovest (${p.label}):`,
-    "masters.q": "Clicca su <strong>tutte le carte vincenti</strong> della tua mano e del morto, poi verifica. Una carta è vincente quando Est e Ovest non hanno più nessuna carta più alta nel suo colore.",
+    "masters.q": "Clicca su <strong>tutte le carte vincenti</strong> della tua mano e del morto, poi verifica. Una carta è vincente quando Est e Ovest non hanno più nessuna carta più alta nel suo colore. Guarda la tua mano e il morto <strong>insieme</strong>: con 10 9 8 3 al morto e 7 6 4 nella tua mano, se Est e Ovest hanno solo il 5, il 2 e l'1, le vincenti sono 10 9 8 7 6.",
     "masters.none": "Nessuna carta era vincente. ",
     "masters.rule": "Per sapere se una carta è vincente, bisogna ricordarsi delle carte più alte già giocate: le altre sono ancora a Est e Ovest, tranne quelle della tua mano e del morto.",
     "masters.suit": p => `${p.suit}: ` +
@@ -305,7 +305,6 @@
     "eval.col.tricks": "Prese Nord-Sud",
     "eval.col.cmp": "Confronto",
     "eval.you": "Tu",
-    "eval.par": "Gioco perfetto (per info)",
     "eval.how": p => `Stessa smazzata, stessi difensori. 2 punti per ogni robot battuto, 1 per un pareggio, su un massimo di ${p.max} punti.`,
     "eval.seeProgress": "Vedi i miei progressi",
     "eval.levelTop": p => `<strong>${p.name}</strong>: il livello più alto. Bravo!`,
@@ -315,7 +314,6 @@
     "prog.scores": p => `Punteggio duplicato delle ultime ${p.n} smazzate${p.avg !== null ? ` (media ${p.avg}%)` : ""}:`,
     "prog.aria": p => `Punteggi: ${p.list}`,
     "prog.col.deal": "Smazzata",
-    "prog.col.par": "Perfetto",
     "prog.col.score": "Punteggio",
     "prog.empty": "Nessuna smazzata ancora valutata. Gioca una smazzata in Sud (dichiarante) con la modalità valutazione: il tuo punteggio apparirà alla fine, e i tuoi progressi qui.",
 
@@ -384,10 +382,10 @@
       <ol>
         <li>Prendono il loro <strong>colore più lungo</strong>, quello in cui hanno più carte.</li>
         <li>Se due colori hanno <strong>tante carte quanto l'altro</strong>, prendono quello con <strong>più punti</strong> (la somma dei valori). A parità di punti, prendono l'ultimo nell'ordine blu, verde, rosso, giallo.</li>
-        <li>In quel colore, se hanno una <dfn>sequenza</dfn> (almeno due carte consecutive, come il 7 e l'8), giocano la <strong>carta più alta della sequenza</strong>. Se hanno più sequenze, prendono la più alta.</li>
-        <li>Senza sequenza, giocano la <strong>carta più bassa</strong> del colore.</li>
+        <li>In quel colore, se hanno una <dfn>sequenza</dfn> (almeno due carte consecutive, come il 7 e l'8), giocano la <strong>carta più alta della sequenza</strong>, ma solo se questa carta vale <strong>almeno 7</strong>. Se hanno più sequenze, prendono la più alta.</li>
+        <li>Senza sequenza (o con una sequenza troppo bassa, come il 3 e il 4), giocano la <strong>carta più bassa</strong> del colore.</li>
       </ol>
-      <p>Esempi: con il 2, il 7 e l'8 blu, attaccano con l'8 blu (sequenza 7-8). Con il 2, il 5 e il 9 blu, attaccano con il 2 blu (nessuna sequenza).</p>
+      <p>Esempi: con il 2, il 7 e l'8 blu, attaccano con l'8 blu (sequenza 7-8). Con il 2, il 5 e il 9 blu, attaccano con il 2 blu (nessuna sequenza). Con il 3, il 4 e il 9 blu, attaccano con il 3 blu (la sequenza 3-4 non arriva al 7).</p>
     </div>
 
     <h3>Come si gioca una presa</h3>

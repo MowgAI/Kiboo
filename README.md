@@ -59,6 +59,7 @@ Le bouton « Exercices » ouvre cinq exercices sur des cartes tirées au hasard 
 - **Couleur la plus longue** : en cas d'égalité, toutes les couleurs les plus longues sont acceptées.
 - **Cartes jouables** : une couleur est demandée, il faut sélectionner toutes les cartes autorisées (fournir si possible, sinon défausser n'importe quelle carte).
 - **Cartes restantes** : en voyant sa main et le mort, combien de cartes de chaque couleur ont Est et Ouest ? Une fois sur deux, le premier pli est déjà joué (par des robots Piperno).
+- **Règle d'entame des robots** (Piperno, Averell, Averell250) : couleur la plus longue (à égalité, la plus forte en points), puis la plus haute carte d'une séquence d'au moins deux cartes qui se suivent si cette carte vaut au moins 7, sinon la plus petite carte.
 - **Répartition de l'entame** : Ouest entame selon la règle de Piperno ; il faut cocher toutes les répartitions possibles de la couleur entamée entre Ouest et Est.
 
 Chaque réponse est corrigée avec le détail du calcul, et un compteur suit les réussites de la session. Le code est dans `js/exercises.js`.
@@ -86,7 +87,7 @@ Toutes les 3 bonnes réponses (cumulées, exercices compris), le joueur choisit 
 
 Comme au bridge en tournoi, on compare son résultat à celui d'autres joueurs **sur les mêmes cartes**. Quand Sud est humain et que la case « Mode évaluation » est cochée (par défaut), la donne est rejouée en coulisses avec **Piperno, Averell et Averell250 en déclarant, contre les mêmes défenseurs**. Ces parties fantômes démarrent dès le début de la donne, dans un Worker séparé.
 
-- **Score duplicate** : 2 points par robot battu, 1 par égalité, rapportés au maximum (6 points), en pourcentage. Le résultat avec un jeu parfait (DDS) est affiché pour information.
+- **Score duplicate** : 2 points par robot battu, 1 par égalité, rapportés au maximum (6 points), en pourcentage.
 - **Résultats reproductibles** : le hasard d'Averell (et de PiperRand en défense) est fixé par une graine tirée de la donne ; avec une graine, Averell fait toujours exactement 40 (ou 250) simulations.
 - **Historique et niveaux** (bouton « Progression », gardés dans le navigateur) : Débutant, puis Niveau Piperno, Niveau Averell, Niveau Averell250 et Expert, en faisant au moins aussi bien que le robot (ou que le jeu parfait) sur 7 des 10 dernières donnes. Chaque nouveau niveau rapporte une carte pour la collection.
 - Une donne n'est **pas comptée** si le joueur a eu de l'aide (meilleurs coups, jeux ouverts, carte révélée) ou s'il l'a rejouée.

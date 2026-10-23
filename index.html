@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=2026-10-23-1152">
+<link rel="stylesheet" href="css/style.css?v=2026-10-23-1205">
 </head>
 <body>
 <div class="wrap">
@@ -20,6 +20,7 @@
       <button class="act ghost" id="btn-album" type="button" aria-haspopup="dialog"><span class="emo" aria-hidden="true">⭐</span><span class="lbl">Collection 0/40</span></button>
       <button class="act ghost" id="btn-exercises" type="button" aria-haspopup="dialog"><span class="emo" aria-hidden="true">✏️</span><span class="lbl" data-i18n="head.exercises">Exercices</span></button>
       <button class="act ghost" id="btn-rules" type="button" aria-haspopup="dialog"><span class="emo" aria-hidden="true">📖</span><span class="lbl" data-i18n="head.rules">Règles du jeu</span></button>
+      <button class="act ghost" id="btn-settings-help" type="button" aria-expanded="false" aria-controls="settings-help"><span class="emo" aria-hidden="true">❓</span><span class="lbl" data-i18n="help.show">Aide</span></button>
     </div>
   </header>
 
@@ -125,10 +126,10 @@
       <ol>
         <li>Ils prennent leur <strong>couleur la plus longue</strong>, celle où ils ont le plus de cartes.</li>
         <li>Si deux couleurs ont <strong>autant de cartes</strong>, ils prennent celle qui a le <strong>plus de points</strong> (la somme des valeurs). À points égaux aussi, ils prennent la dernière dans l'ordre bleu, vert, rouge, jaune.</li>
-        <li>Dans cette couleur, s'ils ont une <dfn>séquence</dfn> (au moins deux cartes qui se suivent, comme le 7 et le 8), ils jouent la <strong>plus haute carte de la séquence</strong>. S'ils ont plusieurs séquences, ils prennent la plus haute.</li>
-        <li>Sans séquence, ils jouent la <strong>plus petite carte</strong> de la couleur.</li>
+        <li>Dans cette couleur, s'ils ont une <dfn>séquence</dfn> (au moins deux cartes qui se suivent, comme le 7 et le 8), ils jouent la <strong>plus haute carte de la séquence</strong>, mais seulement si cette carte vaut <strong>au moins 7</strong>. S'ils ont plusieurs séquences, ils prennent la plus haute.</li>
+        <li>Sans séquence (ou avec une séquence trop petite, comme le 3 et le 4), ils jouent la <strong>plus petite carte</strong> de la couleur.</li>
       </ol>
-      <p>Exemples : avec le 2, le 7 et le 8 bleus, ils entament le 8 bleu (séquence 7-8). Avec le 2, le 5 et le 9 bleus, ils entament le 2 bleu (pas de séquence).</p>
+      <p>Exemples : avec le 2, le 7 et le 8 bleus, ils entament le 8 bleu (séquence 7-8). Avec le 2, le 5 et le 9 bleus, ils entament le 2 bleu (pas de séquence). Avec le 3, le 4 et le 9 bleus, ils entament le 3 bleu (la séquence 3-4 n'atteint pas le 7).</p>
     </div>
 
     <h3>Le déroulement d'un pli</h3>
@@ -153,16 +154,16 @@
   </dialog>
 
   <section class="setup" aria-label="Réglages de la table" data-i18n-aria="setup.aria">
-    <label class="field"><span data-i18n="setup.west">Ouest</span>
+    <label class="field"><span class="seat-name eo" data-i18n="setup.west">Ouest</span>
       <select id="cfg-O"></select>
     </label>
-    <div class="field"><span data-i18n="setup.north">Nord</span>
+    <div class="field"><span class="seat-name ns" data-i18n="setup.north">Nord</span>
       <span class="fixed" data-i18n="setup.northFixed">le mort, joué par Sud</span>
     </div>
-    <label class="field"><span data-i18n="setup.east">Est</span>
+    <label class="field"><span class="seat-name eo" data-i18n="setup.east">Est</span>
       <select id="cfg-E"></select>
     </label>
-    <label class="field"><span data-i18n="setup.south">Sud (déclarant)</span>
+    <label class="field"><span class="seat-name ns" data-i18n="setup.south">Sud (déclarant)</span>
       <select id="cfg-S"></select>
     </label>
     <label class="field"><span><span class="emo" aria-hidden="true">⏱️</span> <span data-i18n="setup.speed">Vitesse des robots</span></span>
@@ -184,7 +185,6 @@
     <label class="check"><input type="checkbox" id="cfg-explain"> <span class="emo" aria-hidden="true">🧑‍🏫</span><span data-i18n="setup.explain">Explications de Piperno</span></label>
     <label class="check"><input type="checkbox" id="cfg-eval" checked> <span class="emo" aria-hidden="true">🏆</span><span data-i18n="setup.eval">Mode évaluation</span></label>
     <div class="btns">
-      <button class="act ghost" id="btn-settings-help" type="button" aria-expanded="false" aria-controls="settings-help"><span class="emo" aria-hidden="true">❓</span><span class="lbl" data-i18n="help.show">Aide des réglages</span></button>
       <button class="act ghost" id="btn-replay" type="button"><span class="emo" aria-hidden="true">🔁</span><span data-i18n="btn.replay">Rejouer la donne</span></button>
       <button class="act" id="btn-new" type="button"><span class="emo" aria-hidden="true">🃏</span><span data-i18n="btn.new">Nouvelle donne</span></button>
     </div>
@@ -226,20 +226,20 @@
   <section class="review" id="review" hidden aria-live="polite"></section>
 </div>
 
-<script>window.KIBOO_VERSION = "2026-10-23-1152";   // mis à jour par tools/bump-version.sh</script>
-<script src="lang/fr.js?v=2026-10-23-1152"></script>
-<script src="lang/en.js?v=2026-10-23-1152"></script>
-<script src="lang/it.js?v=2026-10-23-1152"></script>
-<script src="js/i18n.js?v=2026-10-23-1152"></script>
-<script src="js/dds.js?v=2026-10-23-1152"></script>
-<script src="js/pimc.js?v=2026-10-23-1152"></script>
-<script src="js/solver.js?v=2026-10-23-1152"></script>
-<script src="js/images.js?v=2026-10-23-1152"></script>
-<script src="js/game.js?v=2026-10-23-1152"></script>
-<script src="js/rewards.js?v=2026-10-23-1152"></script>
-<script src="js/exercises.js?v=2026-10-23-1152"></script>
-<script src="js/quiz.js?v=2026-10-23-1152"></script>
-<script src="js/evaluation.js?v=2026-10-23-1152"></script>
-<script src="js/feedback.js?v=2026-10-23-1152"></script>
+<script>window.KIBOO_VERSION = "2026-10-23-1205";   // mis à jour par tools/bump-version.sh</script>
+<script src="lang/fr.js?v=2026-10-23-1205"></script>
+<script src="lang/en.js?v=2026-10-23-1205"></script>
+<script src="lang/it.js?v=2026-10-23-1205"></script>
+<script src="js/i18n.js?v=2026-10-23-1205"></script>
+<script src="js/dds.js?v=2026-10-23-1205"></script>
+<script src="js/pimc.js?v=2026-10-23-1205"></script>
+<script src="js/solver.js?v=2026-10-23-1205"></script>
+<script src="js/images.js?v=2026-10-23-1205"></script>
+<script src="js/game.js?v=2026-10-23-1205"></script>
+<script src="js/rewards.js?v=2026-10-23-1205"></script>
+<script src="js/exercises.js?v=2026-10-23-1205"></script>
+<script src="js/quiz.js?v=2026-10-23-1205"></script>
+<script src="js/evaluation.js?v=2026-10-23-1205"></script>
+<script src="js/feedback.js?v=2026-10-23-1205"></script>
 </body>
 </html>

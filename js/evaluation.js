@@ -201,8 +201,7 @@ const Evaluation = (() => {
       <p class="eval-score">${T("eval.score", { pct: j.pct })}</p>
       <div class="ex-grid-wrap"><table class="ex-grid eval-table">
         <thead><tr><th scope="col">${T("eval.col.declarer")}</th><th scope="col">${T("eval.col.tricks")}</th><th scope="col">${T("eval.col.cmp")}</th></tr></thead>
-        <tbody><tr class="eval-me"><th scope="row">${T("eval.you")}</th><td>${j.me}</td><td></td></tr>${rows}
-        <tr class="eval-par"><th scope="row">${T("eval.par")}</th><td>${j.par}</td><td></td></tr></tbody>
+        <tbody><tr class="eval-me"><th scope="row">${T("eval.you")}</th><td>${j.me}</td><td></td></tr>${rows}</tbody>
       </table></div>
       <p class="eval-how">${T("eval.how", { max: 2 * DECLARERS.length })}</p>
       ${counted}${up}
@@ -229,8 +228,8 @@ const Evaluation = (() => {
       <p class="quiz-label">${T("prog.scores", { n: L.recent.length, avg })}</p>
       <div class="eval-bars" role="img" aria-label="${T("prog.aria", { list: L.recent.map(h => h.pct + " %").join(", ") })}">${bars}</div>
       <div class="ex-grid-wrap"><table class="ex-grid eval-table">
-        <thead><tr><th scope="col">${T("prog.col.deal")}</th><th scope="col">${T("eval.you")}</th><th scope="col">Piperno</th><th scope="col">Averell</th><th scope="col">Averell250</th><th scope="col">${T("prog.col.par")}</th><th scope="col">${T("prog.col.score")}</th></tr></thead>
-        <tbody>${last.map((h, i) => `<tr><td>${history.length - i}</td><td><strong>${h.me}</strong></td><td>${h.piperno}</td><td>${h.averell}</td><td>${h.averell250}</td><td>${h.par}</td><td>${h.pct} %</td></tr>`).join("")}</tbody>
+        <thead><tr><th scope="col">${T("prog.col.deal")}</th><th scope="col">${T("eval.you")}</th><th scope="col">Piperno</th><th scope="col">Averell</th><th scope="col">Averell250</th><th scope="col">${T("prog.col.score")}</th></tr></thead>
+        <tbody>${last.map((h, i) => `<tr><td>${history.length - i}</td><td><strong>${h.me}</strong></td><td>${h.piperno}</td><td>${h.averell}</td><td>${h.averell250}</td><td>${h.pct} %</td></tr>`).join("")}</tbody>
       </table></div>`
       : `<p>${T("prog.empty")}</p>`;
     $("progress").showModal();
