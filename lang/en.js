@@ -218,7 +218,7 @@
     "goat.start": p => `Start of the deal: North (dummy) and South (your hand) are counted. Between them, West and East have ${p.rest.map((n, s) => `${n} ${C[s]} ${S(n, "card", "cards")}`).join(", ")}.`,
     "goat.void": p => `${seatName(p.seat)} can't follow in ${C[p.s]} (he discards the ${cardName(p.card)}): he has none left. ` +
       (p.n ? `He has played ${p.n} (${p.cards.join(", ")}): so he had <strong>${p.n}</strong> ${C[p.s]} ${S(p.n, "card", "cards")} at the start.` : `He had <strong>none</strong> at the start.`),
-    "goat.bound.row": p => `Row ${C[p.s]}: ${p.known.length ? `${10 - p.known.reduce((a, b) => a + b, 0)} cards are left for ` : ""}${p.cells.map(c => seatName(c.seat)).join(" and ")}, and ${p.cells.length > 1 ? "each has already played that many" : "he has already played that many"}: ${p.cells.map(c => `<strong>${c.n}</strong> for ${seatName(c.seat)}`).join(", ")}.`,
+    "goat.bound.row": p => { const t = p.cells.reduce((a, c) => a + c.n, 0); return `Row ${C[p.s]}: ${10 - p.known.reduce((a, b) => a + b, 0)} ${C[p.s]} ${S(t, "card is", "cards are")} left for ${p.cells.map(c => seatName(c.seat)).join(" and ")}, and ${S(p.cells.length, "he has", "they have")} already played ${t}: ${p.cells.map(c => `<strong>${c.n}</strong> for ${seatName(c.seat)}`).join(", ")}, there are no others.`; },
     "goat.bound.col": p => `Column ${seatName(p.seat)}: his known cards and the ones already played already make 10: ${p.cells.map(c => `<strong>${c.n}</strong> ${C[c.s]} ${S(c.n, "card", "cards")}`).join(", ")}.`,
     "goat.none": "No deduction yet: Goat is waiting for a defender who can't follow suit.",
     "goat.done": "The square is complete: Goat knows the whole starting distribution!",
