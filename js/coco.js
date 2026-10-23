@@ -18,8 +18,7 @@
      font le reste. En fin de donne, le vrai carré est montré.
    - Mode Goat (même réglage, choix « Goat ») : le programme remplit le
      carré tout seul pendant la donne et explique chaque déduction. Une case
-     encore inconnue montre « ≥ n » quand le défenseur a déjà joué n cartes
-     de la couleur. Goat est une aide : la donne n'est pas comptée dans
+     encore incertaine montre l'intervalle possible (par exemple 3–6). Goat est une aide : la donne n'est pas comptée dans
      l'évaluation.
    ===================================================================== */
 const Coco = (() => {
@@ -239,80 +238,154 @@ const Coco = (() => {
     state.revealed = true;
   }
 
-  /* ---------- Mode Goat : le carré se remplit tout seul ---------- */
-  // Rejoue l'historique de la donne : chaque défausse d'un défenseur fixe une
-  // case, puis les totaux à 10 en donnent d'autres. Chaque déduction est notée.
-  function goatAnalyse(g) {
-    const M = matrix(g.initial);
-    let known = [0, 1, 2, 3].map(() => ORDER.map(x => x === "N" || x === "S"));
-    const fresh = new Set();                         // cases trouvées au dernier coup
-    const log = [{ trick: 0, k: "goat.start", p: { rest: [0, 1, 2, 3].map(s => M[s][0] + M[s][2]) } }];
-    const led = {}, played = { O: [[], [], [], []], E: [[], [], [], []] };
-    const lower = (s, j) => (ORDER[j] in played ? played[ORDER[j]][s].length : 0);
-    // Une ligne ou une colonne dont les cases connues plus les « au moins » font
-    // déjà 10 : chaque case inconnue vaut exactement son « au moins ».
-    function bounds(trick, last) {
-      const lines = [];
-      for (let s = 0; s < 4; s++) lines.push({ kind: "row", s, cells: [0, 1, 2, 3].map(j => [s, j]) });
-      for (let j = 0; j < 4; j++) lines.push({ kind: "col", j, cells: [0, 1, 2, 3].map(s => [s, j]) });
-      for (const ln of lines) {
-        const miss = ln.cells.filter(([s, j]) => !known[s][j]);
-        if (miss.length < 2) continue;                 // une seule case : les totaux s'en chargent
-        const sum = ln.cells.reduce((t, [s, j]) => t + (known[s][j] ? M[s][j] : lower(s, j)), 0);
-        if (sum !== 10) continue;
-        const cells = miss.map(([s, j]) => ({ s, seat: ORDER[j], n: lower(s, j) }));
-        miss.forEach(([s, j]) => { known[s][j] = true; if (last) fresh.add(s + "-" + j); });
-        log.push({ trick, k: ln.kind === "row" ? "goat.bound.row" : "goat.bound.col", p: { s: ln.s, seat: ORDER[ln.j], cells, known: ln.cells.filter(c => !miss.includes(c)).map(([s, j]) => M[s][j]) } });
-        return true;
-      }
-      return false;
-    }
-    function close(trick, last) {
-      for (let again = true; again;) {
-        const res = propagate(M, known);
-        for (const st of res.steps) {
-          log.push({ trick, k: st.k, p: st.p });
-          if (last) fresh.add(st.p.s + "-" + ORDER.indexOf(st.p.seat));
-        }
-        known = res.known;
-        again = bounds(trick, last);
-      }
-    }
-    g.history.forEach((h, i) => {
-      const last = i === g.history.length - 1;
+  /* ---------- Mode Goat : le carré se remplit tout seul ----------
+     Goat suit la donne coup par coup. Il note ce qui est sûr et pourquoi :
+     - une défausse d'un défenseur fixe sa case ;
+     - les totaux à 10, et les « au moins » (cartes déjà jouées) ;
+     - la règle d'entame : après chaque carte d'Ouest ou d'Est, il passe en
+       revue toutes les mains de départ possibles d'Ouest (cartes jouées,
+       défausses, et entame selon la règle de Piperno quand Ouest la suit) ;
+       une case est sûre quand elle a la même valeur dans toutes. Les cases
+       encore incertaines montrent l'intervalle possible (par exemple 3–6). */
+  const RULE_LEADERS = ["deterministe", "pimc", "pimc250"];
+
+  // Bornes du nombre de cartes de chaque couleur d'Ouest au départ, d'après
+  // les `upto` premières cartes jouées. Renvoie { min, max, n } (n : mains possibles).
+  function westRange(g, upto) {
+    const H = g.history.slice(0, upto);
+    const ns = new Set([...g.initial.N, ...g.initial.S].map(cardId));
+    const pool = makeDeck().filter(c => !ns.has(cardId(c)));       // les 20 cartes d'Ouest et d'Est
+    const fixed = new Set(H.filter(h => h.seat === "O").map(h => cardId(h.card)));
+    const banned = new Set(H.filter(h => h.seat === "E").map(h => cardId(h.card)));
+    const led = {}, voidW = new Set(), voidE = new Set();
+    for (const h of H) {
       if (!(h.trickNo in led)) led[h.trickNo] = h.card.s;
-      if (h.seat in played) played[h.seat][h.card.s].push(h.card.v);
-      const L = led[h.trickNo], j = ORDER.indexOf(h.seat);
-      if (h.card.s !== L && h.seat in played && !known[L][j]) {
-        known[L][j] = true;
-        if (last) fresh.add(L + "-" + j);
-        log.push({ trick: h.trickNo, k: "goat.void", p: { seat: h.seat, card: h.card, s: L, n: M[L][j], cards: played[h.seat][L].slice() } });
+      else if (h.card.s !== led[h.trickNo]) (h.seat === "O" ? voidW : h.seat === "E" ? voidE : new Set()).add(led[h.trickNo]);
+    }
+    // Ouest sans une couleur : il n'en avait que les cartes qu'il a jouées. Est sans une couleur : Ouest a tout le reste.
+    for (const c of pool) {
+      const id = cardId(c);
+      if (voidW.has(c.s) && !fixed.has(id)) banned.add(id);
+      if (voidE.has(c.s) && !banned.has(id)) fixed.add(id);
+    }
+    const base = pool.filter(c => fixed.has(cardId(c)));
+    const free = pool.filter(c => !fixed.has(cardId(c)) && !banned.has(cardId(c)));
+    const k = 10 - base.length;
+    const rule = RULE_LEADERS.includes(g.types.O) && H.length > 0 && H[0].seat === "O";
+    const leadId = rule ? cardId(H[0].card) : -1;
+    const min = [10, 10, 10, 10], max = [0, 0, 0, 0];
+    let n = 0;
+    if (k >= 0 && k <= free.length) {
+      const idx = Array.from({ length: k }, (_, i) => i);
+      while (true) {
+        const hand = base.concat(idx.map(i => free[i]));
+        if (!rule || cardId(openingCard(hand)) === leadId) {
+          n++;
+          const cnt = [0, 0, 0, 0];
+          for (const c of hand) cnt[c.s]++;
+          for (let s = 0; s < 4; s++) { if (cnt[s] < min[s]) min[s] = cnt[s]; if (cnt[s] > max[s]) max[s] = cnt[s]; }
+        }
+        let i = k - 1;
+        while (i >= 0 && idx[i] === free.length - k + i) i--;
+        if (i < 0) break;
+        idx[i]++;
+        for (let j = i + 1; j < k; j++) idx[j] = idx[j - 1] + 1;
       }
-      close(h.trickNo, last);
-    });
-    return { M, known, fresh, log, played, done: known.every(r => r.every(Boolean)) };
+    }
+    return { min, max, n, rule };
+  }
+
+  function goatStart(g) {
+    const M = matrix(g.initial);
+    const rest = [0, 1, 2, 3].map(s => M[s][0] + M[s][2]);
+    return {
+      g, M, rest, step: 0, fresh: new Set(),
+      known: [0, 1, 2, 3].map(() => ORDER.map(x => x === "N" || x === "S")),
+      // Intervalles possibles [min, max] pour Ouest (j = 0) et Est (j = 2).
+      range: [0, 1, 2, 3].map(s => ORDER.map((x, j) => j === 0 || j === 2 ? [0, rest[s]] : [M[s][j], M[s][j]])),
+      played: { O: [[], [], [], []], E: [[], [], [], []] }, led: {},
+      log: [{ trick: 0, k: "goat.start", p: { rest } }],
+    };
+  }
+
+  // Une carte de plus : nouvelles déductions, chacune avec sa raison.
+  function goatStep(G) {
+    const g = G.g, h = g.history[G.step], trick = h.trickNo, M = G.M;
+    G.step++;
+    G.fresh = new Set();
+    const found = (s, j) => { G.known[s][j] = true; G.range[s][j] = [M[s][j], M[s][j]]; G.fresh.add(s + "-" + j); };
+    if (!(trick in G.led)) G.led[trick] = h.card.s;
+    if (h.seat in G.played) G.played[h.seat][h.card.s].push(h.card.v);
+    const L = G.led[trick], j0 = ORDER.indexOf(h.seat);
+    if (h.card.s !== L && h.seat in G.played && !G.known[L][j0]) {
+      found(L, j0);
+      G.log.push({ trick, k: "goat.void", p: { seat: h.seat, card: h.card, s: L, n: M[L][j0], cards: G.played[h.seat][L].slice() } });
+    }
+    const lower = (s, j) => (ORDER[j] in G.played ? G.played[ORDER[j]][s].length : 0);
+    // Totaux à 10, puis « au moins » qui font déjà 10.
+    const close = () => {
+      for (let again = true; again;) {
+        const res = propagate(M, G.known);
+        for (const st of res.steps) { G.log.push({ trick, k: st.k, p: st.p }); found(st.p.s, ORDER.indexOf(st.p.seat)); }
+        again = false;
+        const lines = [];
+        for (let s = 0; s < 4; s++) lines.push({ kind: "row", s, cells: [0, 1, 2, 3].map(j => [s, j]) });
+        for (let j = 0; j < 4; j++) lines.push({ kind: "col", j, cells: [0, 1, 2, 3].map(s => [s, j]) });
+        for (const ln of lines) {
+          const miss = ln.cells.filter(([s, j]) => !G.known[s][j]);
+          if (miss.length < 2) continue;
+          if (ln.cells.reduce((t, [s, j]) => t + (G.known[s][j] ? M[s][j] : lower(s, j)), 0) !== 10) continue;
+          G.log.push({ trick, k: ln.kind === "row" ? "goat.bound.row" : "goat.bound.col", p: { s: ln.s, seat: ORDER[ln.j], cells: miss.map(([s, j]) => ({ s, seat: ORDER[j], n: lower(s, j) })), known: ln.cells.filter(c => !miss.includes(c)).map(([s, j]) => M[s][j]) } });
+          miss.forEach(([s, j]) => found(s, j));
+          again = true;
+          break;
+        }
+      }
+    };
+    close();
+    // Après une carte d'Ouest ou d'Est : toutes les mains possibles d'Ouest.
+    if (h.seat === "O" || h.seat === "E") {
+      const R = westRange(g, G.step);
+      if (R.n) {
+        for (let s = 0; s < 4; s++) {
+          G.range[s][0] = [R.min[s], R.max[s]];
+          G.range[s][2] = [G.rest[s] - R.max[s], G.rest[s] - R.min[s]];
+        }
+        if (G.step === 1 && R.rule) G.log.push({ trick, k: "goat.lead", p: { card: h.card, L: h.card.s, ranges: R.min.map((m, s) => [m, R.max[s]]), n: R.n } });
+        const rule = [];
+        for (let s = 0; s < 4; s++) for (const j of [0, 2]) {
+          if (G.known[s][j] || G.range[s][j][0] !== G.range[s][j][1]) continue;
+          rule.push({ s, seat: ORDER[j], v: M[s][j] });
+          found(s, j);
+        }
+        if (rule.length) G.log.push({ trick, k: "goat.rule", p: { cells: rule, n: R.n, lead: R.rule } });
+        close();
+      }
+    }
   }
 
   function goatRender() {
     const box = $("coco");
-    const A = goatAnalyse(game);
+    const A = goat;
     const cell = (s, j) => {
-      const x = ORDER[j], id = s + "-" + j;
+      const id = s + "-" + j;
       if (A.known[s][j]) return `<td class="given${A.fresh.has(id) ? " fresh" : ""}">${A.M[s][j]}</td>`;
-      const n = A.played[x][s].length;
-      return `<td class="unknown">${n ? "≥ " + n : "?"}</td>`;
+      const [a, b] = A.range[s][j];
+      return `<td class="unknown">${a}–${b}</td>`;
     };
     const head = `<tr><th class="corner"></th>${ORDER.map(x => `<th scope="col"><span class="seat-name ${TEAM[x]}">${seatName(x)}</span></th>`).join("")}<th class="corner" scope="col">${T("coco.total")}</th></tr>`;
     const rows = [0, 1, 2, 3].map(s => `<tr><th scope="row">${Exercises.suitName(s)}</th>${[0, 1, 2, 3].map(j => cell(s, j)).join("")}<td class="corner">10</td></tr>`).join("");
     const foot = `<tr><th class="corner" scope="row">${T("coco.total")}</th>${ORDER.map(() => `<td class="corner">10</td>`).join("")}<td class="corner"></td></tr>`;
     const items = A.log.slice().reverse().map(e =>
       `<li>${e.trick ? `<b>${T("goat.trick", { n: e.trick })}</b> · ` : ""}${T(e.k, e.p)}</li>`).join("");
+    const done = A.known.every(r => r.every(Boolean));
     box.innerHTML = `<h2>${T("goat.title")}</h2>
       <p>${T("goat.intro")}</p>
       <div class="ex-grid-wrap"><table class="coco goat"><thead>${head}</thead><tbody>${rows}${foot}</tbody></table></div>
-      ${A.done ? `<p class="ex-result ok">${T("goat.done")}</p>` : A.log.length === 1 ? `<p class="coco-legend">${T("goat.none")}</p>` : ""}
+      ${done ? `<p class="ex-result ok">${T("goat.done")}</p>` : A.log.length === 1 ? `<p class="coco-legend">${T("goat.none")}</p>` : ""}
       <p class="quiz-label">${T("goat.why")}</p><ul class="goat-log">${items}</ul>`;
   }
+  let goat = null;
 
   // Appelé à chaque affichage de la table (js/game.js).
   function render() {
@@ -324,6 +397,8 @@ const Coco = (() => {
       // Goat est une aide : la donne ne compte pas pour l'évaluation.
       game.assisted = true;
       state = null;
+      if (!goat || goat.g !== game) goat = goatStart(game);
+      while (goat.step < game.history.length) goatStep(goat);
       const key = game.history.length + (game.over ? "!" : "") + I18N.lang;
       if (box.dataset.goat !== key) { box.dataset.goat = key; goatRender(); }
       return;
@@ -350,5 +425,5 @@ const Coco = (() => {
     if (wasRevealed) reveal();
   });
 
-  return { staticPanel, render, matrix, propagate, knownNow };
+  return { staticPanel, render, matrix, propagate, knownNow, westRange, get goat() { return goat; } };
 })();
