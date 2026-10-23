@@ -148,14 +148,15 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px s
   position: relative;
 }
 .hand.side .card { margin-left: calc(var(--w) * -0.62); }
-.card.back {
-  background:
-    radial-gradient(circle at 30% 30%, var(--c-yellow) 0 8%, transparent 9%),
-    radial-gradient(circle at 70% 70%, var(--c-green) 0 8%, transparent 9%),
-    radial-gradient(circle at 70% 30%, var(--c-red) 0 8%, transparent 9%),
-    radial-gradient(circle at 30% 70%, var(--c-blue) 0 8%, transparent 9%),
-    #FFFFFF;
-  border: calc(var(--w) * 0.06) solid #5B3F8C;
+/* Dos des cartes : le logo Kiboo vertical, sur fond blanc bordé de violet. */
+.card.back { background: #FFFFFF; border: calc(var(--w) * 0.04) solid var(--felt); overflow: hidden; }
+.card.back::before {
+  content: ""; position: absolute; inset: 6%;
+  border: 1px solid #E2DAEE; border-radius: calc(var(--w) * 0.05);
+}
+.card.back .back-logo {
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-weight: 700; line-height: 0.95; font-size: calc(var(--w) * 0.27);
 }
 .badge {
   position: absolute; top: 30%; left: 4%;
@@ -277,6 +278,7 @@ button.card:disabled { cursor: default; }
 .rules .close:hover { border-color: var(--ink); }
 
 .head-btns { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.lang-wrap { display: inline-flex; align-items: center; gap: 4px; }
 .lang {
   font: inherit; font-weight: 600; color: var(--ink); cursor: pointer;
   background: var(--page); border: 2px solid var(--ink); border-radius: 10px; padding: 7px 8px;
@@ -454,3 +456,14 @@ a.act { text-decoration: none; display: inline-flex; align-items: center; }
 
 /* Bouton « Pli suivant » : le pli reste visible sur la table jusqu'au clic. */
 .status-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+/* Icônes (emoji) des boutons et des options. */
+.emo { display: inline-block; margin-right: 6px; font-style: normal; line-height: 1; }
+.check .emo { margin-right: 0; }
+@media (max-width: 600px) {
+  /* Sur téléphone, les boutons du haut ne gardent que l'icône (le texte reste lu par les lecteurs d'écran). */
+  .head-btns button:not(#btn-album) .lbl {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+  }
+  .head-btns button:not(#btn-album) .emo { margin-right: 0; }
+}

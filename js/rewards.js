@@ -46,7 +46,7 @@ const Rewards = (() => {
       el.setAttribute("aria-label", T("gift.aria", { n: state.progress, goal: GOAL }));
     }
     const btn = $("btn-album");
-    if (btn) btn.textContent = T("album.btn", { n: state.collection.length });
+    if (btn) btn.querySelector(".lbl").textContent = T("album.btn", { n: state.collection.length });
   }
 
   // Ajoute à la collection une carte qu'on n'a pas encore (null si elle est complète).

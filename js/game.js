@@ -476,6 +476,7 @@ function cardEl(card, opts = {}) {
   } else {
     el.classList.add("back");
     el.setAttribute("aria-hidden", "true");
+    el.innerHTML = '<span class="back-logo kiboo"><span>K</span><span>i</span><span>b</span><span>o</span><span>o</span></span>';
   }
   return el;
 }
@@ -564,8 +565,8 @@ function render() {
     box.className = "result";
     const title = ns === eo ? T("result.tie") : T("result.win", { team: teamName(ns > eo ? "NS" : "EO") });
     box.innerHTML = `<h2>${title}</h2><p>${T("result.score", { ns, eo })}</p>
-      <div class="btns"><button class="act ghost" type="button" data-a="replay">${T("btn.replayShort")}</button>
-      <button class="act" type="button" data-a="new">${T("btn.new")}</button></div>`;
+      <div class="btns"><button class="act ghost" type="button" data-a="replay"><span class="emo" aria-hidden="true">🔁</span>${T("btn.replayShort")}</button>
+      <button class="act" type="button" data-a="new"><span class="emo" aria-hidden="true">🃏</span>${T("btn.new")}</button></div>`;
     box.querySelector('[data-a="replay"]').onclick = replayDeal;
     box.querySelector('[data-a="new"]').onclick = () => newGame(dealHands());
     center.appendChild(box);
@@ -583,7 +584,7 @@ function render() {
   // Pli terminé : il reste affiché jusqu'au clic sur « Pli suivant » (ou sur la table).
   const next = $("btn-next-trick"), wasHidden = next.hidden;
   next.hidden = !game.holding;
-  next.textContent = game.played.length === 40 ? T("btn.endDeal") : T("btn.nextTrick");
+  next.querySelector(".lbl").textContent = game.played.length === 40 ? T("btn.endDeal") : T("btn.nextTrick");
   if (game.holding && wasHidden) next.focus({ preventScroll: true });
 
   // Score
@@ -675,13 +676,13 @@ $("btn-settings-help").addEventListener("click", e => {
   const help = $("settings-help"), open = help.hidden;
   help.hidden = !open;
   e.currentTarget.setAttribute("aria-expanded", open);
-  e.currentTarget.textContent = open ? T("help.hide") : T("help.show");
+  e.currentTarget.querySelector(".lbl").textContent = open ? T("help.hide") : T("help.show");
 });
 
 // Changement de langue : libellés des menus, bouton d'aide, puis la table.
 document.addEventListener("kiboo-lang", () => {
   for (const s of ["O", "E", "S"]) for (const o of $("cfg-" + s).options) o.textContent = PLAYER_TYPES[o.value].label;
-  $("btn-settings-help").textContent = $("settings-help").hidden ? T("help.show") : T("help.hide");
+  $("btn-settings-help").querySelector(".lbl").textContent = $("settings-help").hidden ? T("help.show") : T("help.hide");
   render();
 });
 
