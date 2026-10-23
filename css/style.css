@@ -268,15 +268,15 @@ button.card:disabled { cursor: default; }
   padding: 0 0.1em;
 }
 /* Familles : une pastille de la couleur de la famille */
-.rules .fam { font-weight: 600; white-space: nowrap; }
-.rules .fam::before {
+:is(.rules, .review) .fam { font-weight: 600; white-space: nowrap; }
+:is(.rules, .review) .fam::before {
   content: ""; display: inline-block; width: 0.62em; height: 0.62em;
   border-radius: 50%; margin-right: 0.3em; vertical-align: 0.05em;
 }
-.rules .fam.blue::before { background: var(--c-blue); }
-.rules .fam.green::before { background: var(--c-green); }
-.rules .fam.red::before { background: var(--c-red); }
-.rules .fam.yellow::before { background: var(--c-yellow); }
+:is(.rules, .review) .fam.blue::before { background: var(--c-blue); }
+:is(.rules, .review) .fam.green::before { background: var(--c-green); }
+:is(.rules, .review) .fam.red::before { background: var(--c-red); }
+:is(.rules, .review) .fam.yellow::before { background: var(--c-yellow); }
 .rules .close {
   font: 600 1.5rem/1 "Fredoka", "Nunito", system-ui, sans-serif;
   width: 2em; height: 2em; flex: none; cursor: pointer;
@@ -483,3 +483,32 @@ a.act { text-decoration: none; display: inline-flex; align-items: center; }
 /* En-tête plus compact, pour garder le logo et les boutons sur une ligne. */
 .head-btns { gap: 6px; }
 .head-btns .act, .head-btns .lang { padding: 6px 10px; font-size: 0.92rem; }
+
+/* Carré de Coco : une ligne par couleur, une colonne par joueur, totaux à 10. */
+.coco { border-collapse: separate; border-spacing: 6px; margin-top: 6px; font-variant-numeric: tabular-nums; }
+.coco th { font-weight: 600; padding: 0 4px; text-align: center; }
+.coco tbody th { text-align: left; white-space: nowrap; }
+.coco td { width: 3.2em; height: 2.6em; text-align: center; border-radius: 10px; background: var(--page); border: 2px solid var(--line); font-size: 1.15rem; font-weight: 600; }
+.coco td.given { background: var(--setup); border-color: transparent; }
+.coco td input { font: inherit; width: 100%; height: 100%; border: 0; background: transparent; text-align: center; color: var(--ink); padding: 0; -moz-appearance: textfield; appearance: textfield; }
+.coco td input::-webkit-inner-spin-button, .coco td input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.coco td input:focus { outline: none; }
+.coco td:focus-within { border-color: var(--ink); }
+.coco td.ok { border-color: var(--ok); }
+.coco td.ko { border-color: var(--ko); }
+.coco td.unsure { border-style: dashed; border-color: var(--ink-soft); }
+.coco td.todo { border-color: var(--sun); box-shadow: 0 0 0 2px var(--mark); }
+.coco td .fix { color: var(--ko); }
+.coco td .was { font-size: 0.8rem; color: var(--ink-soft); font-weight: 400; margin-right: 4px; }
+.coco .sum { background: transparent; border: 2px dashed var(--line); color: var(--ink-soft); font-size: 1rem; }
+.coco .sum.done { border-color: var(--ok); color: var(--ok); }
+.coco .sum.over { border-color: var(--ko); color: var(--ko); }
+.coco .corner { background: transparent; border: 0; color: var(--ink-soft); font-size: 0.85rem; }
+.coco-levels { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 4px; }
+.coco-levels button { font: inherit; font-weight: 600; cursor: pointer; padding: 5px 12px; border-radius: 999px; border: 2px solid var(--line); background: var(--page); color: var(--ink); }
+.coco-levels button[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--page); }
+.coco-clues { margin: 6px 0 0; padding-left: 1.2em; }
+.coco-steps { margin: 6px 0 0; padding-left: 1.4em; }
+.coco-steps li { margin: 3px 0; }
+.coco-legend { font-size: 0.88rem; color: var(--ink-soft); margin: 6px 0 0; }
+.coco-totals { margin-top: 4px; }

@@ -64,6 +64,7 @@
         <li>A fine smazzata, il DDS fa il <strong>bilancio</strong> delle carte che sono costate prese.</li>
         <li><strong>Modalità valutazione</strong>: confronta la tua smazzata (in Sud) con quella di Piperno, Averell e Averell250 con le stesse carte; il tuo punteggio duplicato appare a fine smazzata.</li>
         <li><strong>Domande durante la partita</strong> (quando sei il dichiarante, in Sud): <strong>Alcune</strong> ne pone almeno una per smazzata, estratte a sorte; <strong>Tutte</strong> le pone tutte, per allenarsi. Ogni 3 risposte giuste, scegli un regalo.</li>
+        <li><strong>Quadrato di Coco</strong>: durante la smazzata, una tabella delle carte iniziali di ogni colore per ogni giocatore (Nord e Sud già riempiti), da completare per Ovest ed Est presa dopo presa.</li>
         <li>Quando giochi, ogni presa resta sul tavolo finché non clicchi su <strong>Presa successiva</strong>: prenditi il tempo di ricordare le carte giocate.</li>
       </ul>`,
     "player.human": "Umano",
@@ -212,6 +213,32 @@
     "quiz.ex.any": "Per esempio, Ovest potrebbe avere:",
     "quiz.goodAnswer": p => `La risposta giusta: ${p.answer.toLowerCase()}.`,
     "quiz.follow.result": p => (p.list.length > 1 ? "I colori possibili: " : "L'unico colore possibile: il ") + p.list.map(s => C[s]).join(", ") + ". I dettagli sono qui sotto.",
+    /* ---------- Il quadrato di Coco ---------- */
+    "setup.coco": "Riempi il quadrato di Coco",
+    "ex.tab.coco": "Quadrato di Coco",
+    "coco.title": "Il quadrato di Coco",
+    "coco.intro": "All'inizio, ogni giocatore ha <strong>10 carte</strong>, e anche ogni colore ha <strong>10 carte</strong>. Nel quadrato di Coco, ogni casella indica il numero di carte di un colore (la riga) in mano a un giocatore (la colonna) all'inizio della smazzata: ogni riga e ogni colonna fanno quindi <strong>10</strong>. Completa le caselle vuote.",
+    "coco.levels": "Livello",
+    "coco.level.easy": "Facile",
+    "coco.level.medium": "Medio",
+    "coco.level.table": "Come al tavolo",
+    "coco.table.intro": "Come al tavolo: conosci la tua mano (Sud) e il morto (Nord), le loro colonne sono già riempite. Durante la smazzata, hai saputo che:",
+    "coco.clue": p => `${p.seat} aveva <strong>${p.n}</strong> ${S(p.n, "carta", "carte")} ${(p.n === 1 ? F1 : FN)[p.s]} all'inizio.`,
+    "coco.total": "Totale",
+    "coco.aria": p => `${p.seat}, carte ${FN[p.s]}`,
+    "coco.showTotals": "Mostra i totali mentre riempio",
+    "coco.legend": "Caselle blu: date. I totali si aggiornano mentre scrivi: diventano verdi a 10.",
+    "coco.ok": "Bravo, il quadrato di Coco è completo!",
+    "coco.wrong": p => `Non proprio: ${p.n} ${S(p.n, "casella", "caselle")} da rivedere (in rosso, la risposta giusta).`,
+    "coco.steps": "Come dedurre le caselle, nell'ordine:",
+    "coco.step.row": p => `Riga ${C[p.s]}: 10 − ${p.others.join(" − ")} = <strong>${p.v}</strong> ${S(p.v, "carta", "carte")} ${(p.v === 1 ? F1 : FN)[p.s]} a ${seatName(p.seat)}.`,
+    "coco.step.col": p => `Colonna ${seatName(p.seat)}: 10 − ${p.others.join(" − ")} = <strong>${p.v}</strong> ${S(p.v, "carta", "carte")} ${(p.v === 1 ? F1 : FN)[p.s]}.`,
+    "coco.game.intro": "Nord e Sud sono già riempiti (il morto e la tua mano). Riempi Ovest ed Est man mano che si gioca: quando un difensore non risponde al colore, ne aveva tante carte quante ne ha giocate, e i totali a 10 fanno il resto.",
+    "coco.game.check": "Verifica ciò che è sicuro",
+    "coco.game.result": p => `${p.ok} ${S(p.ok, "giusta", "giuste")}, ${p.ko} ${S(p.ko, "sbagliata", "sbagliate")}, ${p.unsure} non ancora ${S(p.unsure, "sicura", "sicure")}` +
+      (p.todo ? `, e ${p.todo} ${S(p.todo, "casella", "caselle")} che puoi già trovare (in giallo).` : "."),
+    "coco.game.legend": "Verde: giusto. Rosso: sbagliato. Tratteggiato: non ancora sicuro. Giallo: già deducibile, tocca a te riempirla.",
+    "coco.game.end": p => `Fine della smazzata: ecco il vero quadrato di Coco. Avevi ${p.ok} ${S(p.ok, "casella giusta", "caselle giuste")} su 8.`,
 
     /* ---------- Domande: modi, fine della presa, carte rimaste, distribuzioni, carte vincenti ---------- */
     "setup.quiz.off": "Nessuna",

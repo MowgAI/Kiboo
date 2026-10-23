@@ -60,6 +60,7 @@
         <li>En fin de donne, le DDS fait le <strong>bilan</strong> des cartes qui ont coûté des plis.</li>
         <li><strong>Mode évaluation</strong> : compare ta donne (en Sud) à celle de Piperno, Averell et Averell250 sur les mêmes cartes ; ton score duplicate s'affiche en fin de donne.</li>
         <li><strong>Questions pendant la partie</strong> (quand tu es le déclarant, en Sud) : <strong>Quelques-unes</strong> en pose au moins une par donne, tirées au sort ; <strong>Toutes</strong> les pose toutes, pour s'entraîner. Toutes les 3 bonnes réponses, tu choisis un cadeau.</li>
+        <li><strong>Carré de Coco</strong> : pendant la donne, un tableau des cartes de départ de chaque couleur chez chaque joueur (Nord et Sud remplis d'office), à compléter pour Ouest et Est au fil des plis.</li>
         <li>Quand tu joues, chaque pli reste sur la table jusqu'à ton clic sur <strong>Pli suivant</strong> : prends le temps de retenir les cartes jouées.</li>
       </ul>`,
     "player.human": "Humain",
@@ -208,6 +209,32 @@
     "quiz.ex.any": "Par exemple, Ouest pourrait avoir :",
     "quiz.goodAnswer": p => `La bonne réponse : ${p.answer.toLowerCase()}.`,
     "quiz.follow.result": p => (p.list.length > 1 ? "Les couleurs possibles : " : "La seule couleur possible : le ") + p.list.map(s => C[s]).join(", ") + ". Le détail est ci-dessous.",
+    /* ---------- Carré de Coco ---------- */
+    "setup.coco": "Remplir le carré de Coco",
+    "ex.tab.coco": "Carré de Coco",
+    "coco.title": "Le carré de Coco",
+    "coco.intro": "Au départ, chaque joueur a <strong>10 cartes</strong>, et chaque couleur a aussi <strong>10 cartes</strong>. Dans le carré de Coco, chaque case donne le nombre de cartes d'une couleur (la ligne) chez un joueur (la colonne) au départ de la donne : chaque ligne et chaque colonne font donc <strong>10</strong>. Complète les cases vides.",
+    "coco.levels": "Niveau",
+    "coco.level.easy": "Facile",
+    "coco.level.medium": "Moyen",
+    "coco.level.table": "Comme à la table",
+    "coco.table.intro": "Comme à la table : tu connais ta main (Sud) et le mort (Nord), leurs colonnes sont remplies. Pendant la donne, tu as appris que :",
+    "coco.clue": p => `${p.seat} avait <strong>${p.n}</strong> ${S(p.n, "carte", "cartes")} ${cardAdj(p.s, p.n)} au départ.`,
+    "coco.total": "Total",
+    "coco.aria": p => `${p.seat}, cartes ${cardAdj(p.s, 2)}`,
+    "coco.showTotals": "Afficher les totaux pendant que je remplis",
+    "coco.legend": "Cases bleues : données. Les totaux se remplissent pendant que tu écris : ils deviennent verts à 10.",
+    "coco.ok": "Bravo, le carré de Coco est complet !",
+    "coco.wrong": p => `Pas tout à fait : ${p.n} ${S(p.n, "case", "cases")} à revoir (en rouge, la bonne réponse).`,
+    "coco.steps": "Comment déduire les cases, dans l'ordre :",
+    "coco.step.row": p => `Ligne ${C[p.s]} : 10 − ${p.others.join(" − ")} = <strong>${p.v}</strong> ${S(p.v, "carte", "cartes")} ${cardAdj(p.s, p.v)} chez ${seatName(p.seat)}.`,
+    "coco.step.col": p => `Colonne ${seatName(p.seat)} : 10 − ${p.others.join(" − ")} = <strong>${p.v}</strong> ${S(p.v, "carte", "cartes")} ${cardAdj(p.s, p.v)}.`,
+    "coco.game.intro": "Nord et Sud sont remplis d'office (le mort et ta main). Remplis Ouest et Est au fur et à mesure de la donne : quand un défenseur ne fournit pas, il avait autant de cartes de la couleur qu'il en a jouées, et les totaux à 10 font le reste.",
+    "coco.game.check": "Vérifier ce qui est sûr",
+    "coco.game.result": p => `${p.ok} ${S(p.ok, "case juste", "cases justes")}, ${p.ko} ${S(p.ko, "fausse", "fausses")}, ${p.unsure} pas encore ${S(p.unsure, "sûre", "sûres")}` +
+      (p.todo ? `, et ${p.todo} ${S(p.todo, "case", "cases")} que tu peux déjà trouver (en jaune).` : "."),
+    "coco.game.legend": "Vert : juste. Rouge : faux. Pointillés : on ne peut pas encore en être sûr. Jaune : déjà déductible, à toi de la remplir.",
+    "coco.game.end": p => `Fin de la donne : voici le vrai carré de Coco. Tu avais ${p.ok} ${S(p.ok, "case juste", "cases justes")} sur 8.`,
 
     /* ---------- Questions : modes, fin de pli, cartes restantes, répartitions, cartes maîtresses ---------- */
     "setup.quiz.off": "Aucune",

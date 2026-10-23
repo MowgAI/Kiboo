@@ -10,6 +10,7 @@
      et Ouest (avant l'entame, ou après le premier pli) ?
    - Répartition de l'entame : comment les cartes de la couleur entamée
      peuvent-elles être réparties entre Ouest et Est (règle d'entame) ?
+   - Carré de Coco : voir js/coco.js.
 
    Chaque exercice est un « panneau » réutilisable : la fenêtre Exercices
    l'affiche sur une main tirée au hasard, les questions en cours de
@@ -455,6 +456,7 @@ const Exercises = (() => {
     legal: body => legalPanel(body, { ...randomLegalSetup(), onResult }),
     rest: body => restPanel(body, { ...randomRestSetup(), onResult }),
     split: body => splitPanel(body, { ...randomSplitSetup(), onResult }),
+    coco: body => Coco.staticPanel(body, { onResult }),
   };
 
   function onResult(ok, btn) {

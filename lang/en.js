@@ -57,6 +57,7 @@
         <li>At the end of the deal, the DDS makes a <strong>review</strong> of the cards that cost tricks.</li>
         <li><strong>Evaluation mode</strong>: compares your deal (as South) with Piperno, Averell and Averell250 on the same cards; your duplicate score is shown at the end of the deal.</li>
         <li><strong>Questions during play</strong> (when you are declarer, as South): <strong>A few</strong> asks at least one per deal, drawn at random; <strong>All</strong> asks them all, for training. Every 3 right answers, you choose a gift.</li>
+        <li><strong>Coco's square</strong>: during the deal, a table of each player's starting cards in each suit (North and South filled in for you), to complete for West and East as the tricks go by.</li>
         <li>When you play, each trick stays on the table until you click <strong>Next trick</strong>: take the time to remember the cards played.</li>
       </ul>`,
     "player.human": "Human",
@@ -205,6 +206,32 @@
     "quiz.ex.any": "For example, West could have:",
     "quiz.goodAnswer": p => `The right answer: ${p.answer.toLowerCase()}.`,
     "quiz.follow.result": p => (p.list.length > 1 ? "The possible suits: " : "The only possible suit: ") + p.list.map(s => C[s]).join(", ") + ". Details below.",
+    /* ---------- Coco's square ---------- */
+    "setup.coco": "Fill in Coco's square",
+    "ex.tab.coco": "Coco's square",
+    "coco.title": "Coco's square",
+    "coco.intro": "At the start, each player has <strong>10 cards</strong>, and each suit also has <strong>10 cards</strong>. In Coco's square, each box gives the number of cards of a suit (the row) held by a player (the column) at the start of the deal: so every row and every column adds up to <strong>10</strong>. Fill in the empty boxes.",
+    "coco.levels": "Level",
+    "coco.level.easy": "Easy",
+    "coco.level.medium": "Medium",
+    "coco.level.table": "Like at the table",
+    "coco.table.intro": "Like at the table: you know your hand (South) and dummy (North), their columns are filled in. During the deal, you have learnt that:",
+    "coco.clue": p => `${p.seat} had <strong>${p.n}</strong> ${C[p.s]} ${S(p.n, "card", "cards")} at the start.`,
+    "coco.total": "Total",
+    "coco.aria": p => `${p.seat}, ${C[p.s]} cards`,
+    "coco.showTotals": "Show the totals while I fill in",
+    "coco.legend": "Blue boxes: given. The totals update as you type: they turn green at 10.",
+    "coco.ok": "Well done, Coco's square is complete!",
+    "coco.wrong": p => `Not quite: ${p.n} ${S(p.n, "box", "boxes")} to check (the right answer in red).`,
+    "coco.steps": "How to work out the boxes, in order:",
+    "coco.step.row": p => `Row ${C[p.s]}: 10 − ${p.others.join(" − ")} = <strong>${p.v}</strong> ${C[p.s]} ${S(p.v, "card", "cards")} for ${seatName(p.seat)}.`,
+    "coco.step.col": p => `Column ${seatName(p.seat)}: 10 − ${p.others.join(" − ")} = <strong>${p.v}</strong> ${C[p.s]} ${S(p.v, "card", "cards")}.`,
+    "coco.game.intro": "North and South are filled in for you (dummy and your hand). Fill in West and East as the deal goes on: when a defender can't follow suit, he had as many cards of that suit as he has played, and the totals of 10 do the rest.",
+    "coco.game.check": "Check what is certain",
+    "coco.game.result": p => `${p.ok} right, ${p.ko} wrong, ${p.unsure} not certain yet` +
+      (p.todo ? `, and ${p.todo} ${S(p.todo, "box", "boxes")} you can already work out (in yellow).` : "."),
+    "coco.game.legend": "Green: right. Red: wrong. Dotted: can't be certain yet. Yellow: can already be worked out, your turn to fill it in.",
+    "coco.game.end": p => `End of the deal: here is the real Coco's square. You had ${p.ok} right ${S(p.ok, "box", "boxes")} out of 8.`,
 
     /* ---------- Questions: modes, end of trick, cards left, distributions, winners ---------- */
     "setup.quiz.off": "None",

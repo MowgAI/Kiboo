@@ -41,6 +41,7 @@ python3 -m http.server 8000
 - `js/feedback.js` : formulaire « Donner mon avis »
 - `js/quiz.js` : questions pendant la partie et moteur de déduction
 - `js/rewards.js` : cadeaux, progression et collection
+- `js/coco.js` : le carré de Coco (exercice et remplissage pendant la donne)
 - `js/exercises.js` : exercices (compter sa main, couleur la plus longue, cartes jouables)
 - `js/game.js` : règles, robots (la table tourne pour que la place du joueur humain, Sud, Ouest ou Est, soit toujours en bas), état de la partie, affichage et réglages
 - `assets/cards/` : images des 40 cartes (WebP)
@@ -53,12 +54,13 @@ Tous les textes sont dans `lang/` : un fichier par langue, avec les mêmes clés
 
 ## Exercices
 
-Le bouton « Exercices » ouvre cinq exercices sur des cartes tirées au hasard :
+Le bouton « Exercices » ouvre six exercices sur des cartes tirées au hasard :
 
 - **Compter sa main** : nombre de cartes et points par couleur, puis total des points. Dans Kiboo, les points d'une couleur sont la somme des valeurs de ses cartes.
 - **Couleur la plus longue** : en cas d'égalité, toutes les couleurs les plus longues sont acceptées.
 - **Cartes jouables** : une couleur est demandée, il faut sélectionner toutes les cartes autorisées (fournir si possible, sinon défausser n'importe quelle carte).
 - **Cartes restantes** : en voyant sa main et le mort, combien de cartes de chaque couleur ont Est et Ouest ? Une fois sur deux, le premier pli est déjà joué (par des robots Piperno).
+- **Carré de Coco** : le tableau des cartes de départ, une ligne par couleur et une colonne par joueur ; chaque ligne et chaque colonne font 10. Il faut compléter les cases vides. Trois niveaux : Facile (4 cases vides), Moyen (7, le maximum pour une seule solution) et Comme à la table (Nord et Sud remplis, trois indices sur Ouest et Est). La correction donne les étapes de la déduction.
 - **Règle d'entame des robots** (Piperno, Averell, Averell250) : couleur la plus longue (à égalité, la plus forte en points), puis la plus haute carte d'une séquence d'au moins deux cartes qui se suivent si cette carte vaut au moins 7, sinon la plus petite carte.
 - **Répartition de l'entame** : Ouest entame selon la règle de Piperno ; il faut cocher toutes les répartitions possibles de la couleur entamée entre Ouest et Est.
 
@@ -78,6 +80,8 @@ Le réglage « Questions pendant la partie » propose trois choix : **Aucune**, 
 - **Après le troisième pli** : cliquer sur toutes les cartes maîtresses de sa main et du mort (Est et Ouest n'ont plus de carte plus forte dans la couleur).
 - **Quand un joueur défausse** (pas à chaque fois) : comment la couleur demandée était-elle répartie au départ, en commençant par Ouest (par exemple 4-3-2-1) ? La question n'est posée que si la réponse est déductible, c'est-à-dire si un défenseur n'a plus la couleur.
 - **Avant de jouer** sur un pli commencé (jamais au dernier pli ni quand une seule carte est jouable) : quelles cartes as-tu le droit de jouer ?
+
+Avec la case « Remplir le carré de Coco » (quand le joueur humain est déclarant), le carré de Coco s'affiche sous la table : Nord et Sud sont remplis d'office, le joueur complète Ouest et Est au fil de la donne. « Vérifier ce qui est sûr » ne juge que les cases déjà déductibles (un défenseur qui ne fournit pas avait autant de cartes de la couleur qu'il en a jouées, puis les totaux à 10) ; les autres sont marquées « pas encore sûres », et les cases déductibles mais vides sont signalées en jaune. En fin de donne, le vrai carré est montré. Le code est dans `js/coco.js`.
 
 Quand un joueur humain est à la table, chaque pli terminé reste affiché jusqu'au clic sur « Pli suivant » (ou sur la table), pour avoir le temps de retenir les cartes jouées.
 
