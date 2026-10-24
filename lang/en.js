@@ -46,6 +46,8 @@
     "help.hide": "Hide help",
     "btn.replay": "Replay the deal",
     "btn.new": "New deal",
+    "btn.help": "Play with Goat",
+    "btn.noHelp": "Play without help",
     "btn.replayShort": "Replay",
     "btn.close": "Close",
     "help.list": `<ul>
@@ -57,7 +59,7 @@
         <li>At the end of the deal, the DDS makes a <strong>review</strong> of the cards that cost tricks.</li>
         <li><strong>Evaluation mode</strong>: compares your deal (as South) with Piperno, Averell and Averell250 on the same cards; your duplicate score is shown at the end of the deal.</li>
         <li><strong>Questions during play</strong> (when you are declarer, as South): <strong>A few</strong> asks at least one per deal, drawn at random; <strong>All</strong> asks them all, for training. Every 3 right answers, you choose a gift.</li>
-        <li><strong>Coco's square</strong>: during the deal, a table of each player's starting cards in each suit (North and South filled in for you), to complete for West and East as the tricks go by. With <strong>Goat</strong>, the square fills in by itself and each deduction is explained (it's a help: the deal isn't evaluated).</li>
+        <li><strong>Coco's square</strong>: during the deal, a table of each player's starting cards in each suit (North and South filled in for you), to complete for West and East as the tricks go by. The <strong>🐐 Play with Goat</strong> button starts a deal with Goat (and becomes “Play without help”). With <strong>Goat</strong>, the square fills in by itself and each deduction is explained (it's a help: the deal isn't evaluated).</li>
         <li><strong>Read aloud</strong>: questions and exercises are read out (in a simple version), with a little encouragement after each answer. The 🔊 Listen buttons also read the rules and this help. The voice depends on the device.</li>
         <li><strong>Music</strong>: a little retro tune during the game. <strong>Sound effects</strong>: card played, trick won or lost, result, right or wrong answer. The <strong>Parade</strong> button shows the 40 characters, who introduce themselves one by one; clicking the Kiboo logo reopens the welcome screen.</li>
         <li>When you play, each trick stays on the table until you click <strong>Next trick</strong>: take the time to remember the cards played.</li>
@@ -218,6 +220,7 @@
     "intro.resume": "Resume",
     "intro.paradeEnd": "That's it! All forty Kiboo characters have said hello. Now, shall we play?",
     "intro.play": "Play",
+    "intro.playHelp": "Play with Goat's help",
     "intro.families": "The families",
     "intro.characters": "The characters",
     "intro.noShow": "Don't show the welcome screen at start",

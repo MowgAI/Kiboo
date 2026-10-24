@@ -53,6 +53,8 @@
     "help.hide": "Nascondi l'aiuto",
     "btn.replay": "Rigioca la smazzata",
     "btn.new": "Nuova smazzata",
+    "btn.help": "Gioca con Goat",
+    "btn.noHelp": "Gioca senza aiuto",
     "btn.replayShort": "Rigioca",
     "btn.close": "Chiudi",
     "help.list": `<ul>
@@ -64,7 +66,7 @@
         <li>A fine smazzata, il DDS fa il <strong>bilancio</strong> delle carte che sono costate prese.</li>
         <li><strong>Modalità valutazione</strong>: confronta la tua smazzata (in Sud) con quella di Piperno, Averell e Averell250 con le stesse carte; il tuo punteggio duplicato appare a fine smazzata.</li>
         <li><strong>Domande durante la partita</strong> (quando sei il dichiarante, in Sud): <strong>Alcune</strong> ne pone almeno una per smazzata, estratte a sorte; <strong>Tutte</strong> le pone tutte, per allenarsi. Ogni 3 risposte giuste, scegli un regalo.</li>
-        <li><strong>Quadrato di Coco</strong>: durante la smazzata, una tabella delle carte iniziali di ogni colore per ogni giocatore (Nord e Sud già riempiti), da completare per Ovest ed Est presa dopo presa. Con <strong>Goat</strong>, il quadrato si riempie da solo e ogni deduzione è spiegata (è un aiuto: la smazzata non viene valutata).</li>
+        <li><strong>Quadrato di Coco</strong>: durante la smazzata, una tabella delle carte iniziali di ogni colore per ogni giocatore (Nord e Sud già riempiti), da completare per Ovest ed Est presa dopo presa. Il pulsante <strong>🐐 Gioca con Goat</strong> avvia una smazzata con Goat (e diventa «Gioca senza aiuto»). Con <strong>Goat</strong>, il quadrato si riempie da solo e ogni deduzione è spiegata (è un aiuto: la smazzata non viene valutata).</li>
         <li><strong>Leggi ad alta voce</strong>: le domande e gli esercizi vengono letti (in versione semplice), con un piccolo incoraggiamento dopo ogni risposta. I pulsanti 🔊 Ascolta leggono anche le regole e questo aiuto. La voce dipende dal dispositivo.</li>
         <li><strong>Musica</strong>: una musichetta rétro durante la partita. <strong>Effetti sonori</strong>: carta giocata, presa vinta o persa, risultato, risposta giusta o sbagliata. Il pulsante <strong>Parata</strong> fa sfilare i 40 personaggi, che si presentano uno alla volta; un clic sul logo Kiboo riapre l'accoglienza.</li>
         <li>Quando giochi, ogni presa resta sul tavolo finché non clicchi su <strong>Presa successiva</strong>: prenditi il tempo di ricordare le carte giocate.</li>
@@ -225,6 +227,7 @@
     "intro.resume": "Riprendi",
     "intro.paradeEnd": "Ecco fatto! Tutti i quaranta personaggi di Kiboo ti hanno salutato. Adesso, giochiamo?",
     "intro.play": "Gioca",
+    "intro.playHelp": "Gioca con l'aiuto di Goat",
     "intro.families": "Le famiglie",
     "intro.characters": "I personaggi",
     "intro.noShow": "Non mostrare più l'accoglienza all'avvio",

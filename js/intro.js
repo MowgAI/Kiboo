@@ -121,6 +121,7 @@ const Intro = (() => {
         ${logo()}
         <div class="intro-btns">
           <button class="act intro-play" type="button" data-a="play"><span class="emo" aria-hidden="true">▶️</span>${T("intro.play")}</button>
+          <button class="act ghost" type="button" data-a="playHelp"><span class="emo" aria-hidden="true">🐐</span>${T("intro.playHelp")}</button>
           <button class="act ghost" type="button" data-a="families"><span class="emo" aria-hidden="true">👋</span>${T("intro.families")}</button>
           <button class="act ghost" type="button" data-a="characters"><span class="emo" aria-hidden="true">🎭</span>${T("intro.characters")}</button>
           <button class="act ghost" type="button" data-a="parade"><span class="emo" aria-hidden="true">🎪</span>${T("intro.parade")}</button>
@@ -130,6 +131,13 @@ const Intro = (() => {
       <button class="act ghost intro-skip" type="button" data-a="skip">${T("intro.skip")} ⏭</button>
     </div>`;
     box.querySelector("[data-a=play]").onclick = () => close(true);
+    // Jouer avec l'aide de Goat (carré de Coco automatique, donne non évaluée).
+    box.querySelector("[data-a=playHelp]").onclick = () => {
+      const started = !!game;
+      setHelp(true);
+      close(true);
+      if (started) newGame(dealHands());
+    };
     box.querySelector("[data-a=skip]").onclick = () => close(false);
     box.querySelector("[data-a=families]").onclick = () => families(0);
     box.querySelector("[data-a=characters]").onclick = () => characters(0);

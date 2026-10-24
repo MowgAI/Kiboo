@@ -685,8 +685,24 @@ $("cfg-eval").addEventListener("change", e => { config.eval = e.target.checked; 
 $("cfg-music").addEventListener("change", e => { config.music = e.target.checked; Sound.music(config.music ? "game" : null); });
 $("cfg-sfx").addEventListener("change", e => { config.sfx = e.target.checked; });
 $("cfg-voice").addEventListener("change", e => { config.voice = e.target.checked; if (!config.voice) Voice.stop(); });
-$("cfg-coco").addEventListener("change", e => { config.coco = e.target.value; render(); });
+$("cfg-coco").addEventListener("change", e => { config.coco = e.target.value; cocoBefore = null; helpLabel(); render(); });
 $("btn-new").addEventListener("click", () => newGame(dealHands()));
+// Jouer avec l'aide de Goat : le carré de Coco se remplit tout seul et explique ses déductions
+// (js/coco.js) ; ces donnes ne comptent pas dans l'évaluation. Le même bouton ramène au jeu sans aide
+// (le réglage du carré de Coco d'avant est rétabli).
+let cocoBefore = null;                          // réglage du carré de Coco avant le mode aide
+const helpMode = () => cocoBefore !== null;
+function setHelp(on) {
+  if (on && !helpMode()) { cocoBefore = config.coco; config.coco = "goat"; }
+  if (!on && helpMode()) { config.coco = cocoBefore === "goat" ? "off" : cocoBefore; cocoBefore = null; }
+  $("cfg-coco").value = config.coco;
+  helpLabel();
+}
+function helpLabel() {
+  $("btn-help-play").querySelector(".lbl").textContent = helpMode() ? T("btn.noHelp") : T("btn.help");
+  $("btn-help-play").setAttribute("aria-pressed", helpMode());
+}
+$("btn-help-play").addEventListener("click", () => { setHelp(!helpMode()); newGame(dealHands()); });
 // Règles du jeu : fenêtre modale, fermée par le bouton ×, la touche Échap ou un clic à côté.
 $("btn-rules").addEventListener("click", () => $("rules").showModal());
 $("btn-rules-close").addEventListener("click", () => $("rules").close());
@@ -705,6 +721,7 @@ $("btn-settings-help").addEventListener("click", e => {
 // Changement de langue : libellés des menus, bouton d'aide, puis la table.
 document.addEventListener("kiboo-lang", () => {
   for (const s of ["O", "E", "S"]) for (const o of $("cfg-" + s).options) o.textContent = PLAYER_TYPES[o.value].label;
+  helpLabel();
   $("btn-settings-help").querySelector(".lbl").textContent = $("settings-help").hidden ? T("help.show") : T("help.hide");
   render();
 });
