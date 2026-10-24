@@ -63,17 +63,24 @@ const Voice = (() => {
   };
 
   // `lang` : langue de lecture (par défaut celle du jeu ; l'accueil peut en choisir une autre).
+  // Renvoie une promesse tenue à la fin de la lecture (tout de suite s'il n'y a rien à lire).
   function speak(html, lang = I18N.lang) {
-    if (!ok || !html) return;
+    if (!ok || !html) return Promise.resolve(false);
     const v = pick(lang);
-    if (!v) return;                                     // pas de voix dans cette langue sur l'appareil
+    if (!v) return Promise.resolve(false);              // pas de voix dans cette langue sur l'appareil
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(plain(html));
     u.lang = LOCALE[lang] || "fr-FR";
     u.voice = v;
     u.rate = RATE[lang] || 1;
     u.pitch = PITCH;
+    // Pendant que la voix parle, la musique baisse (js/sound.js).
+    const done = new Promise(resolve => {
+      u.onend = u.onerror = () => { Sound.duck(false); resolve(true); };
+    });
+    u.onstart = () => Sound.duck(true);
     speechSynthesis.speak(u);
+    return done;
   }
   const stop = () => { if (ok) speechSynthesis.cancel(); };
 

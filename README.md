@@ -43,6 +43,7 @@ python3 -m http.server 8000
 - `js/rewards.js` : cadeaux, progression et collection
 - `js/intro.js` : écran d'accueil, présentations des familles et des personnages, distribution animée
 - `lang/personnages.js` : présentations des 40 personnages (français, anglais, italien)
+- `js/sound.js` : musique rétro et bruitages (Web Audio)
 - `js/voice.js` : lecture à voix haute (versions simplifiées, encouragements)
 - `js/coco.js` : le carré de Coco (exercice et remplissage pendant la donne)
 - `js/exercises.js` : exercices (compter sa main, couleur la plus longue, cartes jouables)
@@ -63,6 +64,13 @@ Au démarrage, un écran d'accueil montre le logo Kiboo qui se forme lettre par 
 - **Les personnages** : les 40 personnages se présentent un par un (flèches du clavier pour avancer).
 
 Les présentations sont lues à voix haute (bouton Son). L'accueil a sa propre langue, l'anglais par défaut (la voix anglaise est la meilleure sur la plupart des appareils) : les boutons EN · FR · IT la changent sans toucher à la langue du jeu. Une case « Ne plus afficher l'accueil au démarrage » est gardée dans le navigateur ; un clic sur le logo Kiboo rouvre l'accueil. Les animations sont coupées si l'appareil demande de réduire les animations. Les textes des personnages sont dans `lang/personnages.js` (à relire et modifier librement) ; le code est dans `js/intro.js`.
+
+## Parade, musique et bruitages
+
+- **La parade de Kiboo** (bouton « Parade » de l'en-tête, ou de l'accueil) : les 40 personnages défilent tout seuls ; chacun dit sa présentation (textes de `lang/personnages.js`), puis laisse la place au suivant. Boutons Pause, Suivant, Son et Accueil.
+- **Musique** façon jeu vidéo rétro, composée dans le code (Web Audio, rien à télécharger) : mélodie en signal carré, basse en triangle, charleston en bruit blanc. Elle joue sur l'accueil (bouton 🎵) et, avec la case « Musique », plus doucement pendant la partie. Elle baisse quand la voix parle.
+- **Bruitages** (case « Bruitages », cochée par défaut) : carte posée, pli gagné ou perdu, fanfare ou petite musique triste en fin de donne, bonne ou mauvaise réponse aux exercices et aux questions, cadeau, distribution.
+- Les navigateurs n'autorisent le son qu'après un premier clic : la musique démarre à ce moment-là. Le code est dans `js/sound.js`.
 
 ## Lecture à voix haute
 

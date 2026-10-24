@@ -62,6 +62,7 @@
         <li><strong>Questions pendant la partie</strong> (quand tu es le déclarant, en Sud) : <strong>Quelques-unes</strong> en pose au moins une par donne, tirées au sort ; <strong>Toutes</strong> les pose toutes, pour s'entraîner. Toutes les 3 bonnes réponses, tu choisis un cadeau.</li>
         <li><strong>Carré de Coco</strong> : pendant la donne, un tableau des cartes de départ de chaque couleur chez chaque joueur (Nord et Sud remplis d'office), à compléter pour Ouest et Est au fil des plis. Avec <strong>Goat</strong>, le carré se remplit tout seul et chaque déduction est expliquée (c'est une aide : la donne n'est pas évaluée).</li>
         <li><strong>Lire à voix haute</strong> : les questions et les exercices sont lus (en version simple), avec un petit encouragement après chaque réponse. Les boutons 🔊 Écouter lisent aussi les règles et cette aide. La voix dépend de l'appareil.</li>
+        <li><strong>Musique</strong> : une petite musique rétro pendant la partie. <strong>Bruitages</strong> : carte posée, pli gagné ou perdu, résultat, bonne ou mauvaise réponse. Le bouton <strong>Parade</strong> fait défiler les 40 personnages, qui se présentent un par un ; un clic sur le logo Kiboo rouvre l'accueil.</li>
         <li>Quand tu joues, chaque pli reste sur la table jusqu'à ton clic sur <strong>Pli suivant</strong> : prends le temps de retenir les cartes jouées.</li>
       </ul>`,
     "player.human": "Humain",
@@ -211,6 +212,14 @@
     "quiz.goodAnswer": p => `La bonne réponse : ${p.answer.toLowerCase()}.`,
     "quiz.follow.result": p => (p.list.length > 1 ? "Les couleurs possibles : " : "La seule couleur possible : le ") + p.list.map(s => C[s]).join(", ") + ". Le détail est ci-dessous.",
     /* ---------- Accueil, familles et personnages ---------- */
+    "head.parade": "Parade",
+    "setup.music": "Musique",
+    "setup.sfx": "Bruitages",
+    "intro.parade": "La parade de Kiboo",
+    "intro.music": "Musique",
+    "intro.pause": "Pause",
+    "intro.resume": "Reprendre",
+    "intro.paradeEnd": "Et voilà ! Les quarante personnages de Kiboo t'ont dit bonjour. Maintenant, on joue ?",
     "intro.play": "Jouer",
     "intro.families": "Les familles",
     "intro.characters": "Les personnages",

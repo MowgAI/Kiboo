@@ -59,6 +59,7 @@
         <li><strong>Questions during play</strong> (when you are declarer, as South): <strong>A few</strong> asks at least one per deal, drawn at random; <strong>All</strong> asks them all, for training. Every 3 right answers, you choose a gift.</li>
         <li><strong>Coco's square</strong>: during the deal, a table of each player's starting cards in each suit (North and South filled in for you), to complete for West and East as the tricks go by. With <strong>Goat</strong>, the square fills in by itself and each deduction is explained (it's a help: the deal isn't evaluated).</li>
         <li><strong>Read aloud</strong>: questions and exercises are read out (in a simple version), with a little encouragement after each answer. The 🔊 Listen buttons also read the rules and this help. The voice depends on the device.</li>
+        <li><strong>Music</strong>: a little retro tune during the game. <strong>Sound effects</strong>: card played, trick won or lost, result, right or wrong answer. The <strong>Parade</strong> button shows the 40 characters, who introduce themselves one by one; clicking the Kiboo logo reopens the welcome screen.</li>
         <li>When you play, each trick stays on the table until you click <strong>Next trick</strong>: take the time to remember the cards played.</li>
       </ul>`,
     "player.human": "Human",
@@ -208,6 +209,14 @@
     "quiz.goodAnswer": p => `The right answer: ${p.answer.toLowerCase()}.`,
     "quiz.follow.result": p => (p.list.length > 1 ? "The possible suits: " : "The only possible suit: ") + p.list.map(s => C[s]).join(", ") + ". Details below.",
     /* ---------- Welcome, families and characters ---------- */
+    "head.parade": "Parade",
+    "setup.music": "Music",
+    "setup.sfx": "Sound effects",
+    "intro.parade": "The Kiboo parade",
+    "intro.music": "Music",
+    "intro.pause": "Pause",
+    "intro.resume": "Resume",
+    "intro.paradeEnd": "That's it! All forty Kiboo characters have said hello. Now, shall we play?",
     "intro.play": "Play",
     "intro.families": "The families",
     "intro.characters": "The characters",

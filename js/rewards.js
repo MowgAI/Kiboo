@@ -29,6 +29,7 @@ const Rewards = (() => {
 
   function answered(ok) {
     Voice.cheer(ok);                              // « Bravo ! », « Presque ! »… si la voix est activée
+    Sound.sfx(ok ? "ok" : "ko");
     if (ok && state.progress < GOAL) state.progress++;
     save();
     refresh();
@@ -81,6 +82,7 @@ const Rewards = (() => {
     const q = sel => box.querySelector(sel);
 
     const show = (card, html) => {
+      Sound.sfx("gift");
       state.progress = 0;
       save();
       refresh();

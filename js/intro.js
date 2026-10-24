@@ -9,6 +9,10 @@
      leurs 10 cartes ; une phrase est lue à voix haute.
    - Les personnages se présentent : les 40 cartes une par une, avec leur
      présentation (lang/personnages.js), lue à voix haute.
+   - La parade de Kiboo (bouton Parade de l'en-tête, ou de l'accueil) : les
+     40 personnages défilent tout seuls, chacun dit sa présentation puis
+     laisse la place au suivant (pause, suivant, son).
+   - Musique rétro sur l'accueil (bouton 🎵, js/sound.js).
    - Distribution animée : à la première donne seulement, les cartes partent
      du centre vers les quatre joueurs (bouton « Passer »).
    L'accueil a sa propre langue, l'anglais par défaut (la voix anglaise est
@@ -30,6 +34,8 @@ const Intro = (() => {
   try { off = localStorage.getItem(KEY) === "1"; } catch (e) { /* stockage indisponible */ }
   let dealPending = true;             // la distribution animée n'a lieu qu'une fois
   let sound = true;                   // voix des présentations (bouton 🔊 / 🔇)
+  let introMusic = true;              // musique de l'accueil (bouton 🎵), gardée dans le navigateur
+  try { introMusic = localStorage.getItem("kiboo.intro.music") !== "0"; } catch (e) { /* idem */ }
   let resolveReady;
   const ready = new Promise(r => { resolveReady = r; });
   let view = "home", index = 0;
@@ -38,13 +44,29 @@ const Intro = (() => {
   const say = text => { if (sound) Voice.speak(text, introLang); };
   // Choix de la langue de l'accueil (EN · FR · IT), puis on redessine la vue courante.
   const langs = () => `<div class="intro-langs" role="group" aria-label="Language">${I18N.SUPPORTED.map(l =>
-    `<button type="button" data-lang="${l}" aria-pressed="${l === introLang}">${l.toUpperCase()}</button>`).join("")}</div>`;
+    `<button type="button" data-lang="${l}" aria-pressed="${l === introLang}">${l.toUpperCase()}</button>`).join("")}
+    <button type="button" data-music aria-pressed="${introMusic}" title="${T("intro.music")}">${introMusic ? "🎵" : "🔇"}</button></div>`;
+  // Redessine la vue courante (après un changement de langue ou de musique).
+  function again() {
+    if (view === "families") families(index);
+    else if (view === "characters") characters(index);
+    else if (view === "parade") parade(index);
+    else home();
+  }
   function wireLangs() {
     for (const b of box.querySelectorAll("[data-lang]")) b.onclick = () => {
       introLang = b.dataset.lang;
       try { localStorage.setItem(LANG_KEY, introLang); } catch (e) { /* idem */ }
       Voice.stop();
-      if (view === "families") families(index); else if (view === "characters") characters(index); else home();
+      again();
+    };
+    box.querySelector("[data-music]").onclick = () => {
+      introMusic = !introMusic;
+      try { localStorage.setItem("kiboo.intro.music", introMusic ? "1" : "0"); } catch (e) { /* idem */ }
+      Sound.music(introMusic ? "intro" : null);
+      const b = box.querySelector("[data-music]");
+      b.setAttribute("aria-pressed", introMusic);
+      b.textContent = introMusic ? "🎵" : "🔇";
     };
   }
   const presentation = (s, v) => {
@@ -86,6 +108,7 @@ const Intro = (() => {
           <button class="act intro-play" type="button" data-a="play"><span class="emo" aria-hidden="true">▶️</span>${T("intro.play")}</button>
           <button class="act ghost" type="button" data-a="families"><span class="emo" aria-hidden="true">👋</span>${T("intro.families")}</button>
           <button class="act ghost" type="button" data-a="characters"><span class="emo" aria-hidden="true">🎭</span>${T("intro.characters")}</button>
+          <button class="act ghost" type="button" data-a="parade"><span class="emo" aria-hidden="true">🎪</span>${T("intro.parade")}</button>
         </div>
         <label class="check intro-off"><input type="checkbox" data-a="off"${off ? " checked" : ""}> ${T("intro.noShow")}</label>
       </div>
@@ -95,6 +118,7 @@ const Intro = (() => {
     box.querySelector("[data-a=skip]").onclick = () => close(false);
     box.querySelector("[data-a=families]").onclick = () => families(0);
     box.querySelector("[data-a=characters]").onclick = () => characters(0);
+    box.querySelector("[data-a=parade]").onclick = () => parade(0);
     box.querySelector("[data-a=off]").onchange = e => {
       off = e.target.checked;
       try { localStorage.setItem(KEY, off ? "1" : "0"); } catch (err) { /* idem */ }
@@ -114,7 +138,7 @@ const Intro = (() => {
   function wireNav(onPrev, onNext, again) {
     box.querySelector("[data-a=prev]").onclick = onPrev;
     box.querySelector("[data-a=next]").onclick = onNext;
-    box.querySelector("[data-a=back]").onclick = () => { Voice.stop(); home(); };
+    box.querySelector("[data-a=back]").onclick = () => { paradeRun++; Voice.stop(); home(); };
     box.querySelector("[data-a=sound]").onclick = () => { sound = !sound; if (!sound) Voice.stop(); again(); };
   }
 
@@ -156,16 +180,91 @@ const Intro = (() => {
     box.querySelector("[data-a=next]").focus();
   }
 
+  /* ---------- La parade de Kiboo ---------- */
+  let paradeRun = 0, paused = false, forward = false, skipNow = null, resumeFn = null;
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+
+  function parade(start) { inLang(paradeView); wireLangs(); runParade(start); }
+  function paradeView() {
+    view = "parade";
+    box.innerHTML = `<div class="intro-stage intro-show intro-parade">${langs()}
+      <h2 class="intro-fam">🎪 ${T("intro.parade")}</h2>
+      <div class="parade-floor" data-role="floor"></div>
+      <div class="intro-nav">
+        <button class="act ghost" type="button" data-a="pause">${paused ? `▶ ${T("intro.resume")}` : `⏸ ${T("intro.pause")}`}</button>
+        <button class="act ghost" type="button" data-a="sound" aria-pressed="${sound}">${sound ? "🔊" : "🔇"} ${T("intro.sound")}</button>
+        <button class="act ghost" type="button" data-a="back">${T("intro.back")}</button>
+        <button class="act" type="button" data-a="next">${T("intro.next")} ▶</button>
+      </div>
+    </div>`;
+    const q = sel => box.querySelector(sel);
+    q("[data-a=back]").onclick = () => { paradeRun++; Voice.stop(); home(); };
+    q("[data-a=sound]").onclick = e => {
+      sound = !sound;
+      if (!sound) Voice.stop();
+      e.currentTarget.setAttribute("aria-pressed", sound);
+      e.currentTarget.textContent = `${sound ? "🔊" : "🔇"} ${inLang(() => T("intro.sound"))}`;
+    };
+    q("[data-a=pause]").onclick = e => {
+      paused = !paused;
+      e.currentTarget.textContent = inLang(() => paused ? `▶ ${T("intro.resume")}` : `⏸ ${T("intro.pause")}`);
+      if (paused) Voice.stop(); else if (resumeFn) resumeFn();
+    };
+    q("[data-a=next]").onclick = () => {
+      forward = true;
+      if (paused) { paused = false; q("[data-a=pause]").textContent = inLang(() => `⏸ ${T("intro.pause")}`); if (resumeFn) resumeFn(); }
+      else { Voice.stop(); if (skipNow) skipNow(); }
+    };
+    q("[data-a=next]").focus();
+  }
+
+  // Les 40 personnages défilent ; chacun parle (ou reste le temps de lire), puis le suivant arrive.
+  async function runParade(start) {
+    const run = ++paradeRun;
+    for (let i = start; i <= 40;) {
+      if (run !== paradeRun) return;
+      index = i;
+      forward = false;
+      const floor = box.querySelector("[data-role=floor]");
+      const text = i < 40
+        ? inLang(() => presentation(Math.floor(i / 10), (i % 10) + 1))
+        : inLang(() => T("intro.paradeEnd"));
+      floor.innerHTML = i < 40
+        ? `<div class="parade-char" style="--fam:var(--c-${COLORS[Math.floor(i / 10)]})">
+             <div class="card intro-big" style="background-image:url(${img(Math.floor(i / 10), (i % 10) + 1)})" role="img" aria-label="${inLang(() => cardName({ s: Math.floor(i / 10), v: (i % 10) + 1 }))}"></div>
+             <div class="intro-bubble"><p>${text}</p><p class="intro-count">${i + 1} / 40</p></div>
+           </div>`
+        : `<div class="parade-end">${[0, 1, 2, 3].map(s => `<div class="card" style="background-image:url(${img(s, 10)})"></div>`).join("")}
+             <p class="intro-text">${text}</p></div>`;
+      if (i < 40) Sound.sfx("click");
+      const skip = new Promise(r => { skipNow = r; });
+      const talk = sound && !paused ? Voice.speak(text, introLang) : Promise.resolve(false);
+      await Promise.race([talk.then(spoken => wait(spoken ? 900 : Math.max(2500, text.length * 60))), skip]);
+      if (run !== paradeRun) return;
+      if (paused) {
+        await new Promise(r => { resumeFn = r; });
+        resumeFn = null;
+        if (run !== paradeRun) return;
+        if (!forward) continue;                     // reprise : le même personnage reparle
+      }
+      if (i === 40) { if (forward) close(true); return; }
+      i++;
+    }
+  }
+
   /* ---------- Ouvrir et fermer ---------- */
   function open() {
     if (!box.isConnected) document.body.appendChild(box);
     box.hidden = false;
     document.body.classList.add("intro-open");
+    Sound.music(introMusic ? "intro" : null);
     home();
   }
   // `animate` : la première donne sera distribuée avec l'animation.
   function close(animate) {
+    paradeRun++;
     Voice.stop();
+    Sound.music(config.music ? "game" : null);
     box.hidden = true;
     document.body.classList.remove("intro-open");
     if (!animate) dealPending = false;
@@ -205,6 +304,7 @@ const Intro = (() => {
       el.style.left = cx + "px";
       el.style.top = cy + "px";
       layer.appendChild(el);
+      Sound.sfx("deal", i * 0.045);
       anims.push(el.animate([
         { transform: "translate(-50%, -50%) rotate(0deg) scale(0.6)", opacity: 0 },
         { transform: "translate(-50%, -50%) rotate(0deg) scale(0.8)", opacity: 1, offset: 0.1 },
@@ -233,8 +333,9 @@ const Intro = (() => {
       logoEl.onclick = open;
       logoEl.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } };
     }
+    $("btn-parade").onclick = () => { open(); parade(0); };
     if (off) resolveReady(); else open();
   });
 
-  return { ready, deal, open };
+  return { ready, deal, open, parade: () => { open(); parade(0); } };
 })();

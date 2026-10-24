@@ -245,7 +245,7 @@ const PLAYER_TYPES = {
 };
 
 /* ===================== État de la partie ===================== */
-const config = { O: "deterministe", E: "deterministe", S: "humain", speed: 650, open: false, hints: false, explain: false, quiz: "off", eval: true, coco: "off", voice: false };
+const config = { O: "deterministe", E: "deterministe", S: "humain", speed: 650, open: false, hints: false, explain: false, quiz: "off", eval: true, coco: "off", voice: false, music: false, sfx: true };
 let game = null;
 let runToken = 0;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -353,6 +353,7 @@ async function play(token) {
     }
     game.hands[seat] = game.hands[seat].filter(c => c !== card);
     game.trick.push({ seat, card, fresh: true });
+    Sound.sfx("card");
     game.played.push(card);
     game.dummyShown = true;
     game.lastTrick = null;
@@ -378,6 +379,7 @@ async function play(token) {
       if (token !== runToken) return;
     }
     const winner = trickWinner(game.trick);
+    Sound.sfx(team(winner) === humanTeam() ? "trickWin" : "trickLose", 0.15);
     game.winnerSeat = winner;
     // Avec un joueur humain, le pli reste visible jusqu'à son clic sur « Pli suivant » :
     // le temps de bien regarder et retenir les cartes jouées.
@@ -399,6 +401,11 @@ async function play(token) {
     }
   }
   game.over = true;
+  {
+    // Fanfare, égalité ou petite musique triste, du point de vue du joueur humain.
+    const mine = game.tricksWon[humanTeam()], theirs = 10 - mine;
+    Sound.sfx(mine > theirs ? "win" : mine === theirs ? "tie" : "lose", 0.3);
+  }
   if (typeof Evaluation !== "undefined") Evaluation.dealOver();
   render();
   reviewDeal(token);
@@ -493,6 +500,8 @@ function cardEl(card, opts = {}) {
    gauche le joueur suivant, en face le partenaire, à droite le précédent. */
 const POSITIONS = ["south", "west", "north", "east"];
 const SLOT_CLASS = { south: "s", west: "o", north: "n", east: "e" };
+// Le camp du joueur humain (Nord-Sud s'il n'y a que des robots).
+const humanTeam = () => team(bottomSeat());
 const bottomSeatHuman = () => !!game && ["S", "O", "E"].some(s => game.types[s] === "humain");
 function bottomSeat() {
   if (game) for (const s of ["S", "O", "E"]) if (game.types[s] === "humain") return s;
@@ -673,6 +682,8 @@ $("cfg-hints").addEventListener("change", e => { config.hints = e.target.checked
 $("cfg-explain").addEventListener("change", e => { config.explain = e.target.checked; render(); });
 $("cfg-quiz").addEventListener("change", e => { config.quiz = e.target.value; });
 $("cfg-eval").addEventListener("change", e => { config.eval = e.target.checked; });
+$("cfg-music").addEventListener("change", e => { config.music = e.target.checked; Sound.music(config.music ? "game" : null); });
+$("cfg-sfx").addEventListener("change", e => { config.sfx = e.target.checked; });
 $("cfg-voice").addEventListener("change", e => { config.voice = e.target.checked; if (!config.voice) Voice.stop(); });
 $("cfg-coco").addEventListener("change", e => { config.coco = e.target.value; render(); });
 $("btn-new").addEventListener("click", () => newGame(dealHands()));
