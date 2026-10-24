@@ -68,7 +68,8 @@ Les présentations sont lues à voix haute (bouton Son). L'accueil a sa propre l
 ## Parade, musique et bruitages
 
 - **La parade de Kiboo** (bouton « Parade » de l'en-tête, ou de l'accueil) : les 40 personnages défilent tout seuls ; chacun dit sa présentation (textes de `lang/personnages.js`), puis laisse la place au suivant. Boutons Pause, Suivant, Son et Accueil.
-- **Musique** façon jeu vidéo rétro, composée dans le code (Web Audio, rien à télécharger) : mélodie en signal carré, basse en triangle, charleston en bruit blanc. Elle joue sur l'accueil (bouton 🎵) et, avec la case « Musique », plus doucement pendant la partie. Elle baisse quand la voix parle.
+- **Musiques** façon jeu vidéo rétro, composées dans le code (Web Audio, rien à télécharger), tirées au hasard pour ne pas se lasser : trois pour l'accueil (bouton 🎵), deux plus calmes pour la partie (case « Musique »), et une par famille pendant les présentations et la parade : comptine sautillante avec des cris d'animaux, marche lourde des dinosaures avec rugissements, arpèges futuristes et bips des robots, petite fanfare des métiers. La musique baisse quand la voix parle.
+- **Un bruit par personnage** quand il se présente : couinement de la souris, cui-cui, miaou, ouaf, groin, rugissements (plus graves pour les gros dinosaures), bips et cliquetis des robots, sifflet, sirène de pompier, fusée… (table `CHARACTER` de `js/sound.js`).
 - **Bruitages** (case « Bruitages », cochée par défaut) : carte posée, pli gagné ou perdu, fanfare ou petite musique triste en fin de donne, bonne ou mauvaise réponse aux exercices et aux questions, cadeau, distribution.
 - Les navigateurs n'autorisent le son qu'après un premier clic : la musique démarre à ce moment-là. Le code est dans `js/sound.js`.
 

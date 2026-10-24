@@ -17,14 +17,15 @@ const Voice = (() => {
   const ok = "speechSynthesis" in window;
   const LOCALE = { fr: "fr-FR", en: "en-GB", it: "it-IT" };
   // Vitesse et hauteur par langue : un peu plus aiguë que la normale, pour une voix sympa.
-  const RATE = { fr: 1.05, en: 0.95, it: 1.0 };
+  const RATE = { fr: 1.18, en: 0.95, it: 1.0 };
   const PITCH = 1.1;
   const KEY = "kiboo.voice.";                          // + langue : nom de la voix choisie
   // Voix agréables, par ordre de préférence (les noms varient selon les appareils).
+  // En français, une voix d'homme : Thomas (Apple), Henri ou Paul (Microsoft)…
   const NICE = {
-    fr: ["Amélie", "Audrey", "Aurélie", "Marie", "Julie", "Denise", "Google français"],
+    fr: ["Thomas", "Henri", "Paul", "Nicolas", "Rémy", "Antoine", "Jérôme", "Mathieu", "Daniel", "Google français"],
     en: ["Samantha", "Karen", "Moira", "Tessa", "Libby", "Sonia", "Jenny", "Aria", "Google UK English Female", "Google US English"],
-    it: ["Alice", "Federica", "Elsa", "Isabella", "Google italiano"],
+    it: ["Isabella", "Elsa", "Diego", "Alice", "Federica", "Luca", "Paola", "Google italiano"],
   };
   let voices = [];
   const load = () => { voices = ok ? speechSynthesis.getVoices() : []; fillMenu(); };
@@ -36,10 +37,14 @@ const Voice = (() => {
     const list = ofLang(lang);
     const chosen = list.find(v => v.name === saved(lang));
     if (chosen) return chosen;
-    for (const name of NICE[lang] || []) {
-      const v = list.find(x => x.name.includes(name));
+    // Les voix « naturelles » (Microsoft … Online (Natural), Apple Premium ou Améliorée) sont bien meilleures.
+    const fine = v => /natural|online|premium|enhanced|amélior|neural|siri/i.test(v.name);
+    for (const good of [true, false]) for (const name of NICE[lang] || []) {
+      const v = list.find(x => x.name.includes(name) && fine(x) === good);
       if (v) return v;
     }
+    const nat = list.find(fine);
+    if (nat) return nat;
     return list.find(v => /female|femme|donna/i.test(v.name)) || list[0] || null;
   }
 

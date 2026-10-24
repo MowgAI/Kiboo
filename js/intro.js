@@ -42,6 +42,20 @@ const Intro = (() => {
 
   const img = (s, v) => IMAGES[COLORS[s] + "-" + v];
   const say = text => { if (sound) Voice.speak(text, introLang); };
+  // Musique de la vue : celle de l'accueil, ou celle de la famille présentée.
+  let family = null;
+  const styleNow = () => (family === null ? "intro" : "fam" + family);
+  const playMusic = () => Sound.music(introMusic ? styleNow() : null);
+  function setFamily(f) { family = f; playMusic(); }
+  // Un personnage arrive : son bruit (miaou, rugissement…), puis il parle.
+  let talkToken = 0;
+  function introduce(s, v, text) {
+    const token = ++talkToken;
+    Voice.stop();
+    if (!sound) return Promise.resolve(false);
+    Sound.character(s, v);
+    return new Promise(r => setTimeout(r, 750)).then(() => (token === talkToken ? Voice.speak(text, introLang) : false));
+  }
   // Choix de la langue de l'accueil (EN · FR · IT), puis on redessine la vue courante.
   const langs = () => `<div class="intro-langs" role="group" aria-label="Language">${I18N.SUPPORTED.map(l =>
     `<button type="button" data-lang="${l}" aria-pressed="${l === introLang}">${l.toUpperCase()}</button>`).join("")}
@@ -63,7 +77,7 @@ const Intro = (() => {
     box.querySelector("[data-music]").onclick = () => {
       introMusic = !introMusic;
       try { localStorage.setItem("kiboo.intro.music", introMusic ? "1" : "0"); } catch (e) { /* idem */ }
-      Sound.music(introMusic ? "intro" : null);
+      playMusic();
       const b = box.querySelector("[data-music]");
       b.setAttribute("aria-pressed", introMusic);
       b.textContent = introMusic ? "🎵" : "🔇";
@@ -101,6 +115,7 @@ const Intro = (() => {
   function home() { inLang(homeView); wireLangs(); }
   function homeView() {
     view = "home";
+    setFamily(null);
     box.innerHTML = `<div class="intro-stage">${langs()}${crowd()}
       <div class="intro-center">
         ${logo()}
@@ -147,6 +162,7 @@ const Intro = (() => {
   function familiesView(f) {
     view = "families"; index = f;
     const s = FAMILY_ORDER[f];
+    setFamily(s);
     box.innerHTML = `<div class="intro-stage intro-show">${langs()}
       <h2 class="intro-fam fam ${COLORS[s]}">${T("intro.famTitle", { s })}</h2>
       <p class="intro-text">${T("intro.fam." + s)}</p>
@@ -164,6 +180,7 @@ const Intro = (() => {
     view = "characters"; index = i;
     const s = Math.floor(i / 10), v = (i % 10) + 1;
     const text = presentation(s, v);
+    setFamily(s);
     box.innerHTML = `<div class="intro-stage intro-show">${langs()}
       <div class="intro-chips" role="group" aria-label="${T("intro.characters")}">
         ${[0, 1, 2, 3].map(x => `<button type="button" class="intro-chip ${COLORS[x]}" data-f="${x}" aria-pressed="${x === s}">${familyName(x)}</button>`).join("")}
@@ -176,7 +193,7 @@ const Intro = (() => {
     </div>`;
     for (const chip of box.querySelectorAll("[data-f]")) chip.onclick = () => characters(+chip.dataset.f * 10);
     wireNav(() => characters(i - 1), () => (i < 39 ? characters(i + 1) : close(true)), () => characters(i));
-    say(text);
+    introduce(s, v, text);
     box.querySelector("[data-a=next]").focus();
   }
 
@@ -236,9 +253,11 @@ const Intro = (() => {
            </div>`
         : `<div class="parade-end">${[0, 1, 2, 3].map(s => `<div class="card" style="background-image:url(${img(s, 10)})"></div>`).join("")}
              <p class="intro-text">${text}</p></div>`;
-      if (i < 40) Sound.sfx("click");
+      if (i < 40) setFamily(Math.floor(i / 10)); else setFamily(null);
       const skip = new Promise(r => { skipNow = r; });
-      const talk = sound && !paused ? Voice.speak(text, introLang) : Promise.resolve(false);
+      const talk = paused ? Promise.resolve(false)
+        : i < 40 ? introduce(Math.floor(i / 10), (i % 10) + 1, text)
+        : (sound ? Voice.speak(text, introLang) : Promise.resolve(false));
       await Promise.race([talk.then(spoken => wait(spoken ? 900 : Math.max(2500, text.length * 60))), skip]);
       if (run !== paradeRun) return;
       if (paused) {
@@ -257,12 +276,14 @@ const Intro = (() => {
     if (!box.isConnected) document.body.appendChild(box);
     box.hidden = false;
     document.body.classList.add("intro-open");
-    Sound.music(introMusic ? "intro" : null);
+    family = null;
+    playMusic();
     home();
   }
   // `animate` : la première donne sera distribuée avec l'animation.
   function close(animate) {
     paradeRun++;
+    talkToken++;
     Voice.stop();
     Sound.music(config.music ? "game" : null);
     box.hidden = true;
