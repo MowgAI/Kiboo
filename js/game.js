@@ -276,6 +276,7 @@ function newGame(hands, opts = {}) {
   game.hint = null;
   game.revealed = new Map();                    // cartes cachées révélées par un cadeau : id -> siège
   game.assisted = false;                        // aide utilisée (meilleurs coups, jeux ouverts, carte révélée)
+  game.first = !!opts.first;                    // première donne de la visite
   game.replayed = !!opts.replay;                // « Rejouer la donne » : le joueur connaît déjà les cartes
   if (typeof Quiz !== "undefined") Quiz.reset();
   game.history = [];                            // un instantané avant chaque carte, pour le bilan
@@ -319,6 +320,9 @@ function viewFor(seat, g = game) {
 }
 
 async function play(token) {
+  // Première donne : distribution animée (js/intro.js) avant que les robots jouent.
+  if (game.first && typeof Intro !== "undefined") await Intro.deal();
+  if (token !== runToken) return;
   // Questions en cours de partie (js/quiz.js) : la partie attend la réponse puis reprend.
   await Quiz.at("start");
   if (token !== runToken) return;
@@ -695,4 +699,8 @@ document.addEventListener("kiboo-lang", () => {
 });
 
 // Première donne une fois tous les scripts chargés (exercices, cadeaux, questions).
-window.addEventListener("DOMContentLoaded", () => newGame(dealHands()));
+// Elle attend la fin de l'écran d'accueil (js/intro.js) ; ses cartes sont distribuées avec une animation.
+window.addEventListener("DOMContentLoaded", async () => {
+  if (typeof Intro !== "undefined") await Intro.ready;
+  newGame(dealHands(), { first: true });
+});

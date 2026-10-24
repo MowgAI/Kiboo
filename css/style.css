@@ -268,15 +268,15 @@ button.card:disabled { cursor: default; }
   padding: 0 0.1em;
 }
 /* Familles : une pastille de la couleur de la famille */
-:is(.rules, .review) .fam { font-weight: 600; white-space: nowrap; }
-:is(.rules, .review) .fam::before {
+:is(.rules, .review, .intro) .fam { font-weight: 600; white-space: nowrap; }
+:is(.rules, .review, .intro) .fam::before {
   content: ""; display: inline-block; width: 0.62em; height: 0.62em;
   border-radius: 50%; margin-right: 0.3em; vertical-align: 0.05em;
 }
-:is(.rules, .review) .fam.blue::before { background: var(--c-blue); }
-:is(.rules, .review) .fam.green::before { background: var(--c-green); }
-:is(.rules, .review) .fam.red::before { background: var(--c-red); }
-:is(.rules, .review) .fam.yellow::before { background: var(--c-yellow); }
+:is(.rules, .review, .intro) .fam.blue::before { background: var(--c-blue); }
+:is(.rules, .review, .intro) .fam.green::before { background: var(--c-green); }
+:is(.rules, .review, .intro) .fam.red::before { background: var(--c-red); }
+:is(.rules, .review, .intro) .fam.yellow::before { background: var(--c-yellow); }
 .rules .close {
   font: 600 1.5rem/1 "Fredoka", "Nunito", system-ui, sans-serif;
   width: 2em; height: 2em; flex: none; cursor: pointer;
@@ -536,3 +536,63 @@ a.act { text-decoration: none; display: inline-flex; align-items: center; }
 .rules-head .voice-btn + .close { margin-left: 8px; }
 .note .voice-btn { margin: 0 0 6px; }
 #quiz .rules-head .voice-btn { margin: 0 auto 0 12px; }
+
+/* ===================== Accueil et animations (js/intro.js) ===================== */
+body.intro-open { overflow: hidden; }
+.intro {
+  position: fixed; inset: 0; z-index: 50;
+  background: radial-gradient(ellipse at 50% 40%, var(--felt-ring) 0%, var(--felt) 75%);
+  color: var(--felt-ink); overflow: auto;
+}
+.intro .card { --w: clamp(54px, 9vw, 92px); margin: 0; }
+.intro-stage { position: relative; min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 16px 90px; gap: 14px; }
+.intro-center { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center; }
+.intro-logo { margin: 0; font-size: clamp(4rem, 16vw, 8.5rem); font-weight: 700; line-height: 1; letter-spacing: 0.02em; }
+.intro-logo span { display: inline-block; opacity: 0; animation: logo-pop 0.55s cubic-bezier(.3, 1.6, .5, 1) forwards; text-shadow: 0 4px 0 rgba(0,0,0,0.25); }
+@keyframes logo-pop { from { opacity: 0; transform: translateY(-60px) scale(0.3) rotate(-20deg); } to { opacity: 1; transform: none; } }
+.intro-btns { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.intro .act, .intro button.act.ghost { border-color: var(--felt-ink); color: var(--felt-ink); background: transparent; }
+.intro .act:not(.ghost) { background: var(--sun); border-color: var(--sun); color: var(--sun-ink); }
+.intro-play { font-size: 1.15rem; padding: 10px 22px; }
+.intro .check { color: var(--felt-soft); font-size: 0.9rem; }
+.intro-skip { position: absolute; right: 16px; bottom: 16px; }
+.intro-hop { position: absolute; z-index: 1; opacity: 0; animation: hop-in 0.5s ease-out forwards, hop 1.4s ease-in-out infinite; }
+@keyframes hop-in { from { opacity: 0; transform: scale(0.2); } to { opacity: 1; transform: scale(1); } }
+@keyframes hop { 0%, 100% { translate: 0 0; rotate: -4deg; } 50% { translate: 0 -18px; rotate: 4deg; } }
+.intro-run { position: absolute; bottom: 8px; left: 0; z-index: 1; animation: run 7s linear 1.5s infinite; translate: -150px 0; }
+.intro-run .card { animation: hop 0.5s ease-in-out infinite; }
+@keyframes run { from { translate: -150px 0; } to { translate: calc(100vw + 50px) 0; } }
+/* Présentations */
+.intro-show { justify-content: flex-start; padding-top: 32px; }
+.intro-fam { margin: 0; font-size: clamp(1.8rem, 6vw, 3rem); }
+.intro-fam.fam::before { width: 0.7em; height: 0.7em; }
+.intro-text { max-width: 640px; text-align: center; font-size: 1.15rem; margin: 0; }
+.intro-fan { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 720px; }
+.intro-fan .card { opacity: 0; animation: deal-in 0.45s cubic-bezier(.3, 1.4, .5, 1) forwards; }
+@keyframes deal-in { from { opacity: 0; transform: translateY(40px) rotate(-12deg) scale(0.5); } to { opacity: 1; transform: none; } }
+.intro-chips { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.intro-chip { font: inherit; font-weight: 600; cursor: pointer; padding: 5px 12px; border-radius: 999px; border: 2px solid rgba(255,255,255,0.3); background: transparent; color: var(--felt-ink); text-transform: capitalize; }
+.intro-chip[aria-pressed="true"] { background: var(--felt-ink); color: var(--felt); }
+.intro-chip.blue { border-color: var(--c-blue); } .intro-chip.green { border-color: var(--c-green); }
+.intro-chip.red { border-color: var(--c-red); } .intro-chip.yellow { border-color: var(--c-yellow); }
+.intro-char { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 24px; margin-top: 10px; }
+.intro-big { --w: clamp(140px, 30vw, 220px) !important; animation: char-in 0.5s cubic-bezier(.3, 1.5, .5, 1); box-shadow: 0 8px 30px rgba(0,0,0,0.45); }
+@keyframes char-in { from { opacity: 0; transform: scale(0.4) rotate(-10deg); } to { opacity: 1; transform: none; } }
+.intro-bubble { position: relative; max-width: 380px; background: var(--panel); color: var(--ink); border-radius: 18px; padding: 16px 18px; font-size: 1.15rem; box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+.intro-bubble p { margin: 0; }
+.intro-bubble .intro-count { margin-top: 8px; font-size: 0.85rem; color: var(--ink-soft); }
+.intro-nav { position: fixed; left: 0; right: 0; bottom: 0; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 12px; background: rgba(0,0,0,0.25); z-index: 3; }
+/* Logo du jeu : un clic rouvre l'accueil. */
+.logo-btn { cursor: pointer; }
+/* Distribution animée */
+.table.dealing .hand { visibility: hidden; }
+.deal-layer { position: fixed; inset: 0; z-index: 40; pointer-events: none; }
+.deal-card { position: fixed; --w: clamp(36px, 6vw, 56px); margin: 0 !important; }
+.deal-skip { position: fixed; right: 16px; bottom: 16px; pointer-events: auto; background: var(--panel); }
+.table.dealt .hand .card { animation: flip-in 0.6s ease-out backwards; }
+@keyframes flip-in { from { transform: rotateY(90deg); } to { transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .intro-logo span, .intro-hop, .intro-fan .card { animation: none; opacity: 1; }
+  .intro-run { display: none; }
+  .intro-run .card, .intro-big { animation: none; }
+}

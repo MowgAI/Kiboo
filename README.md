@@ -41,6 +41,8 @@ python3 -m http.server 8000
 - `js/feedback.js` : formulaire « Donner mon avis »
 - `js/quiz.js` : questions pendant la partie et moteur de déduction
 - `js/rewards.js` : cadeaux, progression et collection
+- `js/intro.js` : écran d'accueil, présentations des familles et des personnages, distribution animée
+- `lang/personnages.js` : présentations des 40 personnages (français, anglais, italien)
 - `js/voice.js` : lecture à voix haute (versions simplifiées, encouragements)
 - `js/coco.js` : le carré de Coco (exercice et remplissage pendant la donne)
 - `js/exercises.js` : exercices (compter sa main, couleur la plus longue, cartes jouables)
@@ -53,9 +55,18 @@ Kiboo existe en français, en anglais et en italien. Le menu en haut de la page 
 
 Tous les textes sont dans `lang/` : un fichier par langue, avec les mêmes clés. Le français (`lang/fr.js`) sert de référence : si un texte manque dans une langue, c'est le texte français qui s'affiche. Pour relire ou corriger l'italien, il suffit de modifier `lang/it.js` (les petites fonctions en haut du fichier gèrent les accords : « il 7 blu », « l'8 rossa »…). Pour ajouter une langue, copier `lang/en.js`, traduire les textes et ajouter le fichier dans `index.html`.
 
+## Accueil, familles et personnages
+
+Au démarrage, un écran d'accueil montre le logo Kiboo qui se forme lettre par lettre et des personnages qui sautillent. Trois boutons :
+- **Jouer** : la première donne est distribuée avec une animation (cartes qui partent du centre vers les joueurs, bouton « Passer ») ; les donnes suivantes ne sont pas animées ;
+- **Les familles** : les quatre familles se présentent tour à tour avec leurs 10 cartes ;
+- **Les personnages** : les 40 personnages se présentent un par un (flèches du clavier pour avancer).
+
+Les présentations sont lues à voix haute (bouton Son). Une case « Ne plus afficher l'accueil au démarrage » est gardée dans le navigateur ; un clic sur le logo Kiboo rouvre l'accueil. Les animations sont coupées si l'appareil demande de réduire les animations. Les textes des personnages sont dans `lang/personnages.js` (à relire et modifier librement) ; le code est dans `js/intro.js`.
+
 ## Lecture à voix haute
 
-Pour les enfants qui ne savent pas encore lire, des boutons **🔊 Écouter** lisent une version simplifiée des règles du jeu, de l'aide, des exercices et des questions. Avec la case « Lire à voix haute », les questions et les exercices sont lus d'office, et une petite phrase d'encouragement suit chaque réponse (« Bravo ! », « Presque ! »…). C'est la synthèse vocale du navigateur : la voix dépend de l'appareil ; Kiboo choisit de préférence une voix douce, un peu plus aiguë et plus lente. Les textes lus sont les clés `voice.*` de `lang/*.js` ; le code est dans `js/voice.js`.
+Pour les enfants qui ne savent pas encore lire, des boutons **🔊 Écouter** lisent une version simplifiée des règles du jeu, de l'aide, des exercices et des questions. Avec la case « Lire à voix haute », les questions et les exercices sont lus d'office, et une petite phrase d'encouragement suit chaque réponse (« Bravo ! », « Presque ! »…). C'est la synthèse vocale du navigateur : la voix dépend de l'appareil. Le menu « Voix » des réglages liste les voix de la langue choisie installées sur l'appareil (le choix est gardé dans le navigateur) ; sans voix dans la langue, rien n'est lu, car une voix d'une autre langue prononcerait mal. Les textes lus sont les clés `voice.*` de `lang/*.js` ; le code est dans `js/voice.js`.
 
 ## Exercices
 

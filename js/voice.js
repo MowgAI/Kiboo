@@ -8,12 +8,18 @@
      d'office, et une petite phrase d'encouragement suit chaque réponse
      (« Bravo ! », « Presque ! »…).
    Utilise la synthèse vocale du navigateur (speechSynthesis) : la voix
-   dépend de l'appareil. On choisit de préférence une voix douce connue, un
-   peu plus aiguë et un peu plus lente que la normale.
+   dépend de l'appareil. Le menu « Voix » des réglages liste les voix de
+   la langue choisie installées sur l'appareil (choix gardé dans le
+   navigateur) ; par défaut, une voix douce connue. Sans voix dans la
+   langue, rien n'est lu (une voix d'une autre langue prononcerait mal).
    ===================================================================== */
 const Voice = (() => {
   const ok = "speechSynthesis" in window;
   const LOCALE = { fr: "fr-FR", en: "en-GB", it: "it-IT" };
+  // Vitesse et hauteur par langue : un peu plus aiguë que la normale, pour une voix sympa.
+  const RATE = { fr: 1.05, en: 0.95, it: 1.0 };
+  const PITCH = 1.1;
+  const KEY = "kiboo.voice.";                          // + langue : nom de la voix choisie
   // Voix agréables, par ordre de préférence (les noms varient selon les appareils).
   const NICE = {
     fr: ["Amélie", "Audrey", "Aurélie", "Marie", "Julie", "Denise", "Google français"],
@@ -21,16 +27,32 @@ const Voice = (() => {
     it: ["Alice", "Federica", "Elsa", "Isabella", "Google italiano"],
   };
   let voices = [];
-  const load = () => { voices = ok ? speechSynthesis.getVoices() : []; };
+  const load = () => { voices = ok ? speechSynthesis.getVoices() : []; fillMenu(); };
+  const ofLang = lang => voices.filter(v => v.lang.toLowerCase().replace("_", "-").startsWith(lang));
+  const saved = lang => { try { return localStorage.getItem(KEY + lang) || ""; } catch (e) { return ""; } };
   if (ok) { load(); speechSynthesis.addEventListener("voiceschanged", load); }
 
   function pick(lang) {
-    const list = voices.filter(v => v.lang.toLowerCase().replace("_", "-").startsWith(lang));
+    const list = ofLang(lang);
+    const chosen = list.find(v => v.name === saved(lang));
+    if (chosen) return chosen;
     for (const name of NICE[lang] || []) {
       const v = list.find(x => x.name.includes(name));
       if (v) return v;
     }
     return list.find(v => /female|femme|donna/i.test(v.name)) || list[0] || null;
+  }
+
+  // Menu « Voix » des réglages : les voix de la langue choisie sur cet appareil.
+  function fillMenu() {
+    const sel = $("cfg-voice-name");
+    if (!sel || typeof I18N === "undefined") return;
+    const lang = I18N.lang, list = ofLang(lang), cur = saved(lang);
+    sel.innerHTML = list.length
+      ? `<option value="">${T("voice.auto")}</option>` + list.map(v => `<option value="${v.name.replace(/"/g, "&quot;")}"${v.name === cur ? " selected" : ""}>${v.name}</option>`).join("")
+      : `<option value="">${T("voice.none")}</option>`;
+    sel.disabled = !list.length;
+    for (const b of document.querySelectorAll(".voice-btn")) b.hidden = !list.length;
   }
 
   // Le texte sans balises HTML ni emoji.
@@ -42,13 +64,14 @@ const Voice = (() => {
 
   function speak(html) {
     if (!ok || !html) return;
+    const v = pick(I18N.lang);
+    if (!v) return;                                     // pas de voix dans cette langue sur l'appareil
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(plain(html));
     u.lang = LOCALE[I18N.lang] || "fr-FR";
-    const v = pick(I18N.lang);
-    if (v) u.voice = v;
-    u.rate = 0.92;
-    u.pitch = 1.2;
+    u.voice = v;
+    u.rate = RATE[I18N.lang] || 1;
+    u.pitch = PITCH;
     speechSynthesis.speak(u);
   }
   const stop = () => { if (ok) speechSynthesis.cancel(); };
@@ -70,7 +93,7 @@ const Voice = (() => {
     b.className = "act ghost voice-btn";
     b.innerHTML = `<span class="emo" aria-hidden="true">🔊</span><span class="lbl">${T("voice.listen")}</span>`;
     b.setAttribute("aria-label", T("voice.listenAria"));
-    b.hidden = !ok;
+    b.hidden = !ok || !ofLang(I18N.lang).length;
     b.onclick = () => speak(text());
     return b;
   }
@@ -83,8 +106,15 @@ const Voice = (() => {
     add("voice-ex", () => T("voice.ex." + Exercises.current));
     add("voice-quiz", () => Quiz.voiceText());
   }
-  document.addEventListener("kiboo-lang", () => { stop(); mount(); });
-  window.addEventListener("DOMContentLoaded", mount);
+  document.addEventListener("kiboo-lang", () => { stop(); mount(); fillMenu(); });
+  window.addEventListener("DOMContentLoaded", () => {
+    mount();
+    fillMenu();
+    $("cfg-voice-name").addEventListener("change", e => {
+      try { localStorage.setItem(KEY + I18N.lang, e.target.value); } catch (err) { /* stockage indisponible */ }
+      speak(T("voice.test"));                           // pour entendre la voix choisie
+    });
+  });
   // Une fenêtre fermée : on arrête de parler.
   document.addEventListener("close", stop, true);
 
