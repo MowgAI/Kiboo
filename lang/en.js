@@ -58,6 +58,7 @@
         <li><strong>Evaluation mode</strong>: compares your deal (as South) with Piperno, Averell and Averell250 on the same cards; your duplicate score is shown at the end of the deal.</li>
         <li><strong>Questions during play</strong> (when you are declarer, as South): <strong>A few</strong> asks at least one per deal, drawn at random; <strong>All</strong> asks them all, for training. Every 3 right answers, you choose a gift.</li>
         <li><strong>Coco's square</strong>: during the deal, a table of each player's starting cards in each suit (North and South filled in for you), to complete for West and East as the tricks go by. With <strong>Goat</strong>, the square fills in by itself and each deduction is explained (it's a help: the deal isn't evaluated).</li>
+        <li><strong>Read aloud</strong>: questions and exercises are read out (in a simple version), with a little encouragement after each answer. The 🔊 Listen buttons also read the rules and this help. The voice depends on the device.</li>
         <li>When you play, each trick stays on the table until you click <strong>Next trick</strong>: take the time to remember the cards played.</li>
       </ul>`,
     "player.human": "Human",
@@ -206,6 +207,28 @@
     "quiz.ex.any": "For example, West could have:",
     "quiz.goodAnswer": p => `The right answer: ${p.answer.toLowerCase()}.`,
     "quiz.follow.result": p => (p.list.length > 1 ? "The possible suits: " : "The only possible suit: ") + p.list.map(s => C[s]).join(", ") + ". Details below.",
+    /* ---------- Voice: simplified texts read aloud ---------- */
+    "setup.voice": "Read aloud",
+    "voice.listen": "Listen",
+    "voice.listenAria": "Listen (simple version, read aloud)",
+    "voice.cheer.ok": "Well done!|Super!|Brilliant!|Great job!|Excellent!|You're a star!",
+    "voice.cheer.ko": "Not bad!|Almost!|Never mind, let's carry on!|Not quite. Look at the answer.|You're nearly there!",
+    "voice.rules": "Kiboo is a card game for four players. North and South play together, against East and West. There are forty cards, in four colours: blue, green, red and yellow. Each card has a number, from one to ten. Ten is the strongest. Each player has ten cards. You are South. You play your cards, and also the cards of your partner North. We call him the dummy: his cards are laid on the table, and everyone can see them. West plays the first card. Then everyone plays a card, in turn. You must play the same colour as the first card, if you have one. If not, you can play any card you like. The strongest card of the colour that was led wins: that is called a trick. Whoever wins the trick plays first in the next trick. At the end, the team that won the most tricks wins the game.",
+    "voice.help": "In the settings, you choose who plays each seat: you, or a robot. You can choose how fast the robots play. You can ask for questions during the game: every three right answers, you win a gift. Coco's square helps you count the cards. Click New deal to start a game.",
+    "voice.ex.count": "Count your cards! For each colour, how many cards do you have, and how many points? The points are the numbers on the cards added together.",
+    "voice.ex.longest": "Which is your longest colour? It is the colour where you have the most cards.",
+    "voice.ex.legal": "Which cards are you allowed to play? You must play the colour that was led, if you have it. Click on all the right cards, then check.",
+    "voice.ex.rest": "Look at your hand and at the dummy. How many cards of each colour do East and West have? Each colour has ten cards in all.",
+    "voice.ex.split": "West played the first card, following the opening lead rule. How many cards of this colour can West and East have? Tick all the possible answers.",
+    "voice.ex.coco": "Here is Coco's square. Every row and every column adds up to ten. Find the missing numbers!",
+    "voice.q.count": "The game begins. Count your cards! For each colour, how many cards do you have, and how many points?",
+    "voice.q.rest0": "Look at your hand and at the dummy. How many cards of each colour do East and West have? Each colour has ten cards in all.",
+    "voice.q.lead": "West played the first card, following the opening lead rule. Think about what he can have in his hand, then choose your answer.",
+    "voice.q.split": "West played the first card. How many cards of this colour can West and East have? Tick all the possible answers.",
+    "voice.q.rest1": "The first trick is over. How many cards of each colour are left for East and West? Don't forget the cards already played.",
+    "voice.q.masters": "Click on all your winners, in your hand and in the dummy. A card is a winner when East and West have no higher card left in its colour.",
+    "voice.q.play": "Which cards are you allowed to play? You must play the colour that was led, if you have it. Click on all the right cards.",
+    "voice.q.discard": "A player has no more cards in the colour that was led. How many cards of this colour did each player have at the start? Start with West.",
     /* ---------- Coco's square ---------- */
     "setup.coco": "Coco's square",
     "setup.coco.off": "Off",

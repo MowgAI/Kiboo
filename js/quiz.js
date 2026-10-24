@@ -35,7 +35,10 @@ const Quiz = (() => {
   let askedTrick = -1;          // au plus une question « play » par pli
 
   /* ---------- Ouvrir une question et attendre la fin ---------- */
-  async function askOne(title, build) {
+  let voiceKey = "";             // version simplifiée de la question, pour la lecture à voix haute
+  const voiceText = () => T(voiceKey);
+
+  async function askOne(title, build, voice) {
     // Si le joueur consulte les règles, les exercices ou sa collection, la question attend.
     while (document.querySelector("dialog[open]")) await sleep(300);
     return new Promise(resolve => {
@@ -48,6 +51,8 @@ const Quiz = (() => {
         resolve();
       };
       build($("quiz-body"));
+      voiceKey = voice || "";
+      if (voice) Voice.auto(T(voice));
       Rewards.refresh();
       dlg.showModal();
     });
@@ -432,7 +437,7 @@ const Quiz = (() => {
     if (config.quiz === "off" || !game || game.types.S !== "humain") return;
     // Deux questions de suite : la deuxième seulement si la donne n'a pas changé entre-temps.
     const g = game;
-    const ask = async (title, build) => { if (game === g) await askOne(title, build); };
+    const ask = async (title, build, voice) => { if (game === g) await askOne(title, build, voice); };
     // Pas de question pendant le dernier pli : il ne reste qu'une carte, aucun choix à faire.
     if (game.tricksWon.NS + game.tricksWon.EO >= 9) return;
     if (!plan) plan = makePlan();
@@ -442,22 +447,22 @@ const Quiz = (() => {
     if (moment === "start") {
       if (pl.has("count")) await ask(T("quiz.title.start"), body => Exercises.countPanel(body, {
         hand: game.hands.S, sorted: true, intro: T("quiz.start.intro"), onResult,
-      }));
+      }), "voice.q.count");
       if (pl.has("rest0")) await ask(T("quiz.title.start"), body => Exercises.restPanel(body, {
         me: game.hands.S, dummy: game.hands.N, intro: T("rest.intro.game"), onResult,
-      }));
+      }), "voice.q.rest0");
     } else if (moment === "lead") {
       if (!RULE_LEADERS.includes(game.types.O) || game.history.length !== 1) return;
-      if (pl.has("lead")) await ask(T("quiz.title.lead"), leadPanel);
+      if (pl.has("lead")) await ask(T("quiz.title.lead"), leadPanel, "voice.q.lead");
       if (pl.has("split")) await ask(T("quiz.title.lead"), body => Exercises.splitPanel(body, {
         ...westCtx(), bot: PLAYER_TYPES[game.types.O].label, onResult,
-      }));
+      }), "voice.q.split");
     } else if (moment === "trick") {
       const done = game.tricksWon.NS + game.tricksWon.EO;
       if (done === 1 && pl.has("rest1")) await ask(T("quiz.title.trick1"), body => Exercises.restPanel(body, {
         me: game.hands.S, dummy: game.hands.N, played: game.played, intro: T("rest.intro.game1"), onResult,
-      }));
-      if (done === 3 && pl.has("masters")) await ask(T("quiz.title.trick3"), mastersPanel);
+      }), "voice.q.rest1");
+      if (done === 3 && pl.has("masters")) await ask(T("quiz.title.trick3"), mastersPanel, "voice.q.masters");
     } else if (moment === "play") {
       const trickNo = game.tricksWon.NS + game.tricksWon.EO;
       if (!pl.has("play") || !game.trick.length || askedTrick === trickNo) return;
@@ -471,7 +476,7 @@ const Quiz = (() => {
       await ask(T("quiz.title.play"), body => Exercises.legalPanel(body, {
         hand: game.hands[seat], trick: game.trick.map(p => ({ seat: p.seat, card: p.card })), sorted: true,
         dummy: seat === DUMMY, onResult,
-      }));
+      }), "voice.q.play");
     } else if (moment === "discard") {
       const led = game.trick[0].card.s;
       // La répartition n'est connue que si un défenseur n'a plus la couleur.
@@ -479,7 +484,7 @@ const Quiz = (() => {
       // Pas à chaque défausse : une fois sur deux en entraînement, une seule fois en mode léger.
       if (all ? Math.random() >= 0.5 : askedSuits.size) return;
       askedSuits.add(led);
-      await ask(T("quiz.title.discard"), body => discardPanel(body, { ...ctx, led }));
+      await ask(T("quiz.title.discard"), body => discardPanel(body, { ...ctx, led }), "voice.q.discard");
     }
   }
 
@@ -497,5 +502,5 @@ const Quiz = (() => {
   // vient d'une question d'une donne précédente, une nouvelle question est déjà ouverte.
   $("quiz").addEventListener("close", () => { if (!$("quiz").open && finish) finish(); });
 
-  return { at, reset, forEachWestHand, leadPanel };
+  return { at, reset, forEachWestHand, leadPanel, voiceText };
 })();

@@ -61,6 +61,7 @@
         <li><strong>Mode évaluation</strong> : compare ta donne (en Sud) à celle de Piperno, Averell et Averell250 sur les mêmes cartes ; ton score duplicate s'affiche en fin de donne.</li>
         <li><strong>Questions pendant la partie</strong> (quand tu es le déclarant, en Sud) : <strong>Quelques-unes</strong> en pose au moins une par donne, tirées au sort ; <strong>Toutes</strong> les pose toutes, pour s'entraîner. Toutes les 3 bonnes réponses, tu choisis un cadeau.</li>
         <li><strong>Carré de Coco</strong> : pendant la donne, un tableau des cartes de départ de chaque couleur chez chaque joueur (Nord et Sud remplis d'office), à compléter pour Ouest et Est au fil des plis. Avec <strong>Goat</strong>, le carré se remplit tout seul et chaque déduction est expliquée (c'est une aide : la donne n'est pas évaluée).</li>
+        <li><strong>Lire à voix haute</strong> : les questions et les exercices sont lus (en version simple), avec un petit encouragement après chaque réponse. Les boutons 🔊 Écouter lisent aussi les règles et cette aide. La voix dépend de l'appareil.</li>
         <li>Quand tu joues, chaque pli reste sur la table jusqu'à ton clic sur <strong>Pli suivant</strong> : prends le temps de retenir les cartes jouées.</li>
       </ul>`,
     "player.human": "Humain",
@@ -209,6 +210,28 @@
     "quiz.ex.any": "Par exemple, Ouest pourrait avoir :",
     "quiz.goodAnswer": p => `La bonne réponse : ${p.answer.toLowerCase()}.`,
     "quiz.follow.result": p => (p.list.length > 1 ? "Les couleurs possibles : " : "La seule couleur possible : le ") + p.list.map(s => C[s]).join(", ") + ". Le détail est ci-dessous.",
+    /* ---------- Voix : textes simplifiés lus à voix haute ---------- */
+    "setup.voice": "Lire à voix haute",
+    "voice.listen": "Écouter",
+    "voice.listenAria": "Écouter (version simple, à voix haute)",
+    "voice.cheer.ok": "Bravo !|Super !|Génial !|Bien joué !|Excellent !|Tu es trop fort !",
+    "voice.cheer.ko": "Pas trop mal !|Presque !|Ce n'est pas grave, on continue !|Pas tout à fait. Regarde la correction.|Tu y es presque !",
+    "voice.rules": "Kiboo, c'est un jeu de cartes pour quatre joueurs. Nord et Sud jouent ensemble, contre Est et Ouest. Il y a quarante cartes, de quatre couleurs : bleu, vert, rouge et jaune. Chaque carte a un nombre, de un à dix. Le dix est le plus fort. Chaque joueur a dix cartes. Toi, tu es Sud. Tu joues tes cartes, et aussi celles de ton partenaire Nord. On l'appelle le mort : ses cartes sont posées sur la table, tout le monde les voit. Ouest joue la première carte. Puis chacun pose une carte, à son tour. Il faut jouer la même couleur que la première carte, si tu en as. Sinon, tu joues la carte que tu veux. La plus forte carte de la couleur demandée gagne : on appelle ça un pli. Celui qui gagne le pli joue en premier au pli suivant. À la fin, l'équipe qui a gagné le plus de plis gagne la partie.",
+    "voice.help": "Dans les réglages, tu choisis qui joue à chaque place : toi, ou un robot. Tu peux choisir la vitesse des robots. Tu peux demander des questions pendant la partie : toutes les trois bonnes réponses, tu gagnes un cadeau. Le carré de Coco t'aide à compter les cartes. Clique sur Nouvelle donne pour commencer une partie.",
+    "voice.ex.count": "Compte tes cartes ! Pour chaque couleur, combien as-tu de cartes, et combien de points ? Les points, c'est l'addition des nombres écrits sur les cartes.",
+    "voice.ex.longest": "Quelle est ta couleur la plus longue ? C'est la couleur où tu as le plus de cartes.",
+    "voice.ex.legal": "Quelles cartes as-tu le droit de jouer ? Il faut jouer la couleur demandée, si tu en as. Clique sur toutes les bonnes cartes, puis vérifie.",
+    "voice.ex.rest": "Regarde ta main et celle du mort. Combien de cartes de chaque couleur ont Est et Ouest ? Chaque couleur a dix cartes en tout.",
+    "voice.ex.split": "Ouest a joué la première carte, avec la règle d'entame. Combien de cartes de cette couleur peuvent avoir Ouest et Est ? Coche toutes les réponses possibles.",
+    "voice.ex.coco": "Voici le carré de Coco. Chaque ligne et chaque colonne fait dix. Trouve les nombres qui manquent !",
+    "voice.q.count": "La partie commence. Compte tes cartes ! Pour chaque couleur, combien as-tu de cartes, et combien de points ?",
+    "voice.q.rest0": "Regarde ta main et celle du mort. Combien de cartes de chaque couleur ont Est et Ouest ? Chaque couleur a dix cartes en tout.",
+    "voice.q.lead": "Ouest a joué la première carte, avec la règle d'entame. Réfléchis à ce qu'il peut avoir dans sa main, puis choisis ta réponse.",
+    "voice.q.split": "Ouest a joué la première carte. Combien de cartes de cette couleur peuvent avoir Ouest et Est ? Coche toutes les réponses possibles.",
+    "voice.q.rest1": "Le premier pli est fini. Combien de cartes de chaque couleur restent chez Est et Ouest ? N'oublie pas les cartes déjà jouées.",
+    "voice.q.masters": "Clique sur toutes tes cartes maîtresses, dans ta main et chez le mort. Une carte est maîtresse quand Est et Ouest n'ont plus de carte plus forte dans sa couleur.",
+    "voice.q.play": "Quelles cartes as-tu le droit de jouer ? Il faut jouer la couleur demandée, si tu en as. Clique sur toutes les bonnes cartes.",
+    "voice.q.discard": "Un joueur n'a plus de cartes de la couleur demandée. Combien de cartes de cette couleur avait chaque joueur au début ? Commence par Ouest.",
     /* ---------- Carré de Coco ---------- */
     "setup.coco": "Carré de Coco",
     "setup.coco.off": "Non",

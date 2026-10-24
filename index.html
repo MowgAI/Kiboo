@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=2026-10-23-1306">
+<link rel="stylesheet" href="css/style.css?v=2026-10-24-0832">
 </head>
 <body>
 <div class="wrap">
@@ -27,6 +27,7 @@
   <dialog class="rules exercises" id="exercises" aria-labelledby="ex-title">
     <div class="rules-head">
       <h2 id="ex-title" data-i18n="ex.title">Exercices</h2>
+      <span id="voice-ex"></span>
       <button class="close" id="btn-ex-close" type="button" aria-label="Fermer les exercices" data-i18n-aria="ex.close">×</button>
     </div>
     <div class="ex-tabs" role="tablist" aria-label="Choix de l'exercice" data-i18n-aria="ex.tabs">
@@ -44,6 +45,7 @@
   <dialog class="rules exercises" id="quiz" aria-labelledby="quiz-title">
     <div class="rules-head">
       <h2 id="quiz-title" data-i18n="quiz.title">Question</h2>
+      <span id="voice-quiz"></span>
       <p class="gift-progress"></p>
     </div>
     <div id="quiz-body"></div>
@@ -104,6 +106,7 @@
   <dialog class="rules" id="rules" aria-labelledby="rules-title">
     <div class="rules-head">
       <h2 id="rules-title" data-i18n-html="rules.title">Règles de <span class="kiboo" aria-label="Kiboo"><span>K</span><span>i</span><span>b</span><span>o</span><span>o</span></span></h2>
+      <span id="voice-rules"></span>
       <button class="close" id="btn-rules-close" type="button" aria-label="Fermer les règles" data-i18n-aria="rules.close">×</button>
     </div>
     <div data-i18n-html="rules.body">
@@ -192,11 +195,12 @@
     <label class="check"><input type="checkbox" id="cfg-hints"> <span class="emo" aria-hidden="true">💡</span><span data-i18n="setup.hints">Montrer les meilleurs coups</span></label>
     <label class="check"><input type="checkbox" id="cfg-explain"> <span class="emo" aria-hidden="true">🧑‍🏫</span><span data-i18n="setup.explain">Explications de Piperno</span></label>
     <label class="check"><input type="checkbox" id="cfg-eval" checked> <span class="emo" aria-hidden="true">🏆</span><span data-i18n="setup.eval">Mode évaluation</span></label>
+    <label class="check"><input type="checkbox" id="cfg-voice"> <span class="emo" aria-hidden="true">🔊</span><span data-i18n="setup.voice">Lire à voix haute</span></label>
     <div class="btns">
       <button class="act ghost" id="btn-replay" type="button"><span class="emo" aria-hidden="true">🔁</span><span data-i18n="btn.replay">Rejouer la donne</span></button>
       <button class="act" id="btn-new" type="button"><span class="emo" aria-hidden="true">🃏</span><span data-i18n="btn.new">Nouvelle donne</span></button>
     </div>
-    <div class="note" id="settings-help" hidden data-i18n-html="help.list">
+    <div class="note" id="settings-help" hidden><span id="voice-help"></span><div data-i18n-html="help.list">
       <ul>
         <li>Les changements de joueurs s'appliquent à la <strong>prochaine donne</strong>.</li>
         <li><strong>Jeux ouverts</strong> montre toutes les mains.</li>
@@ -207,8 +211,9 @@
         <li><strong>Mode évaluation</strong> : compare ta donne (en Sud) à celle de Piperno, Averell et Averell250 sur les mêmes cartes ; ton score duplicate s'affiche en fin de donne.</li>
         <li><strong>Questions pendant la partie</strong> (quand tu es le déclarant, en Sud) : <strong>Quelques-unes</strong> en pose au moins une par donne, tirées au sort ; <strong>Toutes</strong> les pose toutes, pour s'entraîner. Toutes les 3 bonnes réponses, tu choisis un cadeau.</li>
         <li><strong>Carré de Coco</strong> : pendant la donne, un tableau des cartes de départ de chaque couleur chez chaque joueur (Nord et Sud remplis d'office), à compléter pour Ouest et Est au fil des plis. Avec <strong>Goat</strong>, le carré se remplit tout seul et chaque déduction est expliquée (c'est une aide : la donne n'est pas évaluée).</li>
+        <li><strong>Lire à voix haute</strong> : les questions et les exercices sont lus (en version simple), avec un petit encouragement après chaque réponse. Les boutons 🔊 Écouter lisent aussi les règles et cette aide. La voix dépend de l'appareil.</li>
         <li>Quand tu joues, chaque pli reste sur la table jusqu'à ton clic sur <strong>Pli suivant</strong> : prends le temps de retenir les cartes jouées.</li>
-      </ul>
+      </ul></div>
     </div>
   </section>
 
@@ -240,21 +245,22 @@
   <section class="review" id="review" hidden aria-live="polite"></section>
 </div>
 
-<script>window.KIBOO_VERSION = "2026-10-23-1306";   // mis à jour par tools/bump-version.sh</script>
-<script src="lang/fr.js?v=2026-10-23-1306"></script>
-<script src="lang/en.js?v=2026-10-23-1306"></script>
-<script src="lang/it.js?v=2026-10-23-1306"></script>
-<script src="js/i18n.js?v=2026-10-23-1306"></script>
-<script src="js/dds.js?v=2026-10-23-1306"></script>
-<script src="js/pimc.js?v=2026-10-23-1306"></script>
-<script src="js/solver.js?v=2026-10-23-1306"></script>
-<script src="js/images.js?v=2026-10-23-1306"></script>
-<script src="js/game.js?v=2026-10-23-1306"></script>
-<script src="js/rewards.js?v=2026-10-23-1306"></script>
-<script src="js/exercises.js?v=2026-10-23-1306"></script>
-<script src="js/coco.js?v=2026-10-23-1306"></script>
-<script src="js/quiz.js?v=2026-10-23-1306"></script>
-<script src="js/evaluation.js?v=2026-10-23-1306"></script>
-<script src="js/feedback.js?v=2026-10-23-1306"></script>
+<script>window.KIBOO_VERSION = "2026-10-24-0832";   // mis à jour par tools/bump-version.sh</script>
+<script src="lang/fr.js?v=2026-10-24-0832"></script>
+<script src="lang/en.js?v=2026-10-24-0832"></script>
+<script src="lang/it.js?v=2026-10-24-0832"></script>
+<script src="js/i18n.js?v=2026-10-24-0832"></script>
+<script src="js/dds.js?v=2026-10-24-0832"></script>
+<script src="js/pimc.js?v=2026-10-24-0832"></script>
+<script src="js/solver.js?v=2026-10-24-0832"></script>
+<script src="js/images.js?v=2026-10-24-0832"></script>
+<script src="js/game.js?v=2026-10-24-0832"></script>
+<script src="js/voice.js?v=2026-10-24-0832"></script>
+<script src="js/rewards.js?v=2026-10-24-0832"></script>
+<script src="js/exercises.js?v=2026-10-24-0832"></script>
+<script src="js/coco.js?v=2026-10-24-0832"></script>
+<script src="js/quiz.js?v=2026-10-24-0832"></script>
+<script src="js/evaluation.js?v=2026-10-24-0832"></script>
+<script src="js/feedback.js?v=2026-10-24-0832"></script>
 </body>
 </html>

@@ -28,6 +28,7 @@ const Rewards = (() => {
   const complete = () => state.collection.length >= 40;
 
   function answered(ok) {
+    Voice.cheer(ok);                              // « Bravo ! », « Presque ! »… si la voix est activée
     if (ok && state.progress < GOAL) state.progress++;
     save();
     refresh();

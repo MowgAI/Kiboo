@@ -483,6 +483,7 @@ const Exercises = (() => {
       tab.setAttribute("aria-selected", tab.dataset.ex === current);
     }
     PANELS[current]($("ex-body"));
+    Voice.auto(T("voice.ex." + current));
   }
 
   function open() {
@@ -501,5 +502,5 @@ const Exercises = (() => {
   // Changement de langue : l'exercice affiché sera recréé à la prochaine ouverture.
   document.addEventListener("kiboo-lang", () => { $("ex-body").innerHTML = ""; });
 
-  return { countPanel, longestPanel, legalPanel, restPanel, splitPanel, westHands, remainingTable, ruleBlock, ruleToggle, drawHand, suitName };
+  return { get current() { return current; }, countPanel, longestPanel, legalPanel, restPanel, splitPanel, westHands, remainingTable, ruleBlock, ruleToggle, drawHand, suitName };
 })();

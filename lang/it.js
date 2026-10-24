@@ -65,6 +65,7 @@
         <li><strong>Modalità valutazione</strong>: confronta la tua smazzata (in Sud) con quella di Piperno, Averell e Averell250 con le stesse carte; il tuo punteggio duplicato appare a fine smazzata.</li>
         <li><strong>Domande durante la partita</strong> (quando sei il dichiarante, in Sud): <strong>Alcune</strong> ne pone almeno una per smazzata, estratte a sorte; <strong>Tutte</strong> le pone tutte, per allenarsi. Ogni 3 risposte giuste, scegli un regalo.</li>
         <li><strong>Quadrato di Coco</strong>: durante la smazzata, una tabella delle carte iniziali di ogni colore per ogni giocatore (Nord e Sud già riempiti), da completare per Ovest ed Est presa dopo presa. Con <strong>Goat</strong>, il quadrato si riempie da solo e ogni deduzione è spiegata (è un aiuto: la smazzata non viene valutata).</li>
+        <li><strong>Leggi ad alta voce</strong>: le domande e gli esercizi vengono letti (in versione semplice), con un piccolo incoraggiamento dopo ogni risposta. I pulsanti 🔊 Ascolta leggono anche le regole e questo aiuto. La voce dipende dal dispositivo.</li>
         <li>Quando giochi, ogni presa resta sul tavolo finché non clicchi su <strong>Presa successiva</strong>: prenditi il tempo di ricordare le carte giocate.</li>
       </ul>`,
     "player.human": "Umano",
@@ -213,6 +214,28 @@
     "quiz.ex.any": "Per esempio, Ovest potrebbe avere:",
     "quiz.goodAnswer": p => `La risposta giusta: ${p.answer.toLowerCase()}.`,
     "quiz.follow.result": p => (p.list.length > 1 ? "I colori possibili: " : "L'unico colore possibile: il ") + p.list.map(s => C[s]).join(", ") + ". I dettagli sono qui sotto.",
+    /* ---------- Voce: testi semplificati letti ad alta voce ---------- */
+    "setup.voice": "Leggi ad alta voce",
+    "voice.listen": "Ascolta",
+    "voice.listenAria": "Ascolta (versione semplice, ad alta voce)",
+    "voice.cheer.ok": "Bravo!|Super!|Fantastico!|Ben fatto!|Eccellente!|Sei un campione!",
+    "voice.cheer.ko": "Non male!|Quasi!|Non importa, andiamo avanti!|Non proprio. Guarda la correzione.|Ci sei quasi!",
+    "voice.rules": "Kiboo è un gioco di carte per quattro giocatori. Nord e Sud giocano insieme, contro Est e Ovest. Ci sono quaranta carte, di quattro colori: blu, verde, rosso e giallo. Ogni carta ha un numero, da uno a dieci. Il dieci è il più forte. Ogni giocatore ha dieci carte. Tu sei Sud. Giochi le tue carte, e anche quelle del tuo compagno Nord. Lo chiamiamo il morto: le sue carte sono sul tavolo, tutti le vedono. Ovest gioca la prima carta. Poi ognuno gioca una carta, a turno. Devi giocare lo stesso colore della prima carta, se ce l'hai. Altrimenti, giochi la carta che vuoi. La carta più forte del colore richiesto vince: si chiama una presa. Chi vince la presa gioca per primo nella presa successiva. Alla fine, la squadra che ha vinto più prese vince la partita.",
+    "voice.help": "Nelle impostazioni, scegli chi gioca in ogni posto: tu, o un robot. Puoi scegliere la velocità dei robot. Puoi chiedere delle domande durante la partita: ogni tre risposte giuste, vinci un regalo. Il quadrato di Coco ti aiuta a contare le carte. Clicca su Nuova smazzata per cominciare una partita.",
+    "voice.ex.count": "Conta le tue carte! Per ogni colore, quante carte hai, e quanti punti? I punti sono la somma dei numeri scritti sulle carte.",
+    "voice.ex.longest": "Qual è il tuo colore più lungo? È il colore in cui hai più carte.",
+    "voice.ex.legal": "Quali carte puoi giocare? Devi giocare il colore richiesto, se ce l'hai. Clicca su tutte le carte giuste, poi verifica.",
+    "voice.ex.rest": "Guarda la tua mano e quella del morto. Quante carte di ogni colore hanno Est e Ovest? Ogni colore ha dieci carte in tutto.",
+    "voice.ex.split": "Ovest ha giocato la prima carta, seguendo la regola d'attacco. Quante carte di questo colore possono avere Ovest ed Est? Seleziona tutte le risposte possibili.",
+    "voice.ex.coco": "Ecco il quadrato di Coco. Ogni riga e ogni colonna fa dieci. Trova i numeri che mancano!",
+    "voice.q.count": "La partita comincia. Conta le tue carte! Per ogni colore, quante carte hai, e quanti punti?",
+    "voice.q.rest0": "Guarda la tua mano e quella del morto. Quante carte di ogni colore hanno Est e Ovest? Ogni colore ha dieci carte in tutto.",
+    "voice.q.lead": "Ovest ha giocato la prima carta, seguendo la regola d'attacco. Pensa a cosa può avere in mano, poi scegli la tua risposta.",
+    "voice.q.split": "Ovest ha giocato la prima carta. Quante carte di questo colore possono avere Ovest ed Est? Seleziona tutte le risposte possibili.",
+    "voice.q.rest1": "La prima presa è finita. Quante carte di ogni colore restano a Est e Ovest? Non dimenticare le carte già giocate.",
+    "voice.q.masters": "Clicca su tutte le tue carte vincenti, nella tua mano e nel morto. Una carta è vincente quando Est e Ovest non hanno più una carta più alta nel suo colore.",
+    "voice.q.play": "Quali carte puoi giocare? Devi giocare il colore richiesto, se ce l'hai. Clicca su tutte le carte giuste.",
+    "voice.q.discard": "Un giocatore non ha più carte del colore richiesto. Quante carte di questo colore aveva ogni giocatore all'inizio? Comincia da Ovest.",
     /* ---------- Il quadrato di Coco ---------- */
     "setup.coco": "Quadrato di Coco",
     "setup.coco.off": "No",

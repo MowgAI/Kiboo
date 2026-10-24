@@ -41,6 +41,7 @@ python3 -m http.server 8000
 - `js/feedback.js` : formulaire « Donner mon avis »
 - `js/quiz.js` : questions pendant la partie et moteur de déduction
 - `js/rewards.js` : cadeaux, progression et collection
+- `js/voice.js` : lecture à voix haute (versions simplifiées, encouragements)
 - `js/coco.js` : le carré de Coco (exercice et remplissage pendant la donne)
 - `js/exercises.js` : exercices (compter sa main, couleur la plus longue, cartes jouables)
 - `js/game.js` : règles, robots (la table tourne pour que la place du joueur humain, Sud, Ouest ou Est, soit toujours en bas), état de la partie, affichage et réglages
@@ -51,6 +52,10 @@ python3 -m http.server 8000
 Kiboo existe en français, en anglais et en italien. Le menu en haut de la page change la langue ; le choix est gardé dans le navigateur. À la première visite, Kiboo prend la langue du navigateur (français si elle n'est pas disponible).
 
 Tous les textes sont dans `lang/` : un fichier par langue, avec les mêmes clés. Le français (`lang/fr.js`) sert de référence : si un texte manque dans une langue, c'est le texte français qui s'affiche. Pour relire ou corriger l'italien, il suffit de modifier `lang/it.js` (les petites fonctions en haut du fichier gèrent les accords : « il 7 blu », « l'8 rossa »…). Pour ajouter une langue, copier `lang/en.js`, traduire les textes et ajouter le fichier dans `index.html`.
+
+## Lecture à voix haute
+
+Pour les enfants qui ne savent pas encore lire, des boutons **🔊 Écouter** lisent une version simplifiée des règles du jeu, de l'aide, des exercices et des questions. Avec la case « Lire à voix haute », les questions et les exercices sont lus d'office, et une petite phrase d'encouragement suit chaque réponse (« Bravo ! », « Presque ! »…). C'est la synthèse vocale du navigateur : la voix dépend de l'appareil ; Kiboo choisit de préférence une voix douce, un peu plus aiguë et plus lente. Les textes lus sont les clés `voice.*` de `lang/*.js` ; le code est dans `js/voice.js`.
 
 ## Exercices
 
