@@ -11,11 +11,19 @@
      présentation (lang/personnages.js), lue à voix haute.
    - Distribution animée : à la première donne seulement, les cartes partent
      du centre vers les quatre joueurs (bouton « Passer »).
+   L'accueil a sa propre langue, l'anglais par défaut (la voix anglaise est
+   la meilleure sur la plupart des appareils) ; les boutons EN · FR · IT la
+   changent, sans toucher à la langue du jeu.
    Les animations sont coupées si l'appareil demande de réduire les
    animations (prefers-reduced-motion).
    ===================================================================== */
 const Intro = (() => {
   const KEY = "kiboo.intro.off";
+  const LANG_KEY = "kiboo.intro.lang";
+  let introLang = "en";
+  try { introLang = localStorage.getItem(LANG_KEY) || "en"; } catch (e) { /* stockage indisponible */ }
+  // Les textes de l'accueil sont écrits dans sa langue à lui.
+  const inLang = fn => I18N.within(introLang, fn);
   const FAMILY_ORDER = [0, 1, 2, 3];
   const reduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   let off = false;
@@ -27,7 +35,18 @@ const Intro = (() => {
   let view = "home", index = 0;
 
   const img = (s, v) => IMAGES[COLORS[s] + "-" + v];
-  const say = text => { if (sound) Voice.speak(text); };
+  const say = text => { if (sound) Voice.speak(text, introLang); };
+  // Choix de la langue de l'accueil (EN · FR · IT), puis on redessine la vue courante.
+  const langs = () => `<div class="intro-langs" role="group" aria-label="Language">${I18N.SUPPORTED.map(l =>
+    `<button type="button" data-lang="${l}" aria-pressed="${l === introLang}">${l.toUpperCase()}</button>`).join("")}</div>`;
+  function wireLangs() {
+    for (const b of box.querySelectorAll("[data-lang]")) b.onclick = () => {
+      introLang = b.dataset.lang;
+      try { localStorage.setItem(LANG_KEY, introLang); } catch (e) { /* idem */ }
+      Voice.stop();
+      if (view === "families") families(index); else if (view === "characters") characters(index); else home();
+    };
+  }
   const presentation = (s, v) => {
     const all = window.KIBOO_CHARACTERS || {};
     const key = COLORS[s] + "-" + v;
@@ -57,9 +76,10 @@ const Intro = (() => {
     return hop + `<div class="intro-run"><div class="card" style="background-image:url(${img(c.s, c.v)})"></div></div>`;
   }
 
-  function home() {
+  function home() { inLang(homeView); wireLangs(); }
+  function homeView() {
     view = "home";
-    box.innerHTML = `<div class="intro-stage">${crowd()}
+    box.innerHTML = `<div class="intro-stage">${langs()}${crowd()}
       <div class="intro-center">
         ${logo()}
         <div class="intro-btns">
@@ -99,10 +119,11 @@ const Intro = (() => {
   }
 
   /* ---------- Les familles se présentent ---------- */
-  function families(f) {
+  function families(f) { inLang(() => familiesView(f)); wireLangs(); }
+  function familiesView(f) {
     view = "families"; index = f;
     const s = FAMILY_ORDER[f];
-    box.innerHTML = `<div class="intro-stage intro-show">
+    box.innerHTML = `<div class="intro-stage intro-show">${langs()}
       <h2 class="intro-fam fam ${COLORS[s]}">${T("intro.famTitle", { s })}</h2>
       <p class="intro-text">${T("intro.fam." + s)}</p>
       <div class="intro-fan">${Array.from({ length: 10 }, (_, i) => `<div class="card" style="background-image:url(${img(s, i + 1)});animation-delay:${0.2 + i * 0.12}s"></div>`).join("")}</div>
@@ -114,11 +135,12 @@ const Intro = (() => {
   }
 
   /* ---------- Les personnages se présentent ---------- */
-  function characters(i) {
+  function characters(i) { inLang(() => charactersView(i)); wireLangs(); }
+  function charactersView(i) {
     view = "characters"; index = i;
     const s = Math.floor(i / 10), v = (i % 10) + 1;
     const text = presentation(s, v);
-    box.innerHTML = `<div class="intro-stage intro-show">
+    box.innerHTML = `<div class="intro-stage intro-show">${langs()}
       <div class="intro-chips" role="group" aria-label="${T("intro.characters")}">
         ${[0, 1, 2, 3].map(x => `<button type="button" class="intro-chip ${COLORS[x]}" data-f="${x}" aria-pressed="${x === s}">${familyName(x)}</button>`).join("")}
       </div>
@@ -153,10 +175,6 @@ const Intro = (() => {
     if (e.key === "Escape") close(false);
     if (view === "characters" && e.key === "ArrowRight" && index < 39) characters(index + 1);
     if (view === "characters" && e.key === "ArrowLeft" && index > 0) characters(index - 1);
-  });
-  document.addEventListener("kiboo-lang", () => {
-    if (box.hidden) return;
-    if (view === "families") families(index); else if (view === "characters") characters(index); else home();
   });
 
   /* ---------- Distribution animée (première donne seulement) ---------- */
@@ -211,7 +229,7 @@ const Intro = (() => {
       logoEl.classList.add("logo-btn");
       logoEl.setAttribute("role", "button");
       logoEl.setAttribute("tabindex", "0");
-      logoEl.title = T("intro.reopen");
+      logoEl.title = inLang(() => T("intro.reopen"));
       logoEl.onclick = open;
       logoEl.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } };
     }

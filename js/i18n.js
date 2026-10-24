@@ -44,6 +44,13 @@ const I18N = (() => {
     return String(v).replace(/\{(\w+)\}/g, (m, k) => (p[k] !== undefined ? p[k] : m));
   }
 
+  // Exécute `fn` comme si la langue était `code` (textes, grammaire), sans changer le choix du joueur.
+  function within(code, fn) {
+    const saved = lang;
+    lang = SUPPORTED.includes(code) ? code : lang;
+    try { return fn(); } finally { lang = saved; }
+  }
+
   // Outil de grammaire (fonction) de la langue courante.
   const g = name => pack()[name] || KIBOO_LANGS.fr[name];
 
@@ -67,7 +74,7 @@ const I18N = (() => {
     document.dispatchEvent(new CustomEvent("kiboo-lang", { detail: l }));
   }
 
-  return { t, g, apply, set, SUPPORTED, get lang() { return lang; } };
+  return { t, g, apply, set, within, SUPPORTED, get lang() { return lang; } };
 })();
 
 const T = (key, p) => I18N.t(key, p);

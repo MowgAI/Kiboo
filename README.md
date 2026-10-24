@@ -62,7 +62,7 @@ Au démarrage, un écran d'accueil montre le logo Kiboo qui se forme lettre par 
 - **Les familles** : les quatre familles se présentent tour à tour avec leurs 10 cartes ;
 - **Les personnages** : les 40 personnages se présentent un par un (flèches du clavier pour avancer).
 
-Les présentations sont lues à voix haute (bouton Son). Une case « Ne plus afficher l'accueil au démarrage » est gardée dans le navigateur ; un clic sur le logo Kiboo rouvre l'accueil. Les animations sont coupées si l'appareil demande de réduire les animations. Les textes des personnages sont dans `lang/personnages.js` (à relire et modifier librement) ; le code est dans `js/intro.js`.
+Les présentations sont lues à voix haute (bouton Son). L'accueil a sa propre langue, l'anglais par défaut (la voix anglaise est la meilleure sur la plupart des appareils) : les boutons EN · FR · IT la changent sans toucher à la langue du jeu. Une case « Ne plus afficher l'accueil au démarrage » est gardée dans le navigateur ; un clic sur le logo Kiboo rouvre l'accueil. Les animations sont coupées si l'appareil demande de réduire les animations. Les textes des personnages sont dans `lang/personnages.js` (à relire et modifier librement) ; le code est dans `js/intro.js`.
 
 ## Lecture à voix haute
 

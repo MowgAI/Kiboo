@@ -62,15 +62,16 @@ const Voice = (() => {
     return div.textContent.replace(/\p{Extended_Pictographic}/gu, "").replace(/\s+/g, " ").trim();
   };
 
-  function speak(html) {
+  // `lang` : langue de lecture (par défaut celle du jeu ; l'accueil peut en choisir une autre).
+  function speak(html, lang = I18N.lang) {
     if (!ok || !html) return;
-    const v = pick(I18N.lang);
+    const v = pick(lang);
     if (!v) return;                                     // pas de voix dans cette langue sur l'appareil
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(plain(html));
-    u.lang = LOCALE[I18N.lang] || "fr-FR";
+    u.lang = LOCALE[lang] || "fr-FR";
     u.voice = v;
-    u.rate = RATE[I18N.lang] || 1;
+    u.rate = RATE[lang] || 1;
     u.pitch = PITCH;
     speechSynthesis.speak(u);
   }
