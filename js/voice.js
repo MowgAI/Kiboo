@@ -103,14 +103,28 @@ const Voice = (() => {
   }
 
   // Bouton 🔊 : `text()` donne le texte à lire au moment du clic.
+  // Un deuxième clic pendant la lecture l'arrête (le bouton montre alors ⏹ Arrêter).
+  let playing = null;                                  // bouton dont la lecture est en cours
+  function look(b, on) {
+    b.innerHTML = on
+      ? `<span class="emo" aria-hidden="true">⏹</span><span class="lbl">${T("voice.stop")}</span>`
+      : `<span class="emo" aria-hidden="true">🔊</span><span class="lbl">${T("voice.listen")}</span>`;
+    b.setAttribute("aria-pressed", on);
+  }
   function button(text) {
     const b = document.createElement("button");
     b.type = "button";
     b.className = "act ghost voice-btn";
-    b.innerHTML = `<span class="emo" aria-hidden="true">🔊</span><span class="lbl">${T("voice.listen")}</span>`;
+    look(b, false);
     b.setAttribute("aria-label", T("voice.listenAria"));
     b.hidden = !ok || !ofLang(I18N.lang).length;
-    b.onclick = () => speak(text());
+    b.onclick = () => {
+      if (playing === b) { stop(); playing = null; look(b, false); return; }
+      if (playing) look(playing, false);
+      playing = b;
+      look(b, true);
+      speak(text()).then(() => { if (playing === b) { playing = null; look(b, false); } });
+    };
     return b;
   }
 

@@ -241,6 +241,7 @@
     "voice.auto": "Automatique",
     "voice.none": "Pas de voix française sur cet appareil",
     "voice.test": "Bonjour ! Je suis la voix de Kiboo. On joue ?",
+    "voice.stop": "Arrêter",
     "voice.listen": "Écouter",
     "voice.listenAria": "Écouter (version simple, à voix haute)",
     "voice.cheer.ok": "Bravo !|Super !|Génial !|Bien joué !|Excellent !|Tu es trop fort !",

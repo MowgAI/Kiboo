@@ -245,6 +245,7 @@
     "voice.auto": "Automatica",
     "voice.none": "Voce italiana non disponibile per ora",
     "voice.test": "Ciao! Sono la voce di Kiboo. Giochiamo?",
+    "voice.stop": "Ferma",
     "voice.listen": "Ascolta",
     "voice.listenAria": "Ascolta (versione semplice, ad alta voce)",
     "voice.cheer.ok": "Bravo!|Super!|Fantastico!|Ben fatto!|Eccellente!|Sei un campione!",

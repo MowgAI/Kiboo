@@ -238,6 +238,7 @@
     "voice.auto": "Automatic",
     "voice.none": "No English voice on this device",
     "voice.test": "Hello! I'm the voice of Kiboo. Shall we play?",
+    "voice.stop": "Stop",
     "voice.listen": "Listen",
     "voice.listenAria": "Listen (simple version, read aloud)",
     "voice.cheer.ok": "Well done!|Super!|Brilliant!|Great job!|Excellent!|You're a star!",
