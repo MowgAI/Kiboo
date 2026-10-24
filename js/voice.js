@@ -12,6 +12,7 @@
    la langue choisie installées sur l'appareil (choix gardé dans le
    navigateur) ; par défaut, une voix douce connue. Sans voix dans la
    langue, rien n'est lu (une voix d'une autre langue prononcerait mal).
+   L'italien n'est pas lu pour l'instant (MUTED).
    ===================================================================== */
 const Voice = (() => {
   const ok = "speechSynthesis" in window;
@@ -29,7 +30,9 @@ const Voice = (() => {
   };
   let voices = [];
   const load = () => { voices = ok ? speechSynthesis.getVoices() : []; fillMenu(); };
-  const ofLang = lang => voices.filter(v => v.lang.toLowerCase().replace("_", "-").startsWith(lang));
+  // Langues sans voix pour l'instant (la voix italienne des appareils est de mauvaise qualité).
+  const MUTED = new Set(["it"]);
+  const ofLang = lang => (MUTED.has(lang) ? [] : voices.filter(v => v.lang.toLowerCase().replace("_", "-").startsWith(lang)));
   const saved = lang => { try { return localStorage.getItem(KEY + lang) || ""; } catch (e) { return ""; } };
   if (ok) { load(); speechSynthesis.addEventListener("voiceschanged", load); }
 

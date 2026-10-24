@@ -243,7 +243,7 @@
     "setup.voice": "Leggi ad alta voce",
     "voice.choose": "Voce",
     "voice.auto": "Automatica",
-    "voice.none": "Nessuna voce italiana su questo dispositivo",
+    "voice.none": "Voce italiana non disponibile per ora",
     "voice.test": "Ciao! Sono la voce di Kiboo. Giochiamo?",
     "voice.listen": "Ascolta",
     "voice.listenAria": "Ascolta (versione semplice, ad alta voce)",
