@@ -20,7 +20,10 @@ const Account = (() => {
   const SB_URL = "https://hhihpabzhscbouqaflko.supabase.co";
   const SB_KEY = "sb_publishable_86PeLKip3feazaHj438HjA_8PNLuN6_";      // clé publique : la sécurité vient de la base
   const HOME = "https://mowgai.github.io/Kiboo/";
-  const CONTACT = "sollinw@gmail.com";                                    // à qui demander une invitation
+  // À qui demander une invitation. L'adresse n'est jamais écrite en clair (ni dans la page, ni dans
+  // ce fichier) : elle est reconstituée seulement quand quelqu'un clique sur « Demander une invitation »,
+  // ce que ne font pas les robots qui ramassent des adresses pour le spam.
+  const CONTACT = () => String.fromCharCode(...[112, 114, 102, 49, 111, 108, 100, 112, 106, 67, 122, 113, 108, 111, 111, 114, 118].reverse().map(c => c - 3));
   const SESSION = "sb-hhihpabzhscbouqaflko-auth-token";                  // où Supabase garde la session
   const SKIP_INTRO = "kiboo.skipIntroOnce";                              // après une synchronisation qui recharge la page
   const allowed = () => location.hostname === "mowgai.github.io" || ["localhost", "127.0.0.1"].includes(location.hostname);
@@ -154,7 +157,7 @@ const Account = (() => {
     const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false, emailRedirectTo: HOME } });
     if (!error) return status(T("account.sent", { email }), true);
     const m = (error.message || "").toLowerCase();
-    if (m.includes("signup") || m.includes("not allowed") || m.includes("not found")) status(T("account.notInvited", { mail: CONTACT }));
+    if (m.includes("signup") || m.includes("not allowed") || m.includes("not found")) status(T("account.notInvited"));
     else if (m.includes("rate") || m.includes("seconds")) status(T("account.rate"));
     else status(T("account.error", { msg: error.message }));
   }
@@ -175,13 +178,24 @@ const Account = (() => {
     }
     if (!user) {
       body.innerHTML = `<p>${T("account.intro")}</p>
-        <p>${T("account.ask", { mail: CONTACT })}</p>
+        <p>${T("account.ask")}</p>
+        <p data-role="contact"><button class="act ghost" type="button" data-a="contact">✉️ ${T("account.askBtn")}</button></p>
         <form class="account-form" data-role="login">
           <label class="field"><span>${T("account.email")}</span>
             <input type="email" required autocomplete="email" data-role="email" placeholder="nom@exemple.fr"></label>
           <button class="act" type="submit">${T("account.send")}</button>
         </form>${msg}
         <details class="account-privacy"><summary>${T("account.privacyTitle")}</summary>${T("account.privacy")}</details>`;
+      body.querySelector("[data-a=contact]").onclick = () => {
+        const mail = CONTACT();
+        const a = document.createElement("a");
+        a.href = "mailto:" + mail + "?subject=" + encodeURIComponent(T("account.askSubject"));
+        a.textContent = mail;
+        const p = body.querySelector("[data-role=contact]");
+        p.textContent = T("account.askWrite") + " ";
+        p.appendChild(a);
+        a.click();                                   // ouvre la messagerie
+      };
       body.querySelector("[data-role=login]").onsubmit = e => {
         e.preventDefault();
         const email = body.querySelector("[data-role=email]").value.trim();
