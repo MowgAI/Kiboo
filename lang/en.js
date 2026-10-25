@@ -210,6 +210,42 @@
     "quiz.ex.any": "For example, West could have:",
     "quiz.goodAnswer": p => `The right answer: ${p.answer.toLowerCase()}.`,
     "quiz.follow.result": p => (p.list.length > 1 ? "The possible suits: " : "The only possible suit: ") + p.list.map(s => C[s]).join(", ") + ". Details below.",
+    /* ---------- My account ---------- */
+    "account.login": "Sign in",
+    "account.me": "My account",
+    "account.title": "My account",
+    "account.intro": "Kiboo can be played without an account. If you have been <strong>invited</strong>, sign in to find your progress, collection and history on all your devices. Enter your e-mail address: you'll receive a sign-in link, no password needed.",
+    "account.email": "E-mail address",
+    "account.send": "Send me the sign-in link",
+    "account.sending": "Sending…",
+    "account.sent": p => `Sent! Open the e-mail sent to ${p.email} and click the link: you'll come back here, signed in. Remember to check your spam folder.`,
+    "account.notInvited": "This address hasn't been invited: accounts are by invitation only.",
+    "account.rate": "Too many requests at once: wait a minute, then try again.",
+    "account.error": p => `Something went wrong: ${p.msg}`,
+    "account.loadError": "Can't reach the account service. Check your internet connection.",
+    "account.linkError": "The sign-in link is no longer valid (it works only once and expires after an hour). Ask for a new one.",
+    "account.elsewhere": p => `Accounts work on the Kiboo website: <a href="${p.url}">${p.url}</a>`,
+    "account.connected": p => `You're signed in as <strong>${p.email}</strong>. Your save follows your account.`,
+    "account.pseudo": "Nickname",
+    "account.save": "Save",
+    "account.saved": "Saved.",
+    "account.syncing": "Syncing…",
+    "account.synced": p => `Saved at ${p.when}.`,
+    "account.syncError": "Syncing didn't work. It will be tried again later.",
+    "account.syncNow": "Save now",
+    "account.logout": "Sign out",
+    "account.loggedOut": "You're signed out. You can keep playing without an account.",
+    "account.delete": "Delete my account and my data",
+    "account.deleteConfirm": "Delete your account and all the data saved online? This can't be undone. (What's in this browser stays, so you can keep playing without an account.)",
+    "account.deleted": "Your account and your online data have been deleted.",
+    "account.privacyTitle": "Privacy: what is saved",
+    "account.privacy": `<ul>
+        <li><strong>Your e-mail address</strong>, to sign in.</li>
+        <li><strong>Your nickname</strong>, if you choose one.</li>
+        <li><strong>Your save</strong>: progress, collection, evaluation history and settings.</li>
+        <li><strong>A game log</strong>: deals played, answers to questions and exercises, scores, to adapt Kiboo to the way you play.</li>
+      </ul>
+      <p>This data is hosted by Supabase, in Europe (London). It's only used for Kiboo, never sold or shared, and there are no ads. Only you can read your data; Kiboo's organiser can see statistics to improve the game. You can delete everything at any time with the button below.</p>`,
     /* ---------- Welcome, families and characters ---------- */
     "head.parade": "Parade",
     "setup.music": "Music",

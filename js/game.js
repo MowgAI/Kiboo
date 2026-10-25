@@ -405,6 +405,8 @@ async function play(token) {
     // Fanfare, égalité ou petite musique triste, du point de vue du joueur humain.
     const mine = game.tricksWon[humanTeam()], theirs = 10 - mine;
     Sound.sfx(mine > theirs ? "win" : mine === theirs ? "tie" : "lose", 0.3);
+    // Journal du compte (js/account.js), si le joueur est connecté.
+    Account.log("deal", { ns: game.tricksWon.NS, types: game.types, coco: config.coco, quiz: config.quiz, assisted: game.assisted, replayed: game.replayed });
   }
   if (typeof Evaluation !== "undefined") Evaluation.dealOver();
   render();

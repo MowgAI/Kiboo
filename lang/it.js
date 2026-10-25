@@ -217,6 +217,42 @@
     "quiz.ex.any": "Per esempio, Ovest potrebbe avere:",
     "quiz.goodAnswer": p => `La risposta giusta: ${p.answer.toLowerCase()}.`,
     "quiz.follow.result": p => (p.list.length > 1 ? "I colori possibili: " : "L'unico colore possibile: il ") + p.list.map(s => C[s]).join(", ") + ". I dettagli sono qui sotto.",
+    /* ---------- Il mio account ---------- */
+    "account.login": "Accedi",
+    "account.me": "Il mio account",
+    "account.title": "Il mio account",
+    "account.intro": "Kiboo si gioca senza account. Se sei stato <strong>invitato</strong>, accedi per ritrovare i tuoi progressi, la collezione e lo storico su tutti i tuoi dispositivi. Inserisci il tuo indirizzo e-mail: riceverai un link di accesso, senza password.",
+    "account.email": "Indirizzo e-mail",
+    "account.send": "Ricevi il link di accesso",
+    "account.sending": "Invio in corso…",
+    "account.sent": p => `Inviato! Apri l'e-mail ricevuta su ${p.email} e clicca sul link: tornerai qui, con l'accesso fatto. Controlla anche la posta indesiderata.`,
+    "account.notInvited": "Questo indirizzo non è stato invitato: gli account sono solo su invito.",
+    "account.rate": "Troppe richieste in una volta: aspetta un minuto, poi riprova.",
+    "account.error": p => `Si è verificato un problema: ${p.msg}`,
+    "account.loadError": "Impossibile raggiungere il servizio degli account. Controlla la connessione internet.",
+    "account.linkError": "Il link di accesso non è più valido (funziona una sola volta e scade dopo un'ora). Chiedine uno nuovo.",
+    "account.elsewhere": p => `Gli account funzionano sul sito di Kiboo: <a href="${p.url}">${p.url}</a>`,
+    "account.connected": p => `Hai effettuato l'accesso con <strong>${p.email}</strong>. Il tuo salvataggio segue il tuo account.`,
+    "account.pseudo": "Soprannome",
+    "account.save": "Salva",
+    "account.saved": "Salvato.",
+    "account.syncing": "Sincronizzazione in corso…",
+    "account.synced": p => `Salvato alle ${p.when}.`,
+    "account.syncError": "La sincronizzazione non è riuscita. Verrà ritentata più tardi.",
+    "account.syncNow": "Salva adesso",
+    "account.logout": "Esci",
+    "account.loggedOut": "Sei uscito. Puoi continuare a giocare senza account.",
+    "account.delete": "Elimina il mio account e i miei dati",
+    "account.deleteConfirm": "Eliminare il tuo account e tutti i dati salvati online? L'operazione è definitiva. (Quello che c'è in questo browser resta, per continuare a giocare senza account.)",
+    "account.deleted": "Il tuo account e i tuoi dati online sono stati eliminati.",
+    "account.privacyTitle": "Privacy: cosa viene salvato",
+    "account.privacy": `<ul>
+        <li><strong>Il tuo indirizzo e-mail</strong>, per l'accesso.</li>
+        <li><strong>Il tuo soprannome</strong>, se ne scegli uno.</li>
+        <li><strong>Il tuo salvataggio</strong>: progressi, collezione, storico delle valutazioni e impostazioni.</li>
+        <li><strong>Un diario di gioco</strong>: smazzate giocate, risposte alle domande e agli esercizi, punteggi, per adattare Kiboo al tuo modo di giocare.</li>
+      </ul>
+      <p>Questi dati sono ospitati da Supabase, in Europa (Londra). Servono solo a Kiboo, non sono né venduti né condivisi, e non c'è pubblicità. Solo tu puoi leggere i tuoi dati; l'organizzatrice di Kiboo può vedere le statistiche per migliorare il gioco. Puoi eliminare tutto in qualsiasi momento con il pulsante qui sotto.</p>`,
     /* ---------- Accoglienza, famiglie e personaggi ---------- */
     "head.parade": "Parata",
     "setup.music": "Musica",

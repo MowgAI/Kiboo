@@ -213,6 +213,42 @@
     "quiz.ex.any": "Par exemple, Ouest pourrait avoir :",
     "quiz.goodAnswer": p => `La bonne réponse : ${p.answer.toLowerCase()}.`,
     "quiz.follow.result": p => (p.list.length > 1 ? "Les couleurs possibles : " : "La seule couleur possible : le ") + p.list.map(s => C[s]).join(", ") + ". Le détail est ci-dessous.",
+    /* ---------- Mon compte ---------- */
+    "account.login": "Se connecter",
+    "account.me": "Mon compte",
+    "account.title": "Mon compte",
+    "account.intro": "Kiboo se joue sans compte. Si tu as été <strong>invité</strong>, connecte-toi pour retrouver ta progression, ta collection et ton historique sur tous tes appareils. Entre ton adresse e-mail : tu recevras un lien de connexion, sans mot de passe.",
+    "account.email": "Adresse e-mail",
+    "account.send": "Recevoir le lien de connexion",
+    "account.sending": "Envoi en cours…",
+    "account.sent": p => `C'est envoyé ! Ouvre l'e-mail reçu sur ${p.email} et clique sur le lien : tu reviendras ici, connecté. Pense à regarder dans les courriers indésirables.`,
+    "account.notInvited": "Cette adresse n'a pas été invitée : l'accès aux comptes se fait sur invitation.",
+    "account.rate": "Trop de demandes d'un coup : attends une minute, puis réessaie.",
+    "account.error": p => `Un problème est survenu : ${p.msg}`,
+    "account.loadError": "Impossible de joindre le service des comptes. Vérifie ta connexion internet.",
+    "account.linkError": "Le lien de connexion n'est plus valable (il ne sert qu'une fois et expire au bout d'une heure). Demandes-en un nouveau.",
+    "account.elsewhere": p => `Les comptes fonctionnent sur le site de Kiboo : <a href="${p.url}">${p.url}</a>`,
+    "account.connected": p => `Tu es connecté avec <strong>${p.email}</strong>. Ta sauvegarde suit ton compte.`,
+    "account.pseudo": "Pseudo",
+    "account.save": "Enregistrer",
+    "account.saved": "C'est enregistré.",
+    "account.syncing": "Synchronisation en cours…",
+    "account.synced": p => `Sauvegardé à ${p.when}.`,
+    "account.syncError": "La synchronisation n'a pas marché. Elle sera retentée plus tard.",
+    "account.syncNow": "Sauvegarder maintenant",
+    "account.logout": "Se déconnecter",
+    "account.loggedOut": "Tu es déconnecté. Tu peux continuer à jouer sans compte.",
+    "account.delete": "Supprimer mon compte et mes données",
+    "account.deleteConfirm": "Supprimer ton compte et toutes les données enregistrées en ligne ? Cette action est définitive. (Ce qui est dans ce navigateur reste, pour continuer à jouer sans compte.)",
+    "account.deleted": "Ton compte et tes données en ligne ont été supprimés.",
+    "account.privacyTitle": "Confidentialité : ce qui est enregistré",
+    "account.privacy": `<ul>
+        <li><strong>Ton adresse e-mail</strong>, pour la connexion.</li>
+        <li><strong>Ton pseudo</strong>, si tu en choisis un.</li>
+        <li><strong>Ta sauvegarde</strong> : progression, collection, historique d'évaluation et réglages.</li>
+        <li><strong>Un journal de jeu</strong> : donnes jouées, réponses aux questions et aux exercices, scores, pour adapter Kiboo à ta façon de jouer.</li>
+      </ul>
+      <p>Ces données sont hébergées par Supabase, en Europe (Londres). Elles ne servent qu'à Kiboo, ne sont ni vendues ni partagées, et il n'y a pas de publicité. Toi seul peux lire tes données ; l'organisatrice de Kiboo peut voir les statistiques pour améliorer le jeu. Tu peux tout supprimer à tout moment avec le bouton ci-dessous.</p>`,
     /* ---------- Accueil, familles et personnages ---------- */
     "head.parade": "Parade",
     "setup.music": "Musique",

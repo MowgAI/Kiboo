@@ -43,6 +43,8 @@ python3 -m http.server 8000
 - `js/rewards.js` : cadeaux, progression et collection
 - `js/intro.js` : écran d'accueil, présentations des familles et des personnages, distribution animée
 - `lang/personnages.js` : présentations des 40 personnages (français, anglais, italien)
+- `js/account.js` : comptes sur invitation (Supabase), synchronisation de la sauvegarde, journal
+- `supabase/schema.sql` : tables et règles de sécurité de la base
 - `js/sound.js` : musique rétro et bruitages (Web Audio)
 - `js/voice.js` : lecture à voix haute (versions simplifiées, encouragements)
 - `js/coco.js` : le carré de Coco (exercice et remplissage pendant la donne)
@@ -64,6 +66,15 @@ Au démarrage, un écran d'accueil montre le logo Kiboo qui se forme lettre par 
 - **Les personnages** : les 40 personnages se présentent un par un (flèches du clavier pour avancer).
 
 Les présentations sont lues à voix haute (bouton Son). L'accueil a sa propre langue, l'anglais par défaut (la voix anglaise est la meilleure sur la plupart des appareils) : les boutons EN · FR · IT la changent sans toucher à la langue du jeu. Une case « Ne plus afficher l'accueil au démarrage » est gardée dans le navigateur ; un clic sur le logo Kiboo rouvre l'accueil. Les animations sont coupées si l'appareil demande de réduire les animations. Les textes des personnages sont dans `lang/personnages.js` (à relire et modifier librement) ; le code est dans `js/intro.js`.
+
+## Comptes (sur invitation)
+
+Kiboo se joue sans compte : tout est gardé dans le navigateur. Les personnes **invitées** peuvent se connecter (bouton « Se connecter » de l'en-tête) avec un **lien magique** reçu par e-mail, sans mot de passe. Leur sauvegarde (progression, collection, historique d'évaluation, réglages : toutes les clés `kiboo.*` du navigateur) suit alors leur compte d'un appareil à l'autre ; à la première connexion, ce qui est dans le navigateur est fusionné avec le compte sans rien perdre. Un journal (donnes jouées, réponses, scores) est enregistré pour la personnalisation. La fenêtre « Mon compte » permet de choisir un pseudo, de se déconnecter et de supprimer son compte et ses données ; elle explique ce qui est enregistré.
+
+- Service : Supabase (projet en Europe). La clé publique est dans `js/account.js` ; elle n'est pas secrète, la sécurité vient de la base.
+- Base de données : `supabase/schema.sql` (tables `profiles`, `saves`, `events`, règles « chacun ne voit que ses données », fonction de suppression du compte), à exécuter une fois dans Supabase > SQL Editor.
+- Inscriptions fermées dans Supabase (Authentication) ; pour inviter quelqu'un : Authentication > Users > Add user > Send invitation.
+- Les comptes ne marchent que sur le site GitHub Pages (c'est là que le lien magique ramène). La bibliothèque Supabase est copiée dans `js/vendor/supabase.js` (licence MIT) et n'est chargée qu'en cas de besoin.
 
 ## Parade, musique et bruitages
 

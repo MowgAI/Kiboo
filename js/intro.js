@@ -363,7 +363,8 @@ const Intro = (() => {
       logoEl.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } };
     }
     $("btn-parade").onclick = () => { open(); parade(0); };
-    if (off) resolveReady(); else open();
+    // Pas d'accueil si le joueur l'a désactivé, ou juste après une synchronisation du compte.
+    if (off || Account.skipIntro()) resolveReady(); else open();
   });
 
   return { ready, deal, open, parade: () => { open(); parade(0); } };

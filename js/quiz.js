@@ -52,6 +52,7 @@ const Quiz = (() => {
       };
       build($("quiz-body"));
       voiceKey = voice || "";
+      Account.setContext(voice ? voice.replace("voice.", "") : "q.lead");
       if (voice) Voice.auto(T(voice));
       Rewards.refresh();
       dlg.showModal();

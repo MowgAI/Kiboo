@@ -30,6 +30,7 @@ const Rewards = (() => {
   function answered(ok) {
     Voice.cheer(ok);                              // « Bravo ! », « Presque ! »… si la voix est activée
     Sound.sfx(ok ? "ok" : "ko");
+    Account.answered(ok);
     if (ok && state.progress < GOAL) state.progress++;
     save();
     refresh();

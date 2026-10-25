@@ -484,6 +484,7 @@ const Exercises = (() => {
     }
     PANELS[current]($("ex-body"));
     Voice.auto(T("voice.ex." + current));
+    Account.setContext("ex." + current);
   }
 
   function open() {

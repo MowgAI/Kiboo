@@ -145,6 +145,7 @@ const Evaluation = (() => {
     if (j.counted) {
       const before = level().index;
       history.push({ t: Date.now(), me: j.me, piperno: j.results.piperno, averell: j.results.averell, averell250: j.results.averell250, par: j.par, pct: j.pct });
+      Account.log("eval", history[history.length - 1]);
       save();
       const after = level().index;
       if (after > before) j.levelUp = { index: after, card: Rewards.grantCard() };
