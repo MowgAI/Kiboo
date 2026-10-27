@@ -43,6 +43,7 @@ python3 -m http.server 8000
 - `js/rewards.js` : cadeaux, progression et collection
 - `js/intro.js` : écran d'accueil, présentations des familles et des personnages, distribution animée
 - `lang/personnages.js` : présentations des 40 personnages (français, anglais, italien)
+- `js/timing.js` : temps de réflexion (cartes, plan de jeu, réponses)
 - `js/account.js` : comptes sur invitation (Supabase), synchronisation de la sauvegarde, journal
 - `supabase/schema.sql` : tables et règles de sécurité de la base
 - `js/sound.js` : musique rétro et bruitages (Web Audio)
@@ -71,6 +72,7 @@ Les présentations sont lues à voix haute (bouton Son). L'accueil a sa propre l
 
 Kiboo se joue sans compte : tout est gardé dans le navigateur. Les personnes **invitées** peuvent se connecter (bouton « Se connecter » de l'en-tête) avec un **lien magique** reçu par e-mail, sans mot de passe. Leur sauvegarde (progression, collection, historique d'évaluation, réglages : toutes les clés `kiboo.*` du navigateur) suit alors leur compte d'un appareil à l'autre ; à la première connexion, ce qui est dans le navigateur est fusionné avec le compte sans rien perdre. Un journal (donnes jouées, réponses, scores) est enregistré pour la personnalisation. La fenêtre « Mon compte » permet de choisir un pseudo, de se déconnecter et de supprimer son compte et ses données ; elle explique ce qui est enregistré.
 
+- **Temps de réflexion** (`js/timing.js`) : le temps de chaque carte jouée par le joueur humain, avec à part le **temps de plan de jeu** (premier coup du déclarant après l'entame), et le temps de chaque réponse aux questions et aux exercices. Seul compte le temps actif : pas quand la page est cachée, ni pendant la lecture à voix haute. Les 50 derniers temps de chaque sorte sont gardés dans le navigateur (`kiboo.times.v1`) ; avec un compte, ils vont aussi dans le journal (événements `deal`, `answer` et `review`, ce dernier donnant pour chaque carte qui a coûté des plis le temps de réflexion du joueur).
 - Service : Supabase (projet en Europe). La clé publique est dans `js/account.js` ; elle n'est pas secrète, la sécurité vient de la base.
 - Base de données : `supabase/schema.sql` (tables `profiles`, `saves`, `events`, règles « chacun ne voit que ses données », fonction de suppression du compte), à exécuter une fois dans Supabase > SQL Editor.
 - Inscriptions fermées dans Supabase (Authentication) ; pour inviter quelqu'un : Authentication > Users > Add user > Send invitation.

@@ -84,9 +84,10 @@ const Voice = (() => {
     u.pitch = PITCH;
     // Pendant que la voix parle, la musique baisse (js/sound.js).
     const done = new Promise(resolve => {
-      u.onend = u.onerror = () => { Sound.duck(false); resolve(true); };
+      u.onend = u.onerror = () => { Sound.duck(false); Timing.setSpeaking(false); resolve(true); };
     });
-    u.onstart = () => Sound.duck(true);
+    // Le temps de lecture à voix haute ne compte pas dans les temps de réflexion (js/timing.js).
+    u.onstart = () => { Sound.duck(true); Timing.setSpeaking(true); };
     speechSynthesis.speak(u);
     return done;
   }

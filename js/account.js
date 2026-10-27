@@ -137,8 +137,14 @@ const Account = (() => {
     if (document.visibilityState === "hidden" && user) { flush().catch(() => {}); push().catch(() => {}); }
   });
   // Où en est le joueur (question ou exercice en cours), pour le journal des réponses.
-  const setContext = c => { context = c; };
-  const answered = ok => log("answer", { ok, where: context });
+  // Le chronomètre part quand la question ou l'exercice s'affiche (js/timing.js).
+  let watch = null;
+  const setContext = c => { context = c; watch = Timing.stopwatch(); };
+  function answered(ok) {
+    const ms = watch ? watch() : null;
+    if (ms !== null) Timing.record(context || "answer", ms, ok);
+    log("answer", { ok, where: context, ms });
+  }
 
   /* ---------- Connexion ---------- */
   async function setUser(u) {

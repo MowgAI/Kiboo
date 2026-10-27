@@ -337,8 +337,14 @@ async function play(token) {
     if (!controller.human) { render(); await sleep(config.speed); }
     if (token !== runToken) return;
     if (controller.human && (config.hints || config.open)) game.assisted = true;
+    // Temps de réflexion du joueur humain (js/timing.js).
+    const watch = controller.human ? Timing.stopwatch() : null;
     let card = await controller.choose(view);
     if (token !== runToken) return;
+    const ms = watch ? watch() : null;
+    // Premier coup du déclarant juste après l'entame : le temps de faire son plan de jeu.
+    const plan = ms !== null && game.history.length === 1 && seatController(seat) === DECLARER;
+    if (ms !== null) Timing.record(plan ? "plan" : "card", ms);
     game.waiting = null;
     const legal = legalCards(game.hands[seat], game.trick);
     if (!card || !legal.some(c => cardId(c) === cardId(card))) card = legal[0];   // sécurité
@@ -346,6 +352,7 @@ async function play(token) {
     game.history.push({
       seat, card, pos: fullPosition(), ns: game.tricksWon.NS,
       trickNo: game.tricksWon.NS + game.tricksWon.EO + 1,
+      ms, plan,
     });
 
     if (game.types[seatController(seat)] === "deterministe" && controller.reason) {
@@ -406,7 +413,11 @@ async function play(token) {
     const mine = game.tricksWon[humanTeam()], theirs = 10 - mine;
     Sound.sfx(mine > theirs ? "win" : mine === theirs ? "tie" : "lose", 0.3);
     // Journal du compte (js/account.js), si le joueur est connecté.
-    Account.log("deal", { ns: game.tricksWon.NS, types: game.types, coco: config.coco, quiz: config.quiz, assisted: game.assisted, replayed: game.replayed });
+    Account.log("deal", {
+      ns: game.tricksWon.NS, types: game.types, coco: config.coco, quiz: config.quiz, assisted: game.assisted, replayed: game.replayed,
+      planMs: (game.history.find(h => h.plan) || {}).ms ?? null,
+      times: game.history.filter(h => h.ms !== null).map(h => h.ms),     // temps de chaque carte du joueur, dans l'ordre
+    });
   }
   if (typeof Evaluation !== "undefined") Evaluation.dealOver();
   render();
@@ -441,6 +452,12 @@ async function reviewDeal(token) {
     e.best = sortForDisplay(res.filter(r => val(r) === top).map(r => r.card));
   }
   game.review = { par: T[0], errors };
+  // Bilan pour le journal : pour chaque carte qui a coûté des plis, le temps de réflexion du joueur.
+  Account.log("review", {
+    par: T[0], ns: game.tricksWon.NS, assisted: game.assisted,
+    planMs: (steps.find(h => h.plan) || {}).ms ?? null,
+    errors: errors.map(e => ({ trick: e.trickNo, seat: e.seat, loss: e.loss, ms: e.ms ?? null })),
+  });
   render();
 }
 
