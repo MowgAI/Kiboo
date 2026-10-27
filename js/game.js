@@ -508,7 +508,8 @@ function cardEl(card, opts = {}) {
   } else {
     el.classList.add("back");
     el.setAttribute("aria-hidden", "true");
-    el.innerHTML = '<span class="back-logo kiboo"><span>K</span><span>i</span><span>b</span><span>o</span><span>o</span></span>';
+    // Dos des cartes : le logo KIBOO des vraies cartes (les deux O sont des yeux).
+    el.innerHTML = '<span class="back-logo"><b class="bk">K</b><b class="bi">I</b><b class="bb">B</b><i class="eye"></i><i class="eye"></i></span>';
   }
   return el;
 }

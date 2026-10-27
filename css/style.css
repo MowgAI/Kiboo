@@ -157,14 +157,21 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px s
 }
 .hand.side .card { margin-left: calc(var(--w) * -0.62); }
 /* Dos des cartes : le logo Kiboo vertical, sur fond blanc bordé de violet. */
-.card.back { background: #FFFFFF; border: calc(var(--w) * 0.04) solid var(--felt); overflow: hidden; }
-.card.back::before {
-  content: ""; position: absolute; inset: 6%;
-  border: 1px solid #E2DAEE; border-radius: calc(var(--w) * 0.05);
-}
+/* Dos des cartes, comme les vraies cartes : fond bleu dans un cadre blanc, logo KIBOO au milieu
+   (K rouge, I bleu clair, B jaune, et deux O en forme d'yeux). */
+.card.back { background: #3B66B0; border: calc(var(--w) * 0.08) solid #FFFFFF; overflow: hidden; }
 .card.back .back-logo {
-  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  font-weight: 700; line-height: 0.95; font-size: calc(var(--w) * 0.27);
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: calc(var(--w) * 0.006);
+  font: 800 calc(var(--w) * 0.17)/1 "Fredoka", "Nunito", system-ui, sans-serif;
+}
+.card.back .back-logo b { font-weight: 700; -webkit-text-stroke: calc(var(--w) * 0.012) #1C2440; paint-order: stroke fill; }
+.card.back .bk { color: #E5383B; }
+.card.back .bi { color: #5EC4F0; }
+.card.back .bb { color: #F2B705; }
+.card.back .eye {
+  width: calc(var(--w) * 0.13); height: calc(var(--w) * 0.13); border-radius: 50%; flex: none;
+  background: radial-gradient(circle at 50% 52%, #1C2440 0 22%, #FFFFFF 24%);
+  box-shadow: 0 0 0 calc(var(--w) * 0.012) #1C2440;
 }
 .badge {
   position: absolute; top: 30%; left: 4%;
