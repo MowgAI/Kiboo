@@ -49,12 +49,20 @@ const Intro = (() => {
   function setFamily(f) { family = f; playMusic(); }
   // Un personnage arrive : son bruit (miaou, rugissement…), puis il parle.
   let talkToken = 0;
-  function introduce(s, v, text) {
+  // Chaque personnage parle avec une voix d'homme ou de femme (lang/parade.js), un peu plus vite dans la parade.
+  const genderOf = (s, v) => ((window.KIBOO_PARADE || {}).gender || {})[COLORS[s] + "-" + v] || "m";
+  function introduce(s, v, text, rate = 1) {
     const token = ++talkToken;
     Voice.stop();
     if (!sound) return Promise.resolve(false);
     Sound.character(s, v);
-    return new Promise(r => setTimeout(r, 750)).then(() => (token === talkToken ? Voice.speak(text, introLang) : false));
+    return new Promise(r => setTimeout(r, 600)).then(() => (token === talkToken ? Voice.speak(text, introLang, { gender: genderOf(s, v), rate }) : false));
+  }
+  // Ce que dit un personnage dans la parade : « Je suis… » et un truc marrant, tiré au hasard parmi les siens.
+  function paradeLine(s, v) {
+    const all = window.KIBOO_PARADE || {}, key = COLORS[s] + "-" + v;
+    const list = (all[I18N.lang] && all[I18N.lang][key]) || (all.fr && all.fr[key]);
+    return list ? list[Math.floor(Math.random() * list.length)] : presentation(s, v);
   }
   // Choix de la langue de l'accueil (EN · FR · IT), puis on redessine la vue courante.
   const langs = () => `<div class="intro-langs" role="group" aria-label="Language">${I18N.SUPPORTED.map(l =>
@@ -252,7 +260,7 @@ const Intro = (() => {
       forward = false;
       const floor = box.querySelector("[data-role=floor]");
       const text = i < 40
-        ? inLang(() => presentation(Math.floor(i / 10), (i % 10) + 1))
+        ? inLang(() => paradeLine(Math.floor(i / 10), (i % 10) + 1))
         : inLang(() => T("intro.paradeEnd"));
       floor.innerHTML = i < 40
         ? `<div class="parade-char" style="--fam:var(--c-${COLORS[Math.floor(i / 10)]})">
@@ -264,7 +272,7 @@ const Intro = (() => {
       if (i < 40) setFamily(Math.floor(i / 10)); else setFamily(null);
       const skip = new Promise(r => { skipNow = r; });
       const talk = paused ? Promise.resolve(false)
-        : i < 40 ? introduce(Math.floor(i / 10), (i % 10) + 1, text)
+        : i < 40 ? introduce(Math.floor(i / 10), (i % 10) + 1, text, 1.08)
         : (sound ? Voice.speak(text, introLang) : Promise.resolve(false));
       await Promise.race([talk.then(spoken => wait(spoken ? 900 : Math.max(2500, text.length * 60))), skip]);
       if (run !== paradeRun) return;

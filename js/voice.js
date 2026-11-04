@@ -18,7 +18,7 @@ const Voice = (() => {
   const ok = "speechSynthesis" in window;
   const LOCALE = { fr: "fr-FR", en: "en-GB", it: "it-IT" };
   // Vitesse et hauteur par langue : un peu plus aiguë que la normale, pour une voix sympa.
-  const RATE = { fr: 1.18, en: 0.95, it: 1.0 };
+  const RATE = { fr: 1.28, en: 0.98, it: 1.0 };
   const PITCH = 1.1;
   const KEY = "kiboo.voice.";                          // + langue : nom de la voix choisie
   // Voix agréables, par ordre de préférence (les noms varient selon les appareils).
@@ -28,6 +28,19 @@ const Voice = (() => {
     en: ["Samantha", "Karen", "Moira", "Tessa", "Libby", "Sonia", "Jenny", "Aria", "Google UK English Female", "Google US English"],
     it: ["Isabella", "Elsa", "Diego", "Alice", "Federica", "Luca", "Paola", "Google italiano"],
   };
+  // Voix d'homme et de femme connues, pour faire parler chaque personnage avec la sienne.
+  const GENDER = {
+    m: {
+      fr: ["Thomas", "Henri", "Paul", "Nicolas", "Rémy", "Antoine", "Jérôme", "Mathieu", "Daniel", "Claude", "Fabrice", "Alain", "Jacques"],
+      en: ["Daniel", "Alex", "Fred", "Arthur", "Oliver", "George", "Ryan", "Guy", "Thomas", "Eric", "Aaron", "Gordon", "Rishi", "UK English Male"],
+      it: ["Luca", "Diego", "Cosimo", "Giuseppe", "Benigno"],
+    },
+    f: {
+      fr: ["Amélie", "Audrey", "Aurélie", "Marie", "Julie", "Denise", "Hortense", "Virginie", "Céline", "Eloise", "Vivienne", "Joséphine", "Google français"],
+      en: ["Samantha", "Karen", "Moira", "Tessa", "Libby", "Sonia", "Jenny", "Aria", "Serena", "Kate", "Susan", "Zira", "Hazel", "Emma", "UK English Female", "Google US English"],
+      it: ["Alice", "Federica", "Elsa", "Isabella", "Paola", "Google italiano"],
+    },
+  };
   let voices = [];
   const load = () => { voices = ok ? speechSynthesis.getVoices() : []; fillMenu(); };
   // Langues sans voix pour l'instant (la voix italienne des appareils est de mauvaise qualité).
@@ -36,12 +49,22 @@ const Voice = (() => {
   const saved = lang => { try { return localStorage.getItem(KEY + lang) || ""; } catch (e) { return ""; } };
   if (ok) { load(); speechSynthesis.addEventListener("voiceschanged", load); }
 
+  // Les voix « naturelles » (Microsoft … Online (Natural), Apple Premium ou Améliorée) sont bien meilleures.
+  const fine = v => /natural|online|premium|enhanced|amélior|neural|siri/i.test(v.name);
+  // Une voix d'homme (g = "m") ou de femme (g = "f") ; null s'il n'y en a pas sur l'appareil.
+  function pickGender(lang, g) {
+    const list = ofLang(lang), names = (GENDER[g] && GENDER[g][lang]) || [];
+    for (const good of [true, false]) for (const name of names) {
+      const v = list.find(x => x.name.includes(name) && fine(x) === good);
+      if (v) return v;
+    }
+    return list.find(v => (g === "m" ? /\bmale\b|homme|uomo/i : /female|femme|donna/i).test(v.name)) || null;
+  }
+
   function pick(lang) {
     const list = ofLang(lang);
     const chosen = list.find(v => v.name === saved(lang));
     if (chosen) return chosen;
-    // Les voix « naturelles » (Microsoft … Online (Natural), Apple Premium ou Améliorée) sont bien meilleures.
-    const fine = v => /natural|online|premium|enhanced|amélior|neural|siri/i.test(v.name);
     for (const good of [true, false]) for (const name of NICE[lang] || []) {
       const v = list.find(x => x.name.includes(name) && fine(x) === good);
       if (v) return v;
@@ -72,16 +95,22 @@ const Voice = (() => {
 
   // `lang` : langue de lecture (par défaut celle du jeu ; l'accueil peut en choisir une autre).
   // Renvoie une promesse tenue à la fin de la lecture (tout de suite s'il n'y a rien à lire).
-  function speak(html, lang = I18N.lang) {
+  // opts.gender : "m" ou "f" pour la voix d'un personnage (sans voix de ce genre sur l'appareil,
+  // la voix habituelle prend une hauteur plus grave ou plus aiguë) ; opts.rate : vitesse en plus.
+  function speak(html, lang = I18N.lang, opts = {}) {
     if (!ok || !html) return Promise.resolve(false);
-    const v = pick(lang);
+    let v = pick(lang), pitch = PITCH;
     if (!v) return Promise.resolve(false);              // pas de voix dans cette langue sur l'appareil
+    if (opts.gender) {
+      const g = pickGender(lang, opts.gender);
+      if (g) { v = g; pitch = 1; } else pitch = opts.gender === "m" ? 0.8 : 1.25;
+    }
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(plain(html));
     u.lang = LOCALE[lang] || "fr-FR";
     u.voice = v;
-    u.rate = RATE[lang] || 1;
-    u.pitch = PITCH;
+    u.rate = (RATE[lang] || 1) * (opts.rate || 1);
+    u.pitch = pitch;
     // Pendant que la voix parle, la musique baisse (js/sound.js).
     const done = new Promise(resolve => {
       u.onend = u.onerror = () => { Sound.duck(false); Timing.setSpeaking(false); resolve(true); };

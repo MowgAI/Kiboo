@@ -42,6 +42,7 @@ python3 -m http.server 8000
 - `js/quiz.js` : questions pendant la partie et moteur de déduction
 - `js/rewards.js` : cadeaux, progression et collection
 - `js/intro.js` : écran d'accueil, présentations des familles et des personnages, distribution animée
+- `lang/parade.js` : ce que disent les personnages dans la parade, et la voix (homme ou femme) de chacun
 - `lang/personnages.js` : présentations des 40 personnages (français, anglais, italien)
 - `js/timing.js` : temps de réflexion (cartes, plan de jeu, réponses)
 - `js/account.js` : comptes sur invitation (Supabase), synchronisation de la sauvegarde, journal
@@ -80,7 +81,7 @@ Kiboo se joue sans compte : tout est gardé dans le navigateur. Les personnes **
 
 ## Parade, musique et bruitages
 
-- **La parade de Kiboo** (bouton « Parade » de l'en-tête, ou de l'accueil) : les 40 personnages défilent tout seuls ; chacun dit sa présentation (textes de `lang/personnages.js`), puis laisse la place au suivant. Boutons Pause, Suivant, Son et Accueil.
+- **La parade de Kiboo** (bouton « Parade » de l'en-tête, ou de l'accueil) : les 40 personnages défilent tout seuls ; chacun dit « Je suis… » et un truc marrant, tiré au hasard parmi deux (textes de `lang/parade.js`), puis laisse la place au suivant. Chaque personnage parle avec une voix d'homme ou de femme selon son genre (voix d'homme pour les neutres, `gender` dans `lang/parade.js`). Boutons Pause, Suivant, Son et Accueil.
 - **Musiques** façon jeu vidéo rétro, composées dans le code (Web Audio, rien à télécharger), tirées au hasard pour ne pas se lasser : trois pour l'accueil (bouton 🎵), deux plus calmes pour la partie (case « Musique »), et une par famille pendant les présentations et la parade : comptine sautillante avec des cris d'animaux, marche lourde des dinosaures avec rugissements, arpèges futuristes et bips des robots, petite fanfare des métiers. La musique baisse quand la voix parle.
 - **Un bruit par personnage** quand il se présente : couinement de la souris, cui-cui, miaou, ouaf, groin, rugissements (plus graves pour les gros dinosaures), bips et cliquetis des robots, sifflet, sirène de pompier, fusée… (table `CHARACTER` de `js/sound.js`).
 - **Bruitages** (case « Bruitages », cochée par défaut) : carte posée, pli gagné ou perdu, fanfare ou petite musique triste en fin de donne, bonne ou mauvaise réponse aux exercices et aux questions, cadeau, distribution.
