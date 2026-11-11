@@ -45,8 +45,10 @@ const Intro = (() => {
   // Musique de la vue : celle de l'accueil, ou celle de la famille présentée.
   let family = null;
   const styleNow = () => (family === null ? "intro" : "fam" + family);
-  const playMusic = () => Sound.music(introMusic ? styleNow() : null);
-  function setFamily(f) { family = f; playMusic(); }
+  // musicOpts (parade) : la musique suit le mode et change de tonalité à chaque personnage (js/sound.js).
+  let musicOpts = {};
+  const playMusic = () => Sound.music(introMusic ? styleNow() : null, musicOpts);
+  function setFamily(f, opts = {}) { family = f; musicOpts = opts; playMusic(); }
   // Un personnage arrive : son bruit (miaou, rugissement…), puis il parle.
   let talkToken = 0;
   // Chaque personnage parle avec une voix d'homme ou de femme (lang/parade.js), un peu plus vite dans la parade.
@@ -292,7 +294,7 @@ const Intro = (() => {
            </div>`
         : `<div class="parade-end">${[0, 1, 2, 3].map(s => `<div class="card" style="background-image:url(${img(s, 10)})"></div>`).join("")}
              <p class="intro-text">${text}</p></div>`;
-      if (i < 40) setFamily(Math.floor(i / 10)); else setFamily(null);
+      if (i < 40) setFamily(Math.floor(i / 10), { mode: paradeMode, shift: [0, 3, -2, 5, 2][i % 5] }); else setFamily(null);
       const skip = new Promise(r => { skipNow = r; });
       const talk = paused ? Promise.resolve(false)
         : i < 40 ? introduce(Math.floor(i / 10), (i % 10) + 1, text, 1.08 * (MODE_VOICE[paradeMode].rate || 1), MODE_VOICE[paradeMode].pitch || 1)
@@ -316,6 +318,7 @@ const Intro = (() => {
     box.hidden = false;
     document.body.classList.add("intro-open");
     family = null;
+    musicOpts = {};
     playMusic();
     home();
   }
