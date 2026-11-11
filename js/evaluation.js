@@ -73,7 +73,7 @@ const Evaluation = (() => {
     controllers.N = controllers.S;
     const g = {
       hands: {}, trick: [], played: [], history: [], leader: OPENING_LEADER, turn: OPENING_LEADER,
-      tricksWon: { NS: 0, EO: 0 }, dummyShown: false, controllers,
+      tricksWon: { NS: 0, EO: 0 }, dummyShown: false, controllers, trump: j.trump,
     };
     for (const s of SEATS) g.hands[s] = j.hands[s].slice();
     while (g.played.length < 40) {
@@ -89,7 +89,7 @@ const Evaluation = (() => {
       g.played.push(card);
       g.dummyShown = true;
       if (g.trick.length < 4) { g.turn = nextSeat(seat); continue; }
-      const w = trickWinner(g.trick);
+      const w = trickWinner(g.trick, g.trump);
       g.tricksWon[team(w)]++;
       g.trick = [];
       g.leader = g.turn = w;
@@ -104,10 +104,10 @@ const Evaluation = (() => {
     job = null;
     if (!eligible()) return;
     const j = job = {
-      hands: game.initial, types: { ...game.types }, seed: dealSeed(game.initial),
+      hands: game.initial, types: { ...game.types }, seed: dealSeed(game.initial), trump: game.trump,
       results: {}, par: null, current: null, me: null, recorded: false, levelUp: null,
     };
-    j.par = await solver.solve({ hands: SEATS.map(s => j.hands[s].slice()), trick: [], leader: SEATS.indexOf(OPENING_LEADER) });
+    j.par = await solver.solve({ hands: SEATS.map(s => j.hands[s].slice()), trick: [], leader: SEATS.indexOf(OPENING_LEADER), trump: j.trump });
     if (job !== j || j.par === null) return;
     for (const d of DECLARERS) {
       j.current = d.key;

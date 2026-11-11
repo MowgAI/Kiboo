@@ -1,6 +1,6 @@
 /* =====================================================================
    DDS KIBOO : solveur « double-mort » (à jeux ouverts) pour le petit
-   bridge à 40 cartes, sans atout.
+   bridge à 40 cartes, sans atout ou avec un atout (position.trump).
    Il calcule, en supposant que les 4 joueurs voient toutes les cartes et
    jouent parfaitement, combien de plis Nord-Sud feront à partir d'une
    position donnée (y compris au milieu d'un pli).
@@ -25,11 +25,12 @@ const DDS = (() => {
   let tricksLeft;     // nombre de plis restants (pli en cours compris)
   let tt = new Map(); // clé -> [borne basse, borne haute] des plis NS restants
   let nodes = 0;
+  let trump = -1;      // couleur d'atout (-1 : sans atout)
 
   // Clé relative : pour chaque couleur, la suite des propriétaires des cartes
   // restantes (de la plus forte à la plus faible), codée sur 2 bits par carte.
   function key() {
-    let k = leader;
+    let k = leader + 4 * (trump + 1);
     for (let s = 0; s < 4; s++) {
       const h0 = hands[0][s], h1 = hands[1][s], h2 = hands[2][s], h3 = hands[3][s];
       let code = 1;                                   // bit sentinelle pour la longueur
@@ -53,10 +54,11 @@ const DDS = (() => {
     else suits = [0, 1, 2, 3].filter(s => h[s]);
 
     // Carte gagnante actuelle du pli
-    let bestV = 0, bestSeat = -1, led = -1;
+    let bestV = 0, bestSeat = -1, led = -1, bestS = -1;
     if (trick.length) {
       led = trick[0].s;
-      for (const t of trick) if (t.s === led && t.v > bestV) { bestV = t.v; bestSeat = t.seat; }
+      const wt = winnerCard();
+      bestV = wt.v; bestSeat = wt.seat; bestS = wt.s;
     }
     const partnerWins = bestSeat >= 0 && isNS(bestSeat) === isNS(seat);
 
@@ -93,9 +95,14 @@ const DDS = (() => {
         else if (isNS(owner) === isNS(seat)) w = 50 - m.v;
         else w = 30 - m.v;
       } else if (m.s === led) {
-        const beats = m.v > bestV;
+        const beats = bestS === led && m.v > bestV;
         if (partnerWins) w = beats ? 10 - m.v : 40 - m.v;      // partenaire maître : on fournit petit
         else w = beats ? 60 - m.v : 20 - m.v;                   // sinon : la plus petite qui gagne
+      } else if (m.s === trump) {
+        // Coupe : la plus petite qui gagne (surcoupe si besoin), sauf si le partenaire est maître.
+        const beats = bestS !== trump || m.v > bestV;
+        if (partnerWins) w = 5 - m.v;
+        else w = beats ? 65 - m.v : 15 - m.v;
       } else {
         w = 10 - m.v;                                 // défausse : petite carte
       }
@@ -113,12 +120,16 @@ const DDS = (() => {
     hands[seat][m.s] |= 1 << (m.v - 1);
     trick.pop();
   }
-  function winnerOfTrick() {
+  // Carte qui gagne le pli pour l'instant : le plus fort atout, sinon la plus forte de la couleur demandée.
+  function winnerCard() {
     const led = trick[0].s;
     let best = trick[0];
-    for (const t of trick) if (t.s === led && t.v > best.v) best = t;
-    return best.seat;
+    for (const t of trick) {
+      if (t.s === best.s ? t.v > best.v : t.s === trump) best = t;
+    }
+    return best;
   }
+  function winnerOfTrick() { return winnerCard().seat; }
 
   // Renvoie le nombre de plis NS dans le reste de la donne (pli en cours compris).
   function search(alpha, beta) {
@@ -178,6 +189,7 @@ const DDS = (() => {
   }
 
   function load(position) {
+    trump = position.trump === undefined ? -1 : position.trump;
     hands = [0, 1, 2, 3].map(p => {
       const m = [0, 0, 0, 0];
       for (const c of position.hands[p]) m[c.s] |= 1 << (c.v - 1);
@@ -193,6 +205,7 @@ const DDS = (() => {
        hands:  [cartesN, cartesE, cartesS, cartesO]   (cartes restantes, {s, v})
        trick:  [{ seat, card }]                       (pli en cours)
        leader: siège qui a entamé le pli en cours
+       trump:  couleur d'atout, ou -1 / absent pour jouer sans atout
      }
      solve(position)    -> plis NS restants (pli en cours compris)
      analyze(position)  -> [{ card, ns }] pour chaque carte légale du joueur au trait */

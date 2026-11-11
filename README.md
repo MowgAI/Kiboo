@@ -69,6 +69,16 @@ Au démarrage, un écran d'accueil montre le logo Kiboo qui se forme lettre par 
 
 Les présentations sont lues à voix haute (bouton Son). L'accueil a sa propre langue, l'anglais par défaut (la voix anglaise est la meilleure sur la plupart des appareils) : les boutons EN · FR · IT la changent sans toucher à la langue du jeu. Une case « Ne plus afficher l'accueil au démarrage » est gardée dans le navigateur ; un clic sur le logo Kiboo rouvre l'accueil. Les animations sont coupées si l'appareil demande de réduire les animations. Les textes des personnages sont dans `lang/personnages.js` (à relire et modifier librement) ; le code est dans `js/intro.js`.
 
+## Atout
+
+Le réglage « Atout » permet de jouer **sans atout** (par défaut) ou **avec un atout** : la couleur la plus longue de Nord et Sud réunis (à égalité, la plus forte somme des valeurs, puis la dernière dans l'ordre bleu, vert, rouge, jaune). L'atout est affiché en haut à gauche de la table.
+
+- Il faut toujours fournir ; sans la couleur demandée, on peut **couper** (jouer atout) ou défausser, sans obligation de couper. Le plus fort atout du pli l'emporte.
+- **Entame** : les robots gardent leur règle d'entame, mais jamais dans la couleur d'atout.
+- **Piperno à l'atout** : mêmes règles, plus : il ne coupe pas le pli de son partenaire si celui-ci a déjà coupé, si sa carte est maîtresse ou s'il joue en dernier ; il rejoue une couleur que son partenaire a déjà coupée si celui-ci peut encore avoir de l'atout ; il coupe avec son plus petit atout gagnant ; il défausse en gardant ses atouts.
+- Le DDS (`js/dds.js`) accepte `position.trump` ; Averell, Cheater, les meilleurs coups, le bilan, l'évaluation et Goat en tiennent compte (calcul environ 30 % plus long qu'à sans atout).
+- Pour l'instant, les questions sur l'entame et sur les cartes maîtresses ne sont pas posées à l'atout.
+
 ## Comptes (sur invitation)
 
 Kiboo se joue sans compte : tout est gardé dans le navigateur. Les personnes **invitées** peuvent se connecter (bouton « Se connecter » de l'en-tête) avec un **lien magique** reçu par e-mail, sans mot de passe. Leur sauvegarde (progression, collection, historique d'évaluation, réglages : toutes les clés `kiboo.*` du navigateur) suit alors leur compte d'un appareil à l'autre ; à la première connexion, ce qui est dans le navigateur est fusionné avec le compte sans rien perdre. Un journal (donnes jouées, réponses, scores) est enregistré pour la personnalisation. La fenêtre « Mon compte » permet de choisir un pseudo, de se déconnecter et de supprimer son compte et ses données ; elle explique ce qui est enregistré.

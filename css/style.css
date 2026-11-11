@@ -275,15 +275,15 @@ button.card:disabled { cursor: default; }
   padding: 0 0.1em;
 }
 /* Familles : une pastille de la couleur de la famille */
-:is(.rules, .review, .intro) .fam { font-weight: 600; white-space: nowrap; }
-:is(.rules, .review, .intro) .fam::before {
+:is(.rules, .review, .intro, .trump-tag) .fam { font-weight: 600; white-space: nowrap; }
+:is(.rules, .review, .intro, .trump-tag) .fam::before {
   content: ""; display: inline-block; width: 0.62em; height: 0.62em;
   border-radius: 50%; margin-right: 0.3em; vertical-align: 0.05em;
 }
-:is(.rules, .review, .intro) .fam.blue::before { background: var(--c-blue); }
-:is(.rules, .review, .intro) .fam.green::before { background: var(--c-green); }
-:is(.rules, .review, .intro) .fam.red::before { background: var(--c-red); }
-:is(.rules, .review, .intro) .fam.yellow::before { background: var(--c-yellow); }
+:is(.rules, .review, .intro, .trump-tag) .fam.blue::before { background: var(--c-blue); }
+:is(.rules, .review, .intro, .trump-tag) .fam.green::before { background: var(--c-green); }
+:is(.rules, .review, .intro, .trump-tag) .fam.red::before { background: var(--c-red); }
+:is(.rules, .review, .intro, .trump-tag) .fam.yellow::before { background: var(--c-yellow); }
 .rules .close {
   font: 600 1.5rem/1 "Fredoka", "Nunito", system-ui, sans-serif;
   width: 2em; height: 2em; flex: none; cursor: pointer;
@@ -629,3 +629,11 @@ body.intro-open { overflow: hidden; }
 .account-privacy summary { cursor: pointer; font-weight: 600; }
 .account-privacy ul { padding-left: 1.2em; }
 .account-delete { border-color: var(--ko); color: var(--ko); }
+
+/* Atout de la donne */
+.table { position: relative; }
+.trump-tag {
+  position: absolute; top: 12px; left: 14px; z-index: 3;
+  background: var(--panel); color: var(--ink); border-radius: 999px; padding: 4px 12px;
+  font-size: 0.95rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}

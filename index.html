@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=2026-11-04-1107">
+<link rel="stylesheet" href="css/style.css?v=2026-11-11-1053">
 </head>
 <body>
 <div class="wrap">
@@ -151,8 +151,17 @@
       <li>On joue chacun son tour <strong>dans le sens des aiguilles d'une montre</strong> : Ouest, Nord, Est, Sud.</li>
       <li>Le premier joueur du pli choisit librement sa carte. Sa couleur est la <dfn>couleur demandée</dfn> pour le reste du pli.</li>
       <li>Les autres joueurs <strong>doivent fournir</strong> une carte de la couleur demandée s'ils en ont. Sinon, ils jouent n'importe quelle carte : on appelle cette action <dfn>défausser</dfn>.</li>
-      <li>Dans cette version, il n'y a <strong>pas d'atout</strong> : la <strong>plus forte carte de la couleur demandée</strong> remporte donc le pli. Une carte d'une autre couleur ne remporte jamais le pli.</li>
+      <li><strong>Sans atout</strong>, la <strong>plus forte carte de la couleur demandée</strong> remporte le pli. Une carte d'une autre couleur ne remporte jamais le pli.</li>
       <li>Le joueur qui remporte le pli <strong>joue la première carte du pli suivant</strong>.</li>
+    </ul>
+
+    <h3>L'atout</h3>
+    <ul>
+      <li>On peut aussi jouer <strong>avec un atout</strong> (réglage « Atout »). L'<dfn>atout</dfn> est une couleur plus forte que les autres : c'est la couleur où Nord et Sud ont, à eux deux, <strong>le plus de cartes</strong>. Elle est affichée en haut à gauche de la table.</li>
+      <li>Il faut toujours <strong>fournir</strong> la couleur demandée si on en a.</li>
+      <li>Si on n'a pas la couleur demandée, on peut jouer un atout : on appelle cette action <dfn>couper</dfn>. Un atout bat toutes les cartes des autres couleurs, même un 10. On <strong>n'est pas obligé de couper</strong> : on peut aussi défausser.</li>
+      <li>Si plusieurs atouts sont joués dans le même pli, le <strong>plus fort atout</strong> remporte le pli.</li>
+      <li>Avec un atout, les robots n'entament <strong>jamais dans la couleur d'atout</strong> : ils appliquent leur règle d'entame aux trois autres couleurs.</li>
     </ul>
 
     <h3>Qui gagne ?</h3>
@@ -194,6 +203,12 @@
         <option value="all" data-i18n="setup.quiz.all">Toutes (entraînement)</option>
       </select>
     </label>
+    <label class="field"><span><span class="emo" aria-hidden="true">♠️</span> <span data-i18n="setup.trump">Atout</span></span>
+      <select id="cfg-trump">
+        <option value="none" selected data-i18n="setup.trump.none">Sans atout</option>
+        <option value="auto" data-i18n="setup.trump.auto">Couleur la plus longue de Nord-Sud</option>
+      </select>
+    </label>
     <label class="field"><span><span class="emo" aria-hidden="true">🔢</span> <span data-i18n="setup.coco">Carré de Coco</span></span>
       <select id="cfg-coco">
         <option value="off" selected data-i18n="setup.coco.off">Non</option>
@@ -226,6 +241,7 @@
         <li>En fin de donne, le DDS fait le <strong>bilan</strong> des cartes qui ont coûté des plis.</li>
         <li><strong>Mode évaluation</strong> : compare ta donne (en Sud) à celle de Piperno, Averell et Averell250 sur les mêmes cartes ; ton score duplicate s'affiche en fin de donne.</li>
         <li><strong>Questions pendant la partie</strong> (quand tu es le déclarant, en Sud) : <strong>Quelques-unes</strong> en pose au moins une par donne, tirées au sort ; <strong>Toutes</strong> les pose toutes, pour s'entraîner. Toutes les 3 bonnes réponses, tu choisis un cadeau.</li>
+        <li><strong>Atout</strong> : sans atout, ou avec pour atout la couleur la plus longue de Nord et Sud réunis. À l'atout, on peut couper quand on n'a pas la couleur demandée (voir les règles du jeu). Les questions sur l'entame et les cartes maîtresses ne sont pas posées à l'atout pour l'instant.</li>
         <li><strong>Carré de Coco</strong> : pendant la donne, un tableau des cartes de départ de chaque couleur chez chaque joueur (Nord et Sud remplis d'office), à compléter pour Ouest et Est au fil des plis. Le bouton <strong>🐐 Jouer avec Goat</strong> lance une donne avec Goat (et redevient « Jouer sans aide »). Avec <strong>Goat</strong>, le carré se remplit tout seul et chaque déduction est expliquée (c'est une aide : la donne n'est pas évaluée).</li>
         <li><strong>Lire à voix haute</strong> : les questions et les exercices sont lus (en version simple), avec un petit encouragement après chaque réponse. Les boutons 🔊 Écouter lisent aussi les règles et cette aide. La voix dépend de l'appareil.</li>
         <li><strong>Musique</strong> : une petite musique rétro pendant la partie. <strong>Bruitages</strong> : carte posée, pli gagné ou perdu, résultat, bonne ou mauvaise réponse. Le bouton <strong>Parade</strong> fait défiler les 40 personnages, qui se présentent un par un ; un clic sur le logo Kiboo rouvre l'accueil.</li>
@@ -238,6 +254,7 @@
   <div class="play-area">
   <div class="play-main">
   <main class="table" id="table">
+    <div class="trump-tag" id="trump-tag" hidden></div>
     <!-- Les places tournent : celle du joueur humain est toujours en bas (voir position() dans js/game.js). -->
     <div class="seat north" id="seat-N"><div class="tag" id="tag-N"></div><div class="hand main" id="hand-N"></div></div>
     <div class="seat west" id="seat-O"><div class="tag" id="tag-O"></div><div class="hand side" id="hand-O"></div></div>
@@ -262,28 +279,28 @@
   <section class="review" id="review" hidden aria-live="polite"></section>
 </div>
 
-<script>window.KIBOO_VERSION = "2026-11-04-1107";   // mis à jour par tools/bump-version.sh</script>
-<script src="lang/fr.js?v=2026-11-04-1107"></script>
-<script src="lang/en.js?v=2026-11-04-1107"></script>
-<script src="lang/parade.js?v=2026-11-04-1107"></script>
-<script src="lang/personnages.js?v=2026-11-04-1107"></script>
-<script src="lang/it.js?v=2026-11-04-1107"></script>
-<script src="js/i18n.js?v=2026-11-04-1107"></script>
-<script src="js/dds.js?v=2026-11-04-1107"></script>
-<script src="js/pimc.js?v=2026-11-04-1107"></script>
-<script src="js/solver.js?v=2026-11-04-1107"></script>
-<script src="js/images.js?v=2026-11-04-1107"></script>
-<script src="js/timing.js?v=2026-11-04-1107"></script>
-<script src="js/game.js?v=2026-11-04-1107"></script>
-<script src="js/account.js?v=2026-11-04-1107"></script>
-<script src="js/sound.js?v=2026-11-04-1107"></script>
-<script src="js/voice.js?v=2026-11-04-1107"></script>
-<script src="js/rewards.js?v=2026-11-04-1107"></script>
-<script src="js/exercises.js?v=2026-11-04-1107"></script>
-<script src="js/intro.js?v=2026-11-04-1107"></script>
-<script src="js/coco.js?v=2026-11-04-1107"></script>
-<script src="js/quiz.js?v=2026-11-04-1107"></script>
-<script src="js/evaluation.js?v=2026-11-04-1107"></script>
-<script src="js/feedback.js?v=2026-11-04-1107"></script>
+<script>window.KIBOO_VERSION = "2026-11-11-1053";   // mis à jour par tools/bump-version.sh</script>
+<script src="lang/fr.js?v=2026-11-11-1053"></script>
+<script src="lang/en.js?v=2026-11-11-1053"></script>
+<script src="lang/parade.js?v=2026-11-11-1053"></script>
+<script src="lang/personnages.js?v=2026-11-11-1053"></script>
+<script src="lang/it.js?v=2026-11-11-1053"></script>
+<script src="js/i18n.js?v=2026-11-11-1053"></script>
+<script src="js/dds.js?v=2026-11-11-1053"></script>
+<script src="js/pimc.js?v=2026-11-11-1053"></script>
+<script src="js/solver.js?v=2026-11-11-1053"></script>
+<script src="js/images.js?v=2026-11-11-1053"></script>
+<script src="js/timing.js?v=2026-11-11-1053"></script>
+<script src="js/game.js?v=2026-11-11-1053"></script>
+<script src="js/account.js?v=2026-11-11-1053"></script>
+<script src="js/sound.js?v=2026-11-11-1053"></script>
+<script src="js/voice.js?v=2026-11-11-1053"></script>
+<script src="js/rewards.js?v=2026-11-11-1053"></script>
+<script src="js/exercises.js?v=2026-11-11-1053"></script>
+<script src="js/intro.js?v=2026-11-11-1053"></script>
+<script src="js/coco.js?v=2026-11-11-1053"></script>
+<script src="js/quiz.js?v=2026-11-11-1053"></script>
+<script src="js/evaluation.js?v=2026-11-11-1053"></script>
+<script src="js/feedback.js?v=2026-11-11-1053"></script>
 </body>
 </html>

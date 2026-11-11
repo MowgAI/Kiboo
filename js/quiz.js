@@ -99,7 +99,7 @@ const Quiz = (() => {
       if (seat === "O") revealedW.push(makeDeck()[id]);
       else revealedE.add(id);
     }
-    return { me: game.initial.S, dummy: game.initial.N, lead: game.history[0].card, revealedW, revealedE };
+    return { me: game.initial.S, dummy: game.initial.N, lead: game.history[0].card, revealedW, revealedE, trump: game.trump };
   }
   const forEachWestHand = (visit, opts) => Exercises.westHands(westCtx(), visit, opts);
 
@@ -425,7 +425,10 @@ const Quiz = (() => {
   let playAsked = false;
 
   function makePlan() {
-    const sure = SURE.concat(RULE_LEADERS.includes(game.types.O) ? RULE_KINDS : []);
+    // À l'atout, les questions sur l'entame et les cartes maîtresses ne sont pas posées pour l'instant
+    // (la règle d'entame change, et une carte maîtresse peut être coupée).
+    const trump = game.trump >= 0;
+    const sure = SURE.filter(k => !(trump && k === "masters")).concat(RULE_LEADERS.includes(game.types.O) && !trump ? RULE_KINDS : []);
     if (config.quiz === "all") return new Set(sure.concat(OTHER));
     const p = new Set(sure.concat(OTHER).filter(() => Math.random() < 0.3));
     if (!sure.some(k => p.has(k))) p.add(sure[Math.floor(Math.random() * sure.length)]);
@@ -453,7 +456,7 @@ const Quiz = (() => {
         me: game.hands.S, dummy: game.hands.N, intro: T("rest.intro.game"), onResult,
       }), "voice.q.rest0");
     } else if (moment === "lead") {
-      if (!RULE_LEADERS.includes(game.types.O) || game.history.length !== 1) return;
+      if (!RULE_LEADERS.includes(game.types.O) || game.history.length !== 1 || game.trump >= 0) return;
       if (pl.has("lead")) await ask(T("quiz.title.lead"), leadPanel, "voice.q.lead");
       if (pl.has("split")) await ask(T("quiz.title.lead"), body => Exercises.splitPanel(body, {
         ...westCtx(), bot: PLAYER_TYPES[game.types.O].label, onResult,

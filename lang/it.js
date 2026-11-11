@@ -47,6 +47,10 @@
     "setup.open": "Carte scoperte",
     "setup.hints": "Mostra le giocate migliori",
     "setup.explain": "Spiegazioni di Piperno",
+    "setup.trump": "Atout",
+    "setup.trump.none": "Senza atout",
+    "setup.trump.auto": "Colore più lungo di Nord-Sud",
+    "trump.tag": "Atout:",
     "setup.quiz": "Domande durante la partita",
     "setup.eval": "Modalità valutazione",
     "help.show": "Aiuto",
@@ -66,6 +70,7 @@
         <li>A fine smazzata, il DDS fa il <strong>bilancio</strong> delle carte che sono costate prese.</li>
         <li><strong>Modalità valutazione</strong>: confronta la tua smazzata (in Sud) con quella di Piperno, Averell e Averell250 con le stesse carte; il tuo punteggio duplicato appare a fine smazzata.</li>
         <li><strong>Domande durante la partita</strong> (quando sei il dichiarante, in Sud): <strong>Alcune</strong> ne pone almeno una per smazzata, estratte a sorte; <strong>Tutte</strong> le pone tutte, per allenarsi. Ogni 3 risposte giuste, scegli un regalo.</li>
+        <li><strong>Atout</strong>: senza atout, oppure con atout il colore più lungo di Nord e Sud insieme. Con l'atout si può tagliare quando non si ha il colore richiesto (vedi le regole). Le domande sull'attacco e sulle carte vincenti per ora non vengono poste con l'atout.</li>
         <li><strong>Quadrato di Coco</strong>: durante la smazzata, una tabella delle carte iniziali di ogni colore per ogni giocatore (Nord e Sud già riempiti), da completare per Ovest ed Est presa dopo presa. Il pulsante <strong>🐐 Gioca con Goat</strong> avvia una smazzata con Goat (e diventa «Gioca senza aiuto»). Con <strong>Goat</strong>, il quadrato si riempie da solo e ogni deduzione è spiegata (è un aiuto: la smazzata non viene valutata).</li>
         <li><strong>Leggi ad alta voce</strong>: le domande e gli esercizi vengono letti (in versione semplice), con un piccolo incoraggiamento dopo ogni risposta. I pulsanti 🔊 Ascolta leggono anche le regole e questo aiuto. La voce dipende dal dispositivo.</li>
         <li><strong>Musica</strong>: una musichetta rétro durante la partita. <strong>Effetti sonori</strong>: carta giocata, presa vinta o persa, risultato, risposta giusta o sbagliata. Il pulsante <strong>Parata</strong> fa sfilare i 40 personaggi, che si presentano uno alla volta; un clic sul logo Kiboo riapre l'accoglienza.</li>
@@ -97,9 +102,12 @@
     "explain.title": "Spiegazioni di Piperno",
     "explain.none": "Piperno non ha ancora giocato.",
     "explain.item": p => `<b>Presa ${p.trick}</b> · ${p.who} gioca <b>${p.card}</b>. ${p.reason}`,
-    "pip.opening": p => `Attacco: il ${C[p.suit]} è il suo colore più lungo (${p.len} carte)` +
+    "pip.opening": p => `Attacco: il ${C[p.suit]} è il suo colore più lungo${p.trump >= 0 ? " fuori dall'atout" : ""} (${p.len} ${S(p.len, "carta", "carte")})` +
       (p.tied ? ", il più forte tra i colori della stessa lunghezza" : "") + ". " +
       (p.seq ? "Gioca la carta più alta della sua sequenza." : "Senza una sequenza (almeno due carte consecutive, la più alta almeno 7), gioca la più bassa."),
+    "pip.leadForRuff": p => `Il suo compagno ha già tagliato il ${C[p.suit]} e può avere ancora atout: rigioca il ${C[p.suit]} perché tagli di nuovo.`,
+    "pip.keepPartner": p => (p.ruffed ? "Il suo compagno ha già tagliato" : "Il suo compagno sta vincendo la presa") + ": non taglia e scarta una carta bassa.",
+    "pip.ruff": p => `Non ha più ${C[p.led]}: taglia con il suo atout più basso che vince la presa${p.now ? " per ora" : ""}.`,
     "pip.newSuit": p => `Il suo colore preferito diventa il ${C[p.suit]} (il suo colore più lungo).`,
     "pip.leadStrong": p => `Attacca nel suo colore preferito, il ${C[p.suit]}. Ha la carta più alta rimasta (${art(p.top)}): gioca la sua più alta.`,
     "pip.leadWeak": p => `Attacca nel suo colore preferito, il ${C[p.suit]}. Non ha la carta più alta rimasta (${art(p.top)}): gioca la sua più bassa.`,
@@ -293,7 +301,7 @@
     "voice.listenAria": "Ascolta (versione semplice, ad alta voce)",
     "voice.cheer.ok": "Bravo!|Super!|Fantastico!|Ben fatto!|Eccellente!|Sei un campione!",
     "voice.cheer.ko": "Non male!|Quasi!|Non importa, andiamo avanti!|Non proprio. Guarda la correzione.|Ci sei quasi!",
-    "voice.rules": "Kiboo è un gioco di carte per quattro giocatori. Nord e Sud giocano insieme, contro Est e Ovest. Ci sono quaranta carte, di quattro colori: blu, verde, rosso e giallo. Ogni carta ha un numero, da uno a dieci. Il dieci è il più forte. Ogni giocatore ha dieci carte. Tu sei Sud. Giochi le tue carte, e anche quelle del tuo compagno Nord. Lo chiamiamo il morto: le sue carte sono sul tavolo, tutti le vedono. Ovest gioca la prima carta. Poi ognuno gioca una carta, a turno. Devi giocare lo stesso colore della prima carta, se ce l'hai. Altrimenti, giochi la carta che vuoi. La carta più forte del colore richiesto vince: si chiama una presa. Chi vince la presa gioca per primo nella presa successiva. Alla fine, la squadra che ha vinto più prese vince la partita.",
+    "voice.rules": "Kiboo è un gioco di carte per quattro giocatori. Nord e Sud giocano insieme, contro Est e Ovest. Ci sono quaranta carte, di quattro colori: blu, verde, rosso e giallo. Ogni carta ha un numero, da uno a dieci. Il dieci è il più forte. Ogni giocatore ha dieci carte. Tu sei Sud. Giochi le tue carte, e anche quelle del tuo compagno Nord. Lo chiamiamo il morto: le sue carte sono sul tavolo, tutti le vedono. Ovest gioca la prima carta. Poi ognuno gioca una carta, a turno. Devi giocare lo stesso colore della prima carta, se ce l'hai. Altrimenti, giochi la carta che vuoi. La carta più forte del colore richiesto vince: si chiama una presa. Chi vince la presa gioca per primo nella presa successiva. Alla fine, la squadra che ha vinto più prese vince la partita. Si può anche giocare con un atout: è un colore più forte degli altri. Se non hai il colore richiesto, puoi giocare un atout per vincere la presa: si dice tagliare.",
     "voice.help": "Nelle impostazioni, scegli chi gioca in ogni posto: tu, o un robot. Puoi scegliere la velocità dei robot. Puoi chiedere delle domande durante la partita: ogni tre risposte giuste, vinci un regalo. Il quadrato di Coco ti aiuta a contare le carte. Clicca su Nuova smazzata per cominciare una partita.",
     "voice.ex.count": "Conta le tue carte! Per ogni colore, quante carte hai, e quanti punti? I punti sono la somma dei numeri scritti sulle carte.",
     "voice.ex.longest": "Qual è il tuo colore più lungo? È il colore in cui hai più carte.",
@@ -323,7 +331,7 @@
       (p.n ? `Ne ha ${S(p.n, "giocata", "giocate")} ${p.n} (${p.cards.join(", ")}): quindi ne aveva <strong>${p.n}</strong> all'inizio.` : `Non ne aveva <strong>nessuna</strong> all'inizio.`),
     "goat.bound.row": p => { const t = p.cells.reduce((a, c) => a + c.n, 0); return `Riga ${C[p.s]}: ${S(t, "resta", "restano")} ${10 - p.known.reduce((a, b) => a + b, 0)} ${S(t, "carta", "carte")} ${(t === 1 ? F1 : FN)[p.s]} per ${p.cells.map(c => seatName(c.seat)).join(" ed ")}, e ne ${S(p.cells.length, "ha", "hanno")} già ${S(t, "giocata", "giocate")} ${t}: ${p.cells.map(c => `<strong>${c.n}</strong> a ${seatName(c.seat)}`).join(", ")}, non ce ne sono altre.`; },
     "goat.bound.col": p => `Colonna ${seatName(p.seat)}: le sue carte note e quelle già giocate fanno già 10: ${p.cells.map(c => `<strong>${c.n}</strong> ${S(c.n, "carta", "carte")} ${(c.n === 1 ? F1 : FN)[c.s]}`).join(", ")}.`,
-    "goat.lead": p => `Ovest attacca con ${artc(cardName(p.card))} seguendo la regola d'attacco: il ${C[p.L]} è il suo colore più lungo, quindi ne ha <strong>almeno 3</strong> (10 carte per 4 colori). Passando in rassegna le sue ${p.n.toLocaleString("it-IT")} mani possibili, Ovest aveva all'inizio: ${p.ranges.map(([a, b], s) => `${a === b ? `<strong>${a}</strong>` : `da ${a} a ${b}`} ${S(b, "carta", "carte")} ${(b === 1 ? F1 : FN)[s]}`).join(", ")}.`,
+    "goat.lead": p => `Ovest attacca con ${artc(cardName(p.card))} seguendo la regola d'attacco: ${p.trump >= 0 ? `non si attacca mai nell'atout, quindi il ${C[p.L]} è il suo colore più lungo fuori dall'atout.` : `il ${C[p.L]} è il suo colore più lungo, quindi ne ha <strong>almeno 3</strong> (10 carte per 4 colori).`} Passando in rassegna le sue ${p.n.toLocaleString("it-IT")} mani possibili, Ovest aveva all'inizio: ${p.ranges.map(([a, b], s) => `${a === b ? `<strong>${a}</strong>` : `da ${a} a ${b}`} ${S(b, "carta", "carte")} ${(b === 1 ? F1 : FN)[s]}`).join(", ")}.`,
     "goat.rule": p => `${p.lead ? "Con la regola d'attacco e le carte già giocate" : "Con le carte già giocate"}, tutte le mani possibili di Ovest (${p.n.toLocaleString("it-IT")}) danno lo stesso valore: ${p.cells.map(c => `<strong>${c.v}</strong> ${S(c.v, "carta", "carte")} ${(c.v === 1 ? F1 : FN)[c.s]} a ${seatName(c.seat)}`).join(", ")}.`,
     "goat.none": "Ancora nessuna deduzione: Goat aspetta che un difensore non risponda al colore.",
     "goat.done": "Il quadrato è completo: Goat conosce tutta la distribuzione iniziale!",
@@ -532,8 +540,17 @@
       <li>Si gioca a turno <strong>in senso orario</strong>: Ovest, Nord, Est, Sud.</li>
       <li>Il primo giocatore della presa sceglie liberamente la sua carta. Il suo colore è il <dfn>colore richiesto</dfn> per il resto della presa.</li>
       <li>Gli altri giocatori <strong>devono rispondere al colore</strong> con una carta del colore richiesto, se ne hanno. Altrimenti giocano una carta qualsiasi: questa azione si chiama <dfn>scartare</dfn>.</li>
-      <li>In questa versione non c'è <strong>atout</strong>: la <strong>carta più alta del colore richiesto</strong> vince quindi la presa. Una carta di un altro colore non vince mai la presa.</li>
+      <li><strong>Senza atout</strong>, la <strong>carta più alta del colore richiesto</strong> vince la presa. Una carta di un altro colore non vince mai la presa.</li>
       <li>Il giocatore che vince la presa <strong>gioca la prima carta della presa successiva</strong>.</li>
+    </ul>
+
+    <h3>L'atout</h3>
+    <ul>
+      <li>Si può anche giocare <strong>con un atout</strong> (impostazione «Atout»). L'<dfn>atout</dfn> è un colore più forte degli altri: è il colore in cui Nord e Sud hanno, insieme, <strong>più carte</strong>. È indicato in alto a sinistra del tavolo.</li>
+      <li>Bisogna sempre <strong>rispondere al colore</strong> richiesto, se si può.</li>
+      <li>Se non si ha il colore richiesto, si può giocare un atout: si dice <dfn>tagliare</dfn>. Un atout batte tutte le carte degli altri colori, anche un 10. <strong>Non si è obbligati a tagliare</strong>: si può anche scartare.</li>
+      <li>Se nella stessa presa vengono giocati più atout, vince l'<strong>atout più alto</strong>.</li>
+      <li>Con un atout, i robot <strong>non attaccano mai nel colore di atout</strong>: applicano la loro regola d'attacco agli altri tre colori.</li>
     </ul>
 
     <h3>Chi vince?</h3>

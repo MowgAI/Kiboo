@@ -40,11 +40,25 @@ function legalCards(hand, trick) {
   const follow = hand.filter(c => c.s === led);
   return follow.length ? follow : hand.slice();
 }
-function trickWinner(trick) {
-  const led = trick[0].card.s;
+// Le plus fort atout gagne le pli ; sans atout joué, la plus forte carte de la couleur demandée.
+// trump : couleur d'atout, ou -1 sans atout.
+function trickWinner(trick, trump = -1) {
   let best = trick[0];
-  for (const p of trick) if (p.card.s === led && p.card.v > best.card.v) best = p;
+  for (const p of trick) {
+    if (p.card.s === best.card.s ? p.card.v > best.card.v : p.card.s === trump) best = p;
+  }
   return best.seat;
+}
+// Atout de la donne : la couleur la plus longue de Nord et Sud réunis (à égalité, la plus forte
+// somme des valeurs, puis la dernière dans l'ordre bleu, vert, rouge, jaune).
+function longestTrump(hands) {
+  let best = -1, bestLen = -1, bestSum = -1;
+  for (let s = 0; s < 4; s++) {
+    const cards = [...hands.N, ...hands.S].filter(c => c.s === s);
+    const sum = cards.reduce((t, c) => t + c.v, 0);
+    if (cards.length > bestLen || (cards.length === bestLen && sum >= bestSum)) { best = s; bestLen = cards.length; bestSum = sum; }
+  }
+  return best;
 }
 
 /* =====================================================================
@@ -78,7 +92,9 @@ class RandomBot {
 // d'au moins deux cartes dont la plus haute vaut au moins 7, sinon la plus petite.
 const SEQ_MIN = 7;
 // Renvoie aussi les éléments qui ont décidé du choix, pour les explications.
-function openingChoice(hand) {
+// Avec un atout, on n'entame jamais dans la couleur d'atout (sauf si on n'a que ça).
+function openingChoice(hand, trump = -1) {
+  if (trump >= 0 && hand.some(c => c.s !== trump)) hand = hand.filter(c => c.s !== trump);
   const bySuit = [0, 1, 2, 3].map(s => hand.filter(c => c.s === s).sort((a, b) => a.v - b.v));
   const maxLen = Math.max(...bySuit.map(x => x.length));
   let suit = -1, bestSum = -1;
@@ -97,7 +113,7 @@ function openingChoice(hand) {
   const tied = bySuit.filter(x => x.length === maxLen).length > 1;
   return { card: top || cards[0], suit, len: maxLen, tied, seq: !!top };
 }
-const openingCard = hand => openingChoice(hand).card;
+const openingCard = (hand, trump = -1) => openingChoice(hand, trump).card;
 
 // Piperno : robot déterministe de Samuel (src/strategy/deterministic.rs), adapté.
 // Après chaque choix, `this.reason` dit quelle règle a décidé : une liste de
@@ -109,8 +125,8 @@ class DeterministicBot {
   choose(view) {
     const { seat, hand, trick, played, legal } = view;
     if (played.length === 0 && trick.length === 0) {
-      const o = openingChoice(hand);
-      this.reason = [{ k: "pip.opening", p: { suit: o.suit, len: o.len, tied: o.tied, seq: o.seq } }];
+      const o = openingChoice(hand, view.trump);
+      this.reason = [{ k: "pip.opening", p: { suit: o.suit, len: o.len, tied: o.tied, seq: o.seq, trump: view.trump } }];
       return o.card;
     }
 
@@ -121,6 +137,26 @@ class DeterministicBot {
     }
     const my = this.mySuit[seat];
 
+    const trump = view.trump === undefined ? -1 : view.trump;
+    const partner = SEATS[(SEATS.indexOf(seat) + 2) % 4];
+    if (trick.length === 0 && trump >= 0) {
+      // À l'atout : je rejoue une couleur que mon partenaire a déjà coupée, s'il peut encore avoir de l'atout.
+      const ledOf = {}, ruffed = new Set();
+      for (const h of view.history) {
+        if (!(h.trickNo in ledOf)) ledOf[h.trickNo] = h.card.s;
+        else if (h.seat === partner && h.card.s === trump && ledOf[h.trickNo] !== trump) ruffed.add(ledOf[h.trickNo]);
+      }
+      // Atouts dont je ne sais pas où ils sont (ou ceux de mon partenaire, si je vois sa main).
+      const seen = new Set([...played, ...hand, ...Object.entries(view.visible).filter(([s]) => s !== partner).flatMap(([, h]) => h)].map(cardId));
+      const partnerMayRuff = view.visible[partner]
+        ? view.visible[partner].some(c => c.s === trump)
+        : makeDeck().some(c => c.s === trump && !seen.has(cardId(c)));
+      const again = sortAsc(hand.filter(c => ruffed.has(c.s) && c.s !== trump));
+      if (again.length && partnerMayRuff) {
+        this.reason = [{ k: "pip.leadForRuff", p: { suit: again[0].s } }];
+        return again[0];
+      }
+    }
     if (trick.length === 0) {
       // Je détiens la plus forte carte restante de ma couleur ? je la joue, sinon la plus petite.
       const gone = new Set(played.map(cardId));
@@ -134,15 +170,33 @@ class DeterministicBot {
 
     const led = trick[0].card.s;
     const follows = legal[0].s === led;
-    const partnerWins = team(trickWinner(trick)) === team(seat);
+    const partnerWins = team(trickWinner(trick, view.trump)) === team(seat);
     const sorted = sortAsc(legal);
+    // Défausse d'une petite carte : pas d'atout si possible, en épargnant ma couleur préférée.
+    const smallDiscard = () => {
+      const byValue = legal.slice().sort((a, b) => a.v - b.v || a.s - b.s);
+      return byValue.find(c => c.s !== trump && c.s !== my) || byValue.find(c => c.s !== trump) || byValue[0];
+    };
+    if (!follows && trump >= 0 && partnerWins) {
+      // À l'atout, je ne coupe pas le pli de mon partenaire s'il a déjà coupé, si sa carte est
+      // maîtresse (aucune carte plus forte de la couleur n'est encore en jeu ailleurs que chez moi),
+      // ou si je joue en dernier.
+      const win = trick.find(p => p.seat === trickWinner(trick, trump)).card;
+      const known = new Set([...played, ...hand].map(cardId));
+      const master = !makeDeck().some(c => c.s === win.s && c.v > win.v && !known.has(cardId(c)));
+      if (win.s === trump || master || trick.length === 3) {
+        this.reason = [{ k: "pip.keepPartner", p: { ruffed: win.s === trump && led !== trump, led } }];
+        return smallDiscard();
+      }
+    }
     // La plus petite carte qui fait gagner (provisoirement) mon camp.
     for (const c of sorted) {
-      if (team(trickWinner([...trick, { seat, card: c }])) !== team(seat)) continue;
+      if (team(trickWinner([...trick, { seat, card: c }], view.trump)) !== team(seat)) continue;
       if (partnerWins) {
-        this.reason = [{ k: follows ? "pip.partnerFollow" : "pip.partnerDiscard", p: { led } }];
+        // À l'atout, couper la carte non maîtresse du partenaire pour assurer le pli est une coupe.
+        this.reason = [{ k: follows ? "pip.partnerFollow" : c.s === trump ? "pip.ruff" : "pip.partnerDiscard", p: { led, now: trick.length < 3 } }];
       } else {
-        this.reason = [{ k: "pip.win", p: { now: trick.length < 3 } }];
+        this.reason = [{ k: !follows && c.s === trump ? "pip.ruff" : "pip.win", p: { now: trick.length < 3, led } }];
       }
       return c;
     }
@@ -151,7 +205,11 @@ class DeterministicBot {
       this.reason = [{ k: "pip.cantWin" }];
       return sorted[0];
     }
-    // Sinon, je défausse une petite carte en épargnant ma couleur préférée.
+    // Sinon, je défausse une petite carte en épargnant ma couleur préférée (et mes atouts).
+    if (trump >= 0) {
+      this.reason = [...note, { k: "pip.discardKeep", p: { led, my } }];
+      return smallDiscard();
+    }
     const other = sorted.find(c => c.s !== my);
     this.reason = [...note, { k: other ? "pip.discardKeep" : "pip.discardOnly", p: { led, my } }];
     return other || sorted[0];
@@ -222,6 +280,7 @@ function pimcInfo(view) {
     voids,
     trick: view.trick.map(p => ({ seat: SEATS.indexOf(p.seat), card: p.card })),
     leader: SEATS.indexOf(view.leader),
+    trump: view.trump,
     legal: view.legal,
   };
 }
@@ -245,7 +304,7 @@ const PLAYER_TYPES = {
 };
 
 /* ===================== État de la partie ===================== */
-const config = { O: "deterministe", E: "deterministe", S: "humain", speed: 650, open: false, hints: false, explain: false, quiz: "off", eval: true, coco: "off", voice: false, music: false, sfx: true };
+const config = { O: "deterministe", E: "deterministe", S: "humain", speed: 650, open: false, hints: false, explain: false, quiz: "off", eval: true, coco: "off", voice: false, music: false, sfx: true, trump: "none" };
 let game = null;
 let runToken = 0;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -269,6 +328,7 @@ function newGame(hands, opts = {}) {
     hands: {}, trick: [], played: [], leader: OPENING_LEADER,
     tricksWon: { NS: 0, EO: 0 }, turn: OPENING_LEADER, lastTrick: null,
     dummyShown: false, waiting: null, over: false,
+    trump: config.trump === "auto" ? longestTrump(initial) : -1,     // couleur d'atout, ou -1
   };
   game.hands = {};
   SEATS.forEach(s => { game.hands[s] = initial[s].slice(); });
@@ -293,6 +353,7 @@ function fullPosition(g = game) {
     hands: SEATS.map(s => g.hands[s].slice()),
     trick: g.trick.map(p => ({ seat: SEATS.indexOf(p.seat), card: p.card })),
     leader: SEATS.indexOf(g.leader),
+    trump: g.trump === undefined ? -1 : g.trump,
   };
 }
 
@@ -309,6 +370,7 @@ function viewFor(seat, g = game) {
     trick: g.trick.map(p => ({ seat: p.seat, card: p.card })),
     played: g.played.slice(),
     tricksWon: { ...g.tricksWon },
+    trump: g.trump === undefined ? -1 : g.trump,
     // Informations publiques : qui a joué quoi, l'entameur du pli, la taille des mains.
     history: g.history.map(h => ({ seat: h.seat, card: h.card, trickNo: h.trickNo })),
     leader: g.leader,
@@ -385,7 +447,7 @@ async function play(token) {
       await Quiz.at("discard", { seat, card });
       if (token !== runToken) return;
     }
-    const winner = trickWinner(game.trick);
+    const winner = trickWinner(game.trick, game.trump);
     Sound.sfx(team(winner) === humanTeam() ? "trickWin" : "trickLose", 0.15);
     game.winnerSeat = winner;
     // Avec un joueur humain, le pli reste visible jusqu'à son clic sur « Pli suivant » :
@@ -414,7 +476,7 @@ async function play(token) {
     Sound.sfx(mine > theirs ? "win" : mine === theirs ? "tie" : "lose", 0.3);
     // Journal du compte (js/account.js), si le joueur est connecté.
     Account.log("deal", {
-      ns: game.tricksWon.NS, types: game.types, coco: config.coco, quiz: config.quiz, assisted: game.assisted, replayed: game.replayed,
+      ns: game.tricksWon.NS, trump: game.trump, types: game.types, coco: config.coco, quiz: config.quiz, assisted: game.assisted, replayed: game.replayed,
       planMs: (game.history.find(h => h.plan) || {}).ms ?? null,
       times: game.history.filter(h => h.ms !== null).map(h => h.ms),     // temps de chaque carte du joueur, dans l'ordre
     });
@@ -594,6 +656,11 @@ function render() {
     tag.dataset.team = team(seat);
   }
 
+  // Atout de la donne, affiché en haut à gauche de la table.
+  const tt = $("trump-tag");
+  tt.hidden = game.trump < 0;
+  if (game.trump >= 0) tt.innerHTML = `${T("trump.tag")} <b class="fam ${COLORS[game.trump]}">${colorName(game.trump)}</b>`;
+
   // Centre : pli en cours ou résultat
   const center = $("center");
   center.innerHTML = "";
@@ -702,6 +769,7 @@ $("cfg-hints").addEventListener("change", e => { config.hints = e.target.checked
 $("cfg-explain").addEventListener("change", e => { config.explain = e.target.checked; render(); });
 $("cfg-quiz").addEventListener("change", e => { config.quiz = e.target.value; });
 $("cfg-eval").addEventListener("change", e => { config.eval = e.target.checked; });
+$("cfg-trump").addEventListener("change", e => { config.trump = e.target.value; });
 $("cfg-music").addEventListener("change", e => { config.music = e.target.checked; Sound.music(config.music ? "game" : null); });
 $("cfg-sfx").addEventListener("change", e => { config.sfx = e.target.checked; });
 $("cfg-voice").addEventListener("change", e => { config.voice = e.target.checked; if (!config.voice) Voice.stop(); });

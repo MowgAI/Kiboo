@@ -40,6 +40,10 @@
     "setup.open": "Open hands",
     "setup.hints": "Show best plays",
     "setup.explain": "Piperno's explanations",
+    "setup.trump": "Trumps",
+    "setup.trump.none": "No trumps",
+    "setup.trump.auto": "North-South's longest suit",
+    "trump.tag": "Trumps:",
     "setup.quiz": "Questions during play",
     "setup.eval": "Evaluation mode",
     "help.show": "Help",
@@ -59,6 +63,7 @@
         <li>At the end of the deal, the DDS makes a <strong>review</strong> of the cards that cost tricks.</li>
         <li><strong>Evaluation mode</strong>: compares your deal (as South) with Piperno, Averell and Averell250 on the same cards; your duplicate score is shown at the end of the deal.</li>
         <li><strong>Questions during play</strong> (when you are declarer, as South): <strong>A few</strong> asks at least one per deal, drawn at random; <strong>All</strong> asks them all, for training. Every 3 right answers, you choose a gift.</li>
+        <li><strong>Trumps</strong>: no trumps, or North and South's longest combined suit as trumps. With trumps, you may ruff when you can't follow suit (see the rules). Questions about the opening lead and about winners aren't asked with trumps for now.</li>
         <li><strong>Coco's square</strong>: during the deal, a table of each player's starting cards in each suit (North and South filled in for you), to complete for West and East as the tricks go by. The <strong>🐐 Play with Goat</strong> button starts a deal with Goat (and becomes “Play without help”). With <strong>Goat</strong>, the square fills in by itself and each deduction is explained (it's a help: the deal isn't evaluated).</li>
         <li><strong>Read aloud</strong>: questions and exercises are read out (in a simple version), with a little encouragement after each answer. The 🔊 Listen buttons also read the rules and this help. The voice depends on the device.</li>
         <li><strong>Music</strong>: a little retro tune during the game. <strong>Sound effects</strong>: card played, trick won or lost, result, right or wrong answer. The <strong>Parade</strong> button shows the 40 characters, who introduce themselves one by one; clicking the Kiboo logo reopens the welcome screen.</li>
@@ -90,9 +95,12 @@
     "explain.title": "Piperno's explanations",
     "explain.none": "Piperno hasn't played yet.",
     "explain.item": p => `<b>Trick ${p.trick}</b> · ${p.who} plays <b>${p.card}</b>. ${p.reason}`,
-    "pip.opening": p => `Opening lead: ${C[p.suit]} is his longest suit (${p.len} cards)` +
+    "pip.opening": p => `Opening lead: ${C[p.suit]} is his longest suit${p.trump >= 0 ? " outside trumps" : ""} (${p.len} ${S(p.len, "card", "cards")})` +
       (p.tied ? ", the strongest of the suits of the same length" : "") + ". " +
       (p.seq ? "He plays the top card of his sequence." : "Without a sequence (at least two touching cards, the top one at least a 7), he plays the lowest one."),
+    "pip.leadForRuff": p => `His partner has already ruffed ${C[p.suit]} and may still have trumps: he leads ${C[p.suit]} again so that he can ruff once more.`,
+    "pip.keepPartner": p => (p.ruffed ? "His partner has already ruffed" : "His partner is winning the trick") + ": he doesn't ruff and discards a low card.",
+    "pip.ruff": p => `He has no ${C[p.led]} left: he ruffs with his lowest trump that wins the trick${p.now ? " for now" : ""}.`,
     "pip.newSuit": p => `His favourite suit becomes ${C[p.suit]} (his longest suit).`,
     "pip.leadStrong": p => `He leads his favourite suit, ${C[p.suit]}. He holds the highest card left (the ${p.top}): he plays his highest.`,
     "pip.leadWeak": p => `He leads his favourite suit, ${C[p.suit]}. He doesn't hold the highest card left (the ${p.top}): he plays his lowest.`,
@@ -286,7 +294,7 @@
     "voice.listenAria": "Listen (simple version, read aloud)",
     "voice.cheer.ok": "Well done!|Super!|Brilliant!|Great job!|Excellent!|You're a star!",
     "voice.cheer.ko": "Not bad!|Almost!|Never mind, let's carry on!|Not quite. Look at the answer.|You're nearly there!",
-    "voice.rules": "Kiboo is a card game for four players. North and South play together, against East and West. There are forty cards, in four colours: blue, green, red and yellow. Each card has a number, from one to ten. Ten is the strongest. Each player has ten cards. You are South. You play your cards, and also the cards of your partner North. We call him the dummy: his cards are laid on the table, and everyone can see them. West plays the first card. Then everyone plays a card, in turn. You must play the same colour as the first card, if you have one. If not, you can play any card you like. The strongest card of the colour that was led wins: that is called a trick. Whoever wins the trick plays first in the next trick. At the end, the team that won the most tricks wins the game.",
+    "voice.rules": "Kiboo is a card game for four players. North and South play together, against East and West. There are forty cards, in four colours: blue, green, red and yellow. Each card has a number, from one to ten. Ten is the strongest. Each player has ten cards. You are South. You play your cards, and also the cards of your partner North. We call him the dummy: his cards are laid on the table, and everyone can see them. West plays the first card. Then everyone plays a card, in turn. You must play the same colour as the first card, if you have one. If not, you can play any card you like. The strongest card of the colour that was led wins: that is called a trick. Whoever wins the trick plays first in the next trick. At the end, the team that won the most tricks wins the game. You can also play with trumps: a colour that is stronger than the others. If you don't have the colour that was led, you can play a trump to win the trick: that is called ruffing.",
     "voice.help": "In the settings, you choose who plays each seat: you, or a robot. You can choose how fast the robots play. You can ask for questions during the game: every three right answers, you win a gift. Coco's square helps you count the cards. Click New deal to start a game.",
     "voice.ex.count": "Count your cards! For each colour, how many cards do you have, and how many points? The points are the numbers on the cards added together.",
     "voice.ex.longest": "Which is your longest colour? It is the colour where you have the most cards.",
@@ -316,7 +324,7 @@
       (p.n ? `He has played ${p.n} (${p.cards.join(", ")}): so he had <strong>${p.n}</strong> ${C[p.s]} ${S(p.n, "card", "cards")} at the start.` : `He had <strong>none</strong> at the start.`),
     "goat.bound.row": p => { const t = p.cells.reduce((a, c) => a + c.n, 0); return `Row ${C[p.s]}: ${10 - p.known.reduce((a, b) => a + b, 0)} ${C[p.s]} ${S(t, "card is", "cards are")} left for ${p.cells.map(c => seatName(c.seat)).join(" and ")}, and ${S(p.cells.length, "he has", "they have")} already played ${t}: ${p.cells.map(c => `<strong>${c.n}</strong> for ${seatName(c.seat)}`).join(", ")}, there are no others.`; },
     "goat.bound.col": p => `Column ${seatName(p.seat)}: his known cards and the ones already played already make 10: ${p.cells.map(c => `<strong>${c.n}</strong> ${C[c.s]} ${S(c.n, "card", "cards")}`).join(", ")}.`,
-    "goat.lead": p => `West leads the ${cardName(p.card)} following the opening lead rule: ${C[p.L]} is his longest suit, so he has <strong>at least 3</strong> of them (10 cards for 4 suits). Going through his ${p.n.toLocaleString("en-GB")} possible hands, West started with: ${p.ranges.map(([a, b], s) => `${a === b ? `<strong>${a}</strong>` : `${a} to ${b}`} ${C[s]}`).join(", ")}.`,
+    "goat.lead": p => `West leads the ${cardName(p.card)} following the opening lead rule: ${p.trump >= 0 ? `robots never lead a trump, so ${C[p.L]} is his longest suit outside trumps.` : `${C[p.L]} is his longest suit, so he has <strong>at least 3</strong> of them (10 cards for 4 suits).`} Going through his ${p.n.toLocaleString("en-GB")} possible hands, West started with: ${p.ranges.map(([a, b], s) => `${a === b ? `<strong>${a}</strong>` : `${a} to ${b}`} ${C[s]}`).join(", ")}.`,
     "goat.rule": p => `${p.lead ? "With the opening lead rule and the cards already played" : "With the cards already played"}, all of West's possible hands (${p.n.toLocaleString("en-GB")}) give the same value: ${p.cells.map(c => `<strong>${c.v}</strong> ${C[c.s]} ${S(c.v, "card", "cards")} for ${seatName(c.seat)}`).join(", ")}.`,
     "goat.none": "No deduction yet: Goat is waiting for a defender who can't follow suit.",
     "goat.done": "The square is complete: Goat knows the whole starting distribution!",
@@ -525,8 +533,17 @@
       <li>Players take turns <strong>clockwise</strong>: West, North, East, South.</li>
       <li>The first player of the trick chooses any card. Its suit is the <dfn>suit led</dfn> for the rest of the trick.</li>
       <li>The other players <strong>must follow suit</strong> with a card of the suit led if they have one. Otherwise, they play any card: this is called <dfn>discarding</dfn>.</li>
-      <li>In this version, there are <strong>no trumps</strong>: the <strong>highest card of the suit led</strong> wins the trick. A card of another suit never wins the trick.</li>
+      <li>With <strong>no trumps</strong>, the <strong>highest card of the suit led</strong> wins the trick. A card of another suit never wins the trick.</li>
       <li>The player who wins the trick <strong>leads the first card of the next trick</strong>.</li>
+    </ul>
+
+    <h3>Trumps</h3>
+    <ul>
+      <li>You can also play <strong>with a trump suit</strong> (“Trumps” setting). The <dfn>trump suit</dfn> is stronger than the others: it is the suit in which North and South together hold <strong>the most cards</strong>. It is shown at the top left of the table.</li>
+      <li>You must still <strong>follow suit</strong> if you can.</li>
+      <li>If you have no card of the suit led, you may play a trump: this is called <dfn>ruffing</dfn>. A trump beats every card of the other suits, even a 10. You <strong>don't have to ruff</strong>: you can discard instead.</li>
+      <li>If several trumps are played in the same trick, the <strong>highest trump</strong> wins the trick.</li>
+      <li>With a trump suit, the robots <strong>never lead a trump</strong> at the opening lead: they apply their opening lead rule to the other three suits.</li>
     </ul>
 
     <h3>Who wins?</h3>

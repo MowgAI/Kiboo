@@ -120,7 +120,7 @@ const PIMC = (() => {
       const hands = sampleDeal(info);
       if (!hands) break;
       DDS.reset();                                   // garde la mémoire du Worker sous contrôle
-      const position = { hands, trick: info.trick, leader: info.leader };
+      const position = { hands, trick: info.trick, leader: info.leader, trump: info.trump };
       for (const r of DDS.analyzeFast(position, toAnalyze, opts.maxLoss || 2)) {
         total.set(id(r.card), total.get(id(r.card)) + (ns ? r.ns : -r.ns));
       }

@@ -43,6 +43,10 @@
     "setup.open": "Jeux ouverts",
     "setup.hints": "Montrer les meilleurs coups",
     "setup.explain": "Explications de Piperno",
+    "setup.trump": "Atout",
+    "setup.trump.none": "Sans atout",
+    "setup.trump.auto": "Couleur la plus longue de Nord-Sud",
+    "trump.tag": "Atout :",
     "setup.quiz": "Questions pendant la partie",
     "setup.eval": "Mode évaluation",
     "help.show": "Aide",
@@ -62,6 +66,7 @@
         <li>En fin de donne, le DDS fait le <strong>bilan</strong> des cartes qui ont coûté des plis.</li>
         <li><strong>Mode évaluation</strong> : compare ta donne (en Sud) à celle de Piperno, Averell et Averell250 sur les mêmes cartes ; ton score duplicate s'affiche en fin de donne.</li>
         <li><strong>Questions pendant la partie</strong> (quand tu es le déclarant, en Sud) : <strong>Quelques-unes</strong> en pose au moins une par donne, tirées au sort ; <strong>Toutes</strong> les pose toutes, pour s'entraîner. Toutes les 3 bonnes réponses, tu choisis un cadeau.</li>
+        <li><strong>Atout</strong> : sans atout, ou avec pour atout la couleur la plus longue de Nord et Sud réunis. À l'atout, on peut couper quand on n'a pas la couleur demandée (voir les règles du jeu). Les questions sur l'entame et les cartes maîtresses ne sont pas posées à l'atout pour l'instant.</li>
         <li><strong>Carré de Coco</strong> : pendant la donne, un tableau des cartes de départ de chaque couleur chez chaque joueur (Nord et Sud remplis d'office), à compléter pour Ouest et Est au fil des plis. Le bouton <strong>🐐 Jouer avec Goat</strong> lance une donne avec Goat (et redevient « Jouer sans aide »). Avec <strong>Goat</strong>, le carré se remplit tout seul et chaque déduction est expliquée (c'est une aide : la donne n'est pas évaluée).</li>
         <li><strong>Lire à voix haute</strong> : les questions et les exercices sont lus (en version simple), avec un petit encouragement après chaque réponse. Les boutons 🔊 Écouter lisent aussi les règles et cette aide. La voix dépend de l'appareil.</li>
         <li><strong>Musique</strong> : une petite musique rétro pendant la partie. <strong>Bruitages</strong> : carte posée, pli gagné ou perdu, résultat, bonne ou mauvaise réponse. Le bouton <strong>Parade</strong> fait défiler les 40 personnages, qui se présentent un par un ; un clic sur le logo Kiboo rouvre l'accueil.</li>
@@ -93,9 +98,12 @@
     "explain.title": "Explications de Piperno",
     "explain.none": "Piperno n'a pas encore joué.",
     "explain.item": p => `<b>Pli ${p.trick}</b> · ${p.who} joue <b>${p.card}</b>. ${p.reason}`,
-    "pip.opening": p => `Entame : ${theColor(p.suit)} est sa couleur la plus longue (${p.len} cartes)` +
+    "pip.opening": p => `Entame : ${theColor(p.suit)} est sa couleur la plus longue${p.trump >= 0 ? " en dehors de l'atout" : ""} (${p.len} ${S(p.len, "carte", "cartes")})` +
       (p.tied ? ", la plus forte des couleurs de même longueur" : "") + ". " +
       (p.seq ? "Il joue la plus haute carte de sa séquence." : "Sans séquence (au moins deux cartes qui se suivent, la plus haute valant au moins 7), il joue la plus petite."),
+    "pip.leadForRuff": p => `Son partenaire a déjà coupé ${theColor(p.suit)} et peut encore avoir de l'atout : il rejoue ${theColor(p.suit)} pour qu'il coupe encore.`,
+    "pip.keepPartner": p => (p.ruffed ? "Son partenaire a déjà coupé" : "Son partenaire est maître du pli") + " : il ne coupe pas et défausse une petite carte.",
+    "pip.ruff": p => `Il n'a plus de ${C[p.led]} : il coupe avec son plus petit atout qui gagne le pli${p.now ? " pour l'instant" : ""}.`,
     "pip.newSuit": p => `Sa couleur préférée devient ${theColor(p.suit)} (sa couleur la plus longue).`,
     "pip.leadStrong": p => `Il entame dans sa couleur préférée, ${theColor(p.suit)}. Il détient la plus forte carte restante (le ${p.top}) : il joue sa plus haute.`,
     "pip.leadWeak": p => `Il entame dans sa couleur préférée, ${theColor(p.suit)}. Il n'a pas la plus forte carte restante (le ${p.top}) : il joue sa plus petite.`,
@@ -289,7 +297,7 @@
     "voice.listenAria": "Écouter (version simple, à voix haute)",
     "voice.cheer.ok": "Bravo !|Super !|Génial !|Bien joué !|Excellent !|Tu es trop fort !",
     "voice.cheer.ko": "Pas trop mal !|Presque !|Ce n'est pas grave, on continue !|Pas tout à fait. Regarde la correction.|Tu y es presque !",
-    "voice.rules": "Kiboo, c'est un jeu de cartes pour quatre joueurs. Nord et Sud jouent ensemble, contre Est et Ouest. Il y a quarante cartes, de quatre couleurs : bleu, vert, rouge et jaune. Chaque carte a un nombre, de un à dix. Le dix est le plus fort. Chaque joueur a dix cartes. Toi, tu es Sud. Tu joues tes cartes, et aussi celles de ton partenaire Nord. On l'appelle le mort : ses cartes sont posées sur la table, tout le monde les voit. Ouest joue la première carte. Puis chacun pose une carte, à son tour. Il faut jouer la même couleur que la première carte, si tu en as. Sinon, tu joues la carte que tu veux. La plus forte carte de la couleur demandée gagne : on appelle ça un pli. Celui qui gagne le pli joue en premier au pli suivant. À la fin, l'équipe qui a gagné le plus de plis gagne la partie.",
+    "voice.rules": "Kiboo, c'est un jeu de cartes pour quatre joueurs. Nord et Sud jouent ensemble, contre Est et Ouest. Il y a quarante cartes, de quatre couleurs : bleu, vert, rouge et jaune. Chaque carte a un nombre, de un à dix. Le dix est le plus fort. Chaque joueur a dix cartes. Toi, tu es Sud. Tu joues tes cartes, et aussi celles de ton partenaire Nord. On l'appelle le mort : ses cartes sont posées sur la table, tout le monde les voit. Ouest joue la première carte. Puis chacun pose une carte, à son tour. Il faut jouer la même couleur que la première carte, si tu en as. Sinon, tu joues la carte que tu veux. La plus forte carte de la couleur demandée gagne : on appelle ça un pli. Celui qui gagne le pli joue en premier au pli suivant. À la fin, l'équipe qui a gagné le plus de plis gagne la partie. On peut aussi jouer avec un atout : c'est une couleur plus forte que les autres. Si tu n'as pas la couleur demandée, tu peux jouer un atout pour gagner le pli : ça s'appelle couper.",
     "voice.help": "Dans les réglages, tu choisis qui joue à chaque place : toi, ou un robot. Tu peux choisir la vitesse des robots. Tu peux demander des questions pendant la partie : toutes les trois bonnes réponses, tu gagnes un cadeau. Le carré de Coco t'aide à compter les cartes. Clique sur Nouvelle donne pour commencer une partie.",
     "voice.ex.count": "Compte tes cartes ! Pour chaque couleur, combien as-tu de cartes, et combien de points ? Les points, c'est l'addition des nombres écrits sur les cartes.",
     "voice.ex.longest": "Quelle est ta couleur la plus longue ? C'est la couleur où tu as le plus de cartes.",
@@ -319,7 +327,7 @@
       (p.n ? `Il en a joué ${p.n} (${p.cards.join(", ")}) : il avait donc <strong>${p.n}</strong> ${S(p.n, "carte", "cartes")} ${cardAdj(p.s, p.n)} au départ.` : `Il n'en avait <strong>aucune</strong> au départ.`),
     "goat.bound.row": p => { const t = p.cells.reduce((a, c) => a + c.n, 0); return `Ligne ${C[p.s]} : il reste ${10 - p.known.reduce((a, b) => a + b, 0)} ${S(t, "carte", "cartes")} ${cardAdj(p.s, t)} pour ${p.cells.map(c => seatName(c.seat)).join(" et ")}, et ${S(p.cells.length, "il en a", "ils en ont")} déjà joué ${t} : ${p.cells.map(c => `<strong>${c.n}</strong> chez ${seatName(c.seat)}`).join(", ")}, il n'y en a pas d'autres.`; },
     "goat.bound.col": p => `Colonne ${seatName(p.seat)} : ses cartes connues et celles déjà jouées font déjà 10 : ${p.cells.map(c => `<strong>${c.n}</strong> ${S(c.n, "carte", "cartes")} ${cardAdj(c.s, c.n)}`).join(", ")}.`,
-    "goat.lead": p => `${seatName("O")} entame le ${cardName(p.card)} en suivant la règle d'entame : le ${C[p.L]} est sa couleur la plus longue, il en a donc <strong>au moins 3</strong> (10 cartes pour 4 couleurs). En passant en revue ses ${p.n.toLocaleString("fr-FR")} mains possibles, Ouest avait au départ : ${p.ranges.map(([a, b], s) => `${a === b ? `<strong>${a}</strong>` : `${a} à ${b}`} ${S(b, "carte", "cartes")} ${cardAdj(s, b)}`).join(", ")}.`,
+    "goat.lead": p => `${seatName("O")} entame le ${cardName(p.card)} en suivant la règle d'entame : ${p.trump >= 0 ? `on n'entame jamais atout, le ${C[p.L]} est donc sa couleur la plus longue en dehors de l'atout.` : `le ${C[p.L]} est sa couleur la plus longue, il en a donc <strong>au moins 3</strong> (10 cartes pour 4 couleurs).`} En passant en revue ses ${p.n.toLocaleString("fr-FR")} mains possibles, Ouest avait au départ : ${p.ranges.map(([a, b], s) => `${a === b ? `<strong>${a}</strong>` : `${a} à ${b}`} ${S(b, "carte", "cartes")} ${cardAdj(s, b)}`).join(", ")}.`,
     "goat.rule": p => `${p.lead ? "Avec la règle d'entame et les cartes déjà jouées" : "Avec les cartes déjà jouées"}, toutes les mains possibles d'Ouest (${p.n.toLocaleString("fr-FR")}) donnent la même valeur : ${p.cells.map(c => `<strong>${c.v}</strong> ${S(c.v, "carte", "cartes")} ${cardAdj(c.s, c.v)} chez ${seatName(c.seat)}`).join(", ")}.`,
     "goat.none": "Pas encore de déduction : Goat attend qu'un défenseur ne fournisse pas.",
     "goat.done": "Le carré est complet : Goat connaît toute la distribution de départ !",
@@ -528,8 +536,17 @@
       <li>On joue chacun son tour <strong>dans le sens des aiguilles d'une montre</strong> : Ouest, Nord, Est, Sud.</li>
       <li>Le premier joueur du pli choisit librement sa carte. Sa couleur est la <dfn>couleur demandée</dfn> pour le reste du pli.</li>
       <li>Les autres joueurs <strong>doivent fournir</strong> une carte de la couleur demandée s'ils en ont. Sinon, ils jouent n'importe quelle carte : on appelle cette action <dfn>défausser</dfn>.</li>
-      <li>Dans cette version, il n'y a <strong>pas d'atout</strong> : la <strong>plus forte carte de la couleur demandée</strong> remporte donc le pli. Une carte d'une autre couleur ne remporte jamais le pli.</li>
+      <li><strong>Sans atout</strong>, la <strong>plus forte carte de la couleur demandée</strong> remporte le pli. Une carte d'une autre couleur ne remporte jamais le pli.</li>
       <li>Le joueur qui remporte le pli <strong>joue la première carte du pli suivant</strong>.</li>
+    </ul>
+
+    <h3>L'atout</h3>
+    <ul>
+      <li>On peut aussi jouer <strong>avec un atout</strong> (réglage « Atout »). L'<dfn>atout</dfn> est une couleur plus forte que les autres : c'est la couleur où Nord et Sud ont, à eux deux, <strong>le plus de cartes</strong>. Elle est affichée en haut à gauche de la table.</li>
+      <li>Il faut toujours <strong>fournir</strong> la couleur demandée si on en a.</li>
+      <li>Si on n'a pas la couleur demandée, on peut jouer un atout : on appelle cette action <dfn>couper</dfn>. Un atout bat toutes les cartes des autres couleurs, même un 10. On <strong>n'est pas obligé de couper</strong> : on peut aussi défausser.</li>
+      <li>Si plusieurs atouts sont joués dans le même pli, le <strong>plus fort atout</strong> remporte le pli.</li>
+      <li>Avec un atout, les robots n'entament <strong>jamais dans la couleur d'atout</strong> : ils appliquent leur règle d'entame aux trois autres couleurs.</li>
     </ul>
 
     <h3>Qui gagne ?</h3>

@@ -243,7 +243,7 @@ const Exercises = (() => {
     const n = unknown.length;
     while (true) {
       const hand = fixed.concat(idx.map(i => unknown[i]));
-      const chosen = openingCard(hand);
+      const chosen = openingCard(hand, ctx.trump === undefined ? -1 : ctx.trump);
       const possible = cardId(chosen) === leadId;
       if (possible || opts.all) visit(hand, possible, chosen);
       let i = k - 1;

@@ -279,7 +279,7 @@ const Coco = (() => {
       const idx = Array.from({ length: k }, (_, i) => i);
       while (true) {
         const hand = base.concat(idx.map(i => free[i]));
-        if (!rule || cardId(openingCard(hand)) === leadId) {
+        if (!rule || cardId(openingCard(hand, g.trump)) === leadId) {
           n++;
           const cnt = [0, 0, 0, 0];
           for (const c of hand) cnt[c.s]++;
@@ -351,7 +351,7 @@ const Coco = (() => {
           G.range[s][0] = [R.min[s], R.max[s]];
           G.range[s][2] = [G.rest[s] - R.max[s], G.rest[s] - R.min[s]];
         }
-        if (G.step === 1 && R.rule) G.log.push({ trick, k: "goat.lead", p: { card: h.card, L: h.card.s, ranges: R.min.map((m, s) => [m, R.max[s]]), n: R.n } });
+        if (G.step === 1 && R.rule) G.log.push({ trick, k: "goat.lead", p: { card: h.card, L: h.card.s, trump: g.trump, ranges: R.min.map((m, s) => [m, R.max[s]]), n: R.n } });
         const rule = [];
         for (let s = 0; s < 4; s++) for (const j of [0, 2]) {
           if (G.known[s][j] || G.range[s][j][0] !== G.range[s][j][1]) continue;
