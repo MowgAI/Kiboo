@@ -6,7 +6,7 @@
    Mêmes textes que dans KibooM (MowgAI/KimindVV) ; le mode gentil, lui, reprend les phrases
    de lang/parade.js.
    Clé : couleur-valeur (blue = animaux, green = dinosaures, red = robots, yellow = métiers).
-   Les 40 personnages sont écrits en français et en anglais (jeux de mots adaptés, pas traduits
+   Les 40 personnages sont écrits en français, en anglais et en italien (l'italien n'est pas lu à voix haute, voir js/voice.js) (jeux de mots adaptés, pas traduits
    mot à mot). */
 window.PARADE_MODES = {
   fr: {
@@ -984,6 +984,494 @@ window.PARADE_MODES = {
         "I'm {n}! My experiment will turn your homework… into even more homework! Mwahaha!",
         "I'm {n}! I'm going to invent a potion that wins every time.",
         "I'm {n}! Boom! Oops. No, no, I meant to do that."] },
+    },
+  },
+  it: {
+    bebe: {
+      "blue-1": { n: ["Grovierina", "Piccola Groviera", "Squittina"], p: [
+        "Io {n}! Gnam gnam, formaggino… ghe ghe!",
+        "Ciao, sono {n}! Io piccola piccola, piccola piccola.",
+        "{n} vuole una coccola… e un pezzetto di formaggino!"] },
+      "blue-2": { n: ["Piumina", "Piccolo Piuma", "Pio-Pio"], p: [
+        "Pio pio! Io {n}, io non volo ancora…",
+        "Sono {n}! Cip… cip… oh, un vermetto!",
+        "{n} fa ciao ciao con le alucce!"] },
+      "blue-3": { n: ["Micino", "Piccolo Gomitolo", "Ronfino"], p: [
+        "Miao miao! Sono {n}, voglio il lattino!",
+        "{n} ha preso una coda… ahi, è la sua!",
+        "Io {n}, faccio ron ron… nanna."] },
+      "blue-4": { n: ["Cagnolino", "Piccola Birba", "Bau-Bau"], p: [
+        "Bau bau! Io {n}, io voglio bene a tutti!",
+        "{n} vuole la pallina! Palla! Palla!",
+        "Sono {n}… leccatina sul naso!"] },
+      "blue-5": { n: ["Rosettina", "Piccola Oink", "Maialina"], p: [
+        "Oink oink! Sono {n}, tutta rosa!",
+        "{n} ha fatto splash nella pozzanghera… ancora splash!",
+        "Io {n}, io voglio un bacino… oink!"] },
+      "blue-6": { n: ["Volpino", "Piccolo Furbetto", "Codina"], p: [
+        "Ciao! Sono {n}, io non furbo, io tanto buono!",
+        "{n} ha nascosto il peluche… dov'è? Eccolo!",
+        "Io {n}, la mia coda tutta morbida… tocca!"] },
+      "blue-7": { n: ["Fiocchino", "Piccolo Fiocco", "Micio-Neve"], p: [
+        "Brrr! Sono {n}, io amo la neve fredda fredda!",
+        "{n} fa le palle di neve… puf, sul tuo naso!",
+        "Io {n}, ho le macchie dappertutto, guarda!"] },
+      "blue-8": { n: ["Orsetto", "Piccolo Miele", "Cucciolotto"], p: [
+        "Sono {n}! Io voglio il miele… tanto miele!",
+        "{n} fa un abbraccione… morbido morbido!",
+        "Io {n}, io ho sonno… uaaah."] },
+      "blue-9": { n: ["Pandino", "Piccolo Bambù", "Bambolino"], p: [
+        "Ciao! Sono {n}, io faccio le capriole!",
+        "{n} mangia il bambù… crunch crunch… ancora!",
+        "Io {n}, io tutto morbido, bianco e nero."] },
+      "blue-10": { n: ["Coniglietta", "Piccola Carota", "Saltellina"], p: [
+        "Hop hop! Sono {n}, io salto dappertutto!",
+        "{n} ha trovato una carota… crunch!",
+        "Io {n}, le mie orecchie lunghe lunghe, guarda!"] },
+      "green-1": { n: ["Zippino", "Piccolo Zip", "Zip-Zip"], p: [
+        "Zum zum! Sono {n}, io corro veloce veloce!",
+        "{n} ha le piumette… fanno il solletico!",
+        "Io {n}, io caduto… niente bua! Ancora!"] },
+      "green-2": { n: ["Rosina", "Piccola Rosy", "Rosellina"], p: [
+        "Ciao! Sono {n}, io tutta rosa, tutta bella!",
+        "{n} ha tre corna… uno, due… tante!",
+        "Io {n}, io voglio un fiocco rosa sul corno!"] },
+      "green-3": { n: ["Puntina", "Piccolo Punta", "Pungino"], p: [
+        "Sono {n}! Io ho le spine piccoline… non toccare!",
+        "{n} vuole una coccola… piano, punge!",
+        "Io {n}, io faccio la nanna sulla schiena… ahi!"] },
+      "green-4": { n: ["Dentino", "Piccolo Dentone", "Morsetto"], p: [
+        "Sono {n}! Io ho i dentini… cheese!",
+        "{n} morde il peluche… piano piano!",
+        "Io {n}, io faccio un sorrisone, guarda!"] },
+      "green-5": { n: ["Zefirino", "Piccolo Zefiro", "Svolazzino"], p: [
+        "Sono {n}! Io volo… un pochino… bum!",
+        "{n} fa l'aeroplano! Vruuum!",
+        "Io {n}, io voglio volare sulla tua schiena!"] },
+      "green-6": { n: ["Fiordalisino", "Mini-Fiordaliso", "Blu-Blu"], p: [
+        "Ghe ghe! Sono {n}, io piccolo piccolo dino!",
+        "{n} ha ancora il guscio in testa… cucù!",
+        "Io {n}, io do colpetti di corno… piano piano!"] },
+      "green-7": { n: ["Caramellina", "Piccola Caramello", "Dolcetta"], p: [
+        "Sono {n}! Perché? Perché? Perché?",
+        "{n} vuole toccare tutto… cos'è questo?",
+        "Io {n}, io tutta arancione come una caramella!"] },
+      "green-8": { n: ["Bracina", "Piccolo Brace", "Grrr-Bebè"], p: [
+        "Grrr… ghe ghe! Sono {n}, io faccio paura?",
+        "{n} apre il collare… cucù!",
+        "Io {n}, io tutto rosso, tutto caldo!"] },
+      "green-9": { n: ["Velina", "Piccola Vela", "Splash"], p: [
+        "Splash! Sono {n}, io nuoto come un pesciolino!",
+        "{n} fa le bolle… blub blub blub!",
+        "Io {n}, io voglio il bagnetto… ancora il bagnetto!"] },
+      "green-10": { n: ["Rexino", "Piccolo Rex", "Rexolino"], p: [
+        "Roar roar! Sono {n}, io tanto grande… quasi!",
+        "{n} ha paura del topolino… mamma!",
+        "Io {n}, io faccio un abbraccione… attento, stringe!"] },
+      "red-1": { n: ["Carichino", "Piccolo Carica", "Tic-Tac"], p: [
+        "Tic tac! Sono {n}, io giro giro!",
+        "{n} è scarico… nanna… gira la chiave!",
+        "Io {n}, io ballo… a passettini!"] },
+      "red-2": { n: ["Bibip", "Piccolo Bip", "Bipino"], p: [
+        "Bibip! Io {n}, io robottino piccolo… nanna?",
+        "{n} rotola, rotola… bum! Ancora!",
+        "Sono {n}! Bip? Bip bip! Coccola?"] },
+      "red-3": { n: ["Sorrisino", "Piccolo Sorriso", "Ovetto"], p: [
+        "Ih ih! Sono {n}, io faccio i sorrisi!",
+        "{n} è un ovetto piccolo… non rompere!",
+        "Io {n}, io rido sempre… ih ih ih!"] },
+      "red-4": { n: ["Lampadinina", "Piccola Luce", "Lucina"], p: [
+        "Ding! Sono {n}, io ho un'idea… ops… dimenticata!",
+        "{n} fa lampeggia, lampeggia!",
+        "Io {n}, io la lucina per la nanna."] },
+      "red-5": { n: ["Cliccolino", "Piccolo Clic", "Flashino"], p: [
+        "Clic clac! Sono {n}, io faccio la foto!",
+        "{n} ha fatto una foto… al suo piede!",
+        "Io {n}, sorridi… cheese! Ih ih!"] },
+      "red-6": { n: ["Schermino", "Piccolo Schermo", "Tivù"], p: [
+        "Sono {n}! Io voglio i cartoni!",
+        "{n} fa passi lunghi… e bum, per terra!",
+        "Io {n}, guarda la mia pancia… ci sono le figure!"] },
+      "red-7": { n: ["Cassafortina", "Piccola Cassaforte", "Scatolina"], p: [
+        "Bum bum! Sono {n}, io fortissimo!",
+        "{n} tiene il tuo peluche… ben nascosto!",
+        "Io {n}, io ho i segreti… shh!"] },
+      "red-8": { n: ["Cosmino", "Piccolo Cosmo", "Astro-Bebè"], p: [
+        "Sono {n}! Io vado sulla Luna… vruuum!",
+        "{n} ha visto una stella… oooh!",
+        "Io {n}, io galleggio nello spazio… evviva!"] },
+      "red-9": { n: ["Zoomino", "Piccolo Zoom", "Sbirciatino"], p: [
+        "Sono {n}! Io ti vedo… cucù!",
+        "{n} fa gli occhioni… oooh!",
+        "Io {n}, io gioco a nascondino… trovato!"] },
+      "red-10": { n: ["Maestà Bebè", "Piccolo Re", "Reuccio"], p: [
+        "Sono {n}! Io il re… io voglio il biberon!",
+        "{n} ha una coroncina… sta cadendo!",
+        "Io {n}, tutti fanno ciao al re!"] },
+      "yellow-1": { n: ["Martino Bebè", "Piccolo Agente", "Martinello"], p: [
+        "Nino-nino… no! Sono {n}, io la polizia!",
+        "{n} fischia… fiii! Alt!",
+        "Io {n}, io ho un cappellino!"] },
+      "yellow-2": { n: ["Fatinina", "Piccola Fata", "Fatuzza"], p: [
+        "Puf! Sono {n}, io faccio la magia!",
+        "{n} ha rotto la bacchetta… ueee!",
+        "Io {n}, io ti trasformo in… un bacino!"] },
+      "yellow-3": { n: ["Lazo Bebè", "Piccolo Sceriffo", "Lazino"], p: [
+        "Yi-ha! Sono {n}, io sul mio cavallino!",
+        "{n} lancia il lazo… preso il peluche!",
+        "Io {n}, io ho un cappello grande grande!"] },
+      "yellow-4": { n: ["Linuccia", "Piccola Lina", "Lilì"], p: [
+        "Ciao! Sono {n}, io seguo le tracce piccoline!",
+        "{n} ha visto uno scoiattolo… oooh!",
+        "Io {n}, io abbraccio l'albero!"] },
+      "yellow-5": { n: ["Leoncino", "Piccolo Leo", "Leo-Leo"], p: [
+        "Gol! Sono {n}, io calcio la palla!",
+        "{n} ha tirato… sul suo piede!",
+        "Io {n}, io corro dietro alla palla!"] },
+      "yellow-6": { n: ["Inesina", "Piccola Ines", "Nenè"], p: [
+        "Sono {n}! Io cerco… trovato! Un sassolino!",
+        "{n} guarda nella lente… nasone!",
+        "Io {n}, io ho trovato un tesoro… una caramella!"] },
+      "yellow-7": { n: ["Sami Bebè", "Piccolo Dottore", "Samino"], p: [
+        "Sono {n}! Io curo il peluche!",
+        "{n} mette un cerotto… sul tuo naso!",
+        "Io {n}, di' aaah… ih ih!"] },
+      "yellow-8": { n: ["Fiammella", "Piccola Pompiera", "Nino-Nino"], p: [
+        "Nino-nino! Sono {n}, io bagno tutto!",
+        "{n} ha un camioncino rosso!",
+        "Io {n}, io salgo sulla scala… fino in cima!"] },
+      "yellow-9": { n: ["Stellina", "Piccola Stella", "Stellotta"], p: [
+        "Sono {n}! Io vado sulla Luna… nanna nel razzo!",
+        "{n} conta: tre… due… uno… ghe ghe!",
+        "Io {n}, io voglio una stella per il mio peluche!"] },
+      "yellow-10": { n: ["Provetta Bebè", "Piccola Scienziata", "Provettina"], p: [
+        "Bum! Sono {n}, io faccio le bolle!",
+        "{n} mescola tutto… bleah!",
+        "Io {n}, io ho fatto una pozione… di latte!"] },
+    },
+    drole: {
+      "blue-1": { n: ["Groviera Bucherellata", "Super Groviera", "Groviera Piroetta"], p: [
+        "Sono {n}! Ho provato a mordere la Luna: mi avevano detto che era di formaggio.",
+        "Sono {n}! Il mio sogno: una casa di formaggio, con il tetto di formaggio e i vicini di formaggio.",
+        "Sono {n}! Il gioco preferito dei topi? Nascondino… nel formaggio!"] },
+      "blue-2": { n: ["Piuma Tralalà", "Capitan Piuma", "Piuma Ridarella"], p: [
+        "Sono {n}! Quando canto sotto la doccia, le lumache applaudono.",
+        "Sono {n}! Una volta ho preso l'aereo. Perché? Boh, ho le ali!",
+        "Sono {n}! Ho fatto il nido nel cappello del nonno. Non se n'è ancora accorto."] },
+      "blue-3": { n: ["Gomitolo Pantofola", "Dottor Gomitolo", "Gomitolo Ronfone"], p: [
+        "Sono {n}! Non sono pigro: mi alleno per il campionato di pisolini.",
+        "Sono {n}! Ho sette vite… e le passo tutte a dormire.",
+        "Sono {n}! I topi? Li invito a merenda e giochiamo a carte."] },
+      "blue-4": { n: ["Birba Combinaguai", "Birba Calzino", "Super Birba"], p: [
+        "Sono {n}! Ho rincorso la mia coda per un'ora. Non l'ho ancora presa.",
+        "Sono {n}! Seduto! A cuccia! Rotola! … Ah no, sei tu che devi dirlo.",
+        "Sono {n}! Porto i calzini sulle orecchie. È la moda dei cani."] },
+      "blue-5": { n: ["Rosetta Piroetta", "Rosetta Bolla", "Principessa Oink-Oink"], p: [
+        "Sono {n}! Faccio il bagno nel fango al cioccolato. Cioè… credo che sia cioccolato.",
+        "Sono {n}! Con la mia coda a cavatappi apro le bottiglie di succo.",
+        "Sono {n}! Oink oink, in maialese, vuol dire: passami il ketchup."] },
+      "blue-6": { n: ["Furbetto Burlone", "Furbetto Cucù", "Professor Furbetto"], p: [
+        "Sono {n}! Avevo un piano geniale… ma l'ho dimenticato.",
+        "Sono {n}! Mi sono travestito da gallina. Nessuno mi ha riconosciuto. Tranne le galline.",
+        "Sono {n}! Il mio piano segreto: mangiare un gelato. Shh, non dirlo a nessuno."] },
+      "blue-7": { n: ["Fiocco Scivolone", "Fiocco Pattino", "Fiocco Etciù"], p: [
+        "Sono {n}! Ho fatto un pupazzo di neve. È scappato con la mia sciarpa.",
+        "Sono {n}! Etciù! Anche i leopardi delle nevi prendono il raffreddore.",
+        "Sono {n}! Ho contato le mie macchie: quarantadue. O quarantatré. Mi sono mosso."] },
+      "blue-8": { n: ["Miele Abbraccione", "Miele Pigiama", "Miele Russone"], p: [
+        "Sono {n}! Dormo tutto l'inverno… e d'estate faccio il pisolino.",
+        "Sono {n}! Ho il miele appiccicato dappertutto. Anche sulle orecchie. Soprattutto sulle orecchie.",
+        "Sono {n}! Quando russo, gli alberi tremano. Zzzz… scusa."] },
+      "blue-9": { n: ["Bambù Capriola", "Bambù Pigiama", "Bambù Kung-Fu"], p: [
+        "Sono {n}! Perché sono bianco e nero? Non trovavo i pennarelli colorati.",
+        "Sono {n}! Ho assaggiato una pizza. Sapeva di bambù.",
+        "Sono {n}! Faccio kung-fu… ma solo dopo il pisolino."] },
+      "blue-10": { n: ["Carota Boing-Boing", "Carota Turbo", "Carota Orecchie-Antenna"], p: [
+        "Sono {n}! Con le mie orecchie prendo la radio. Shh, c'è la mia canzone!",
+        "Sono {n}! Ho saltato così in alto che un aereo mi ha salutata.",
+        "Sono {n}! La verdura preferita dei conigli? La carota. Che sorpresa!"] },
+      "green-1": { n: ["Zip Turbo", "Zip Razzo", "Zip Zigzag"], p: [
+        "Sono {n}! Corro così veloce che arrivo prima di partire.",
+        "Sono {n}! Ho le piume ma non volo. Aspetto ancora le istruzioni.",
+        "Sono {n}! Ho fatto una gara con il vento. Il vento vuole la rivincita."] },
+      "green-2": { n: ["Rosy Lustrini", "Rosy Fronzoli", "Rosy Bigodini"], p: [
+        "Sono {n}! Ogni sera metto i bigodini sulle corna.",
+        "Sono {n}! Il mio specchio dice che sono la più bella. È un po' adulatore.",
+        "Sono {n}! Ho dipinto un arcobaleno… tutto rosa."] },
+      "green-3": { n: ["Punta Riccio", "Punta Cactus", "Punta Picnic"], p: [
+        "Sono {n}! Faccio da attaccapanni, da stendibiancheria e da scivolo. Quasi.",
+        "Sono {n}! I palloncini mi odiano. Pop!",
+        "Sono {n}! Alle feste reggo gli spuntini: dieci salsicce sulla schiena!"] },
+      "green-4": { n: ["Dentone Spazzolino", "Dentone Sorrisone", "Dentone Dentifricio"], p: [
+        "Sono {n}! Mi serve un tubetto di dentifricio al giorno. Almeno.",
+        "Sono {n}! Sorrido così tanto che mi vengono i crampi alle guance.",
+        "Sono {n}! Il topolino dei denti passa da me ogni sera. È sfinito."] },
+      "green-5": { n: ["Zefiro Paracadute", "Zefiro Aquilone", "Comandante Zefiro"], p: [
+        "Sono {n}! Gli uccelli mi chiedono lezioni di volo. Mi faccio pagare in semi.",
+        "Sono {n}! Volo così in alto che le nuvole mi chiedono permesso.",
+        "Sono {n}! Una volta sono atterrato su un aereo. Il pilota si è spaventato tantissimo."] },
+      "green-6": { n: ["Fiordaliso Guscio", "Fiordaliso Ariete", "Fiordaliso Mirtillo"], p: [
+        "Sono {n}! Porto ancora il guscio d'uovo come cappello. È molto di moda.",
+        "Sono {n}! Ogni mattina misuro le mie corna. Un millimetro in più!",
+        "Sono {n}! Ho sbattuto contro un albero. L'albero sta bene. Anch'io, quasi."] },
+      "green-7": { n: ["Caramello Perché-Perché", "Caramello Sciolto", "Caramello Punto-Interrogativo"], p: [
+        "Sono {n}! Perché il cielo è blu? Perché l'erba è verde? Perché io sono arancione?",
+        "Sono {n}! Ho fatto una domanda a un sasso. Non mi ha ancora risposto.",
+        "Sono {n}! Attenzione, al sole mi sciolgo un po'."] },
+      "green-8": { n: ["Brace Ombrello", "Brace Ventaglio", "Brace Barbecue"], p: [
+        "Sono {n}! Il mio collare è il mio ombrello. E il mio ventaglio. E il mio cappello.",
+        "Sono {n}! Ho provato a spaventare una farfalla. Mi ha preso in giro.",
+        "Sono {n}! Arrostisco i marshmallow con il mio soffio. Cioè… ci provo."] },
+      "green-9": { n: ["Vela Salvagente", "Capitana Vela", "Vela Windsurf"], p: [
+        "Sono {n}! I pesci mi scambiano per una barca. Vogliono il biglietto.",
+        "Sono {n}! Quando c'è vento, vado avanti senza nuotare. Comodissimo.",
+        "Sono {n}! Ho imparato a nuotare prima di camminare. E ancora non cammino dritta."] },
+      "green-10": { n: ["Rex Pantofole", "Rex Braccini", "Rex Pancione"], p: [
+        "Sono {n}! Con le mie braccine non riesco a grattarmi il naso.",
+        "Sono {n}! Ho provato ad andare in bici. La bici ha detto di no.",
+        "Sono {n}! Quando starnutisco, il tavolo vola via."] },
+      "red-1": { n: ["Carica Trottola", "Carica Disco", "Carica Molla"], p: [
+        "Sono {n}! Se giri troppo la chiave, ballo la disco tutta la notte.",
+        "Sono {n}! Ho perso la chiave. L'ho cercata dappertutto… era sulla mia schiena.",
+        "Sono {n}! Tic, tac… ah no, non sono un orologio."] },
+      "red-2": { n: ["Bip Palla", "Bip Bowling", "Bip Rimbalzo"], p: [
+        "Sono {n}! Sono così rotondo che mi scambiano per un pallone.",
+        "Sono {n}! Bip bip vuol dire ciao. Bip bip bip vuol dire: ho fame.",
+        "Sono {n}! Sono rotolato fino in cucina. Poi in giardino. Poi fino al mare. Ops."] },
+      "red-3": { n: ["Sorriso Frittata", "Sorriso Portauovo", "Sorriso Tuorlo"], p: [
+        "Sono {n}! Sono un uovo, ma per favore non invitarmi a colazione.",
+        "Sono {n}! Sorrido anche quando lavo i piatti. E odio lavare i piatti.",
+        "Sono {n}! È nato prima l'uovo o la gallina? Io."] },
+      "red-4": { n: ["Lampadina Genio", "Lampadina Lampione", "Lampadina Lampeggiante"], p: [
+        "Sono {n}! Ho avuto un'idea geniale. Poi mi sono spento.",
+        "Sono {n}! Le falene sono le mie più grandi fan.",
+        "Sono {n}! Quando ho troppe idee, salta la corrente."] },
+      "red-5": { n: ["Clic Selfie", "Clic Paparazzo", "Clic Flash"], p: [
+        "Sono {n}! Ho fatto mille foto di gatti. E una di un cane, per sbaglio.",
+        "Sono {n}! Faccio selfie con tutti. Anche con i bidoni della spazzatura.",
+        "Sono {n}! Attento al flash! … Troppo tardi, hai gli occhi rossi."] },
+      "red-6": { n: ["Schermo Telecomando", "Schermo Zapping", "Schermo Pixel"], p: [
+        "Sono {n}! Qualcuno mi ha cambiato canale mentre dormivo.",
+        "Sono {n}! Quando faccio un passo lungo, il mio cartone salta.",
+        "Sono {n}! Ho guardato tutti i cartoni del mondo. Due volte."] },
+      "red-7": { n: ["Cassaforte Imbranata", "Cassaforte dei Giocattoli", "Cassaforte Bum-Bum"], p: [
+        "Sono {n}! Ho dimenticato la combinazione della mia cassaforte. Che guaio.",
+        "Sono {n}! Quando cammino, le tazze ballano sul tavolo.",
+        "Sono {n}! Dentro di me c'è un tesoro: calzini e un vecchio biscotto."] },
+      "red-8": { n: ["Cosmo Razzo", "Cosmo Lunatico", "Cosmo Cometa"], p: [
+        "Sono {n}! Nello spazio ho perso un calzino. Gira ancora intorno alla Terra.",
+        "Sono {n}! Gli alieni mi hanno chiesto la ricetta delle crêpes.",
+        "Sono {n}! Su Marte non c'è nessuno con cui parlare. Allora parlo con i sassi."] },
+      "red-9": { n: ["Zoom Binocolo", "Zoom Lente", "Zoom Telescopio"], p: [
+        "Sono {n}! Vedo una formica che fa la spesa dall'altra parte della città.",
+        "Sono {n}! Ho cercato i miei occhiali tutto il giorno. Non li porto.",
+        "Sono {n}! Vedo così lontano che vedo la mia nuca."] },
+      "red-10": { n: ["Maestà Bullone", "Maestà Corona-Storta", "Sua Maestà Arrugginita"], p: [
+        "Sono {n}! La mia corona è di carta stagnola. Non dirlo a nessuno.",
+        "Sono {n}! Sono il re dei robot, ma è il mio tostapane che comanda.",
+        "Sono {n}! Il mio trono? Una sedia della cucina con un cuscino."] },
+      "yellow-1": { n: ["l'agente Fischietto", "l'agente Cornetto", "l'agente Bastoncino"], p: [
+        "Sono {n}! Ho arrestato un ladro di calzini. Era il cane.",
+        "Sono {n}! Dirigo il traffico… delle formiche.",
+        "Sono {n}! Ho perso il fischietto. Allora faccio fiii con la bocca."] },
+      "yellow-2": { n: ["la fata Brillantina", "la fata Oplà", "la fata Pasticcina"], p: [
+        "Sono {n}! Volevo trasformare una zucca in carrozza. Ho fatto la minestra.",
+        "Sono {n}! Abracadabra! … Ops, ho trasformato il mio gatto in una pantofola.",
+        "Sono {n}! La mia bacchetta ha bisogno di pile nuove."] },
+      "yellow-3": { n: ["lo sceriffo Biscotto", "lo sceriffo Lazo-Spaghetto", "il cowboy Senza-Fretta"], p: [
+        "Sono {n}! Il mio lazo ha preso una mucca. Poi la mucca ha preso me.",
+        "Sono {n}! Il mio cavallo si chiama Biscotto, perché è un po' croccante.",
+        "Sono {n}! Galoppo così veloce che il cappello arriva dopo di me."] },
+      "yellow-4": { n: ["Lina Bussola", "Lina Fungo", "Lina Zainetto"], p: [
+        "Sono {n}! Conosco le tracce di tutti gli animali. Queste? Sono le mie.",
+        "Sono {n}! Mi sono persa nel bosco. Per fortuna il bosco conosceva la strada.",
+        "Sono {n}! I gufi mi chiedono l'ora. Non lo so mai."] },
+      "yellow-5": { n: ["Leo Pallone", "Leo Scarpini", "Leo Rovesciata"], p: [
+        "Sono {n}! Ho segnato un gol… in cucina. La mamma non era contenta.",
+        "Sono {n}! Il mio pallone è più veloce di me. Non mi aspetta mai.",
+        "Sono {n}! Ho fatto una rovesciata. E mi sono rovesciato anch'io."] },
+      "yellow-6": { n: ["Ines Lente", "Ines Tesoro", "Ines Sherlock"], p: [
+        "Sono {n}! Ho trovato un indizio: una briciola. Il colpevole è la merenda.",
+        "Sono {n}! Ho esplorato tutta la casa. Il posto più pericoloso: sotto il letto.",
+        "Sono {n}! Con la mia lente, le formiche sembrano dinosauri."] },
+      "yellow-7": { n: ["il dottor Cerotto", "il dottor Sciroppo", "il dottor Etciù"], p: [
+        "Sono {n}! La mia cura per tutto: un bacio e un abbraccio. Funziona sempre.",
+        "Sono {n}! Ho curato un dinosauro. Aveva mal di denti. A tutti i denti.",
+        "Sono {n}! Etciù! Anche i dottori prendono il raffreddore."] },
+      "yellow-8": { n: ["Fiamma Idrante", "Fiamma Nino-Nino", "Fiamma Annaffiatoio"], p: [
+        "Sono {n}! Ho spento il barbecue del nonno. Non era contento.",
+        "Sono {n}! Il mio camion fa nino-nino. Anch'io, quando ho fretta.",
+        "Sono {n}! Ho salvato un gatto su un albero. Poi il gatto ha salvato me."] },
+      "yellow-9": { n: ["Stella Razzo", "Stella Falce-di-Luna", "Stella Soffione"], p: [
+        "Sono {n}! Nello spazio i miei capelli fluttuano. Sembro un soffione.",
+        "Sono {n}! Ho portato una pizza nel razzo. Ha fatto il giro della Terra.",
+        "Sono {n}! Sulla Luna ho saltato così in alto che sono atterrata il giorno dopo."] },
+      "yellow-10": { n: ["la professoressa Alambicco", "la professoressa Bollicina", "la professoressa Kabum"], p: [
+        "Sono {n}! Il mio esperimento doveva fare l'oro. Ha fatto il purè.",
+        "Sono {n}! Ho inventato una macchina per mettere in ordine le camerette. Si è nascosta sotto il letto.",
+        "Sono {n}! Attenzione, farà le bolle… tante bolle… troppe bolle!"] },
+    },
+    mechant: {
+      "blue-1": { n: ["Groviera la Terribile", "Groviera la Rosicchiona", "Groviera la Sgranocchiona"], p: [
+        "Sono {n}! Ho mangiato TUTTO il formaggio, e non mi dispiace per niente.",
+        "Sono {n}! La tua carta? L'ho rosicchiata. Ben ti sta!",
+        "Sono {n}! I buchi nei tuoi calzini? Sono stata io. Ih ih ih."] },
+      "blue-2": { n: ["Piuma lo Strillone", "Piuma il Ladruncolo", "Piuma il Chiassone"], p: [
+        "Sono {n}! Canto sotto la tua finestra alle sei del mattino. Apposta.",
+        "Sono {n}! Le briciole della tua merenda? Rubate. Cip cip!",
+        "Sono {n}! Tu non sai nemmeno volare. Pfff."] },
+      "blue-3": { n: ["Gomitolo il Graffiatore", "Gomitolo lo Sfacciato", "Gomitolo il Brontolone"], p: [
+        "Sono {n}! Il tuo divano? Adesso è il mio tiragraffi.",
+        "Sono {n}! Faccio cadere i bicchieri dal tavolo. Uno alla volta. Guardandoti.",
+        "Sono {n}! Spostati, quello è il MIO posto al sole."] },
+      "blue-4": { n: ["Birba il Masticatore", "Birba il Teppista", "Birba il Terribile"], p: [
+        "Sono {n}! I tuoi compiti? Li ho mangiati. E mi sono piaciuti.",
+        "Sono {n}! La tua pallina me la tengo. Vieni a prenderla, se hai coraggio!",
+        "Sono {n}! Ho scavato una buca in giardino. Buona fortuna a trovarla."] },
+      "blue-5": { n: ["Rosetta la Sporcacciona", "Rosetta la Fangosa", "Rosetta la Golosona"], p: [
+        "Sono {n}! Mi sono appena rotolata nel fango. Vuoi un abbraccio? Ih ih.",
+        "Sono {n}! Ho mangiato la tua merenda E la mia. Oink!",
+        "Sono {n}! Fare il bagno? Neanche per sogno!"] },
+      "blue-6": { n: ["Furbetto l'Imbroglione", "Furbetto il Bugiardello", "Furbetto il Trucchetto"], p: [
+        "Sono {n}! Ho guardato le tue carte. Tutte. Eh eh eh.",
+        "Sono {n}! Vinco sempre… soprattutto quando imbroglio.",
+        "Sono {n}! Fidati di me… o forse no."] },
+      "blue-7": { n: ["Fiocco il Gelido", "Fiocco la Bufera", "Fiocco il Ghiacciolo"], p: [
+        "Sono {n}! Una palla di neve nel colletto? Sono stato io.",
+        "Sono {n}! Hai freddo? Io no. Troppo facile.",
+        "Sono {n}! Ti guardo da lassù… e rido."] },
+      "blue-8": { n: ["Miele il Brontolone", "Miele il Mangione", "Miele il Ringhioso"], p: [
+        "Sono {n}! Tutto il miele è mio. TUTTO. Grrr!",
+        "Sono {n}! Non svegliarmi d'inverno. Sennò… grrr.",
+        "Sono {n}! Le api mi pungono? Non mi fanno neanche il solletico."] },
+      "blue-9": { n: ["Bambù il Pigrone", "Bambù il Musone", "Bambù lo Scansafatiche"], p: [
+        "Sono {n}! Giocare? No. Dormo. Vattene.",
+        "Sono {n}! Ho mangiato tutta la foresta di bambù. Per te non ne resta.",
+        "Sono {n}! I miei occhi neri? Servono a farti paura."] },
+      "blue-10": { n: ["Carota la Capa", "Carota la Terribile", "Carota la Regina"], p: [
+        "Sono {n}! La più forte degli animali sono io. Tu non hai speranze.",
+        "Sono {n}! Ho sentito tutti i tuoi segreti. E li racconterò a tutti!",
+        "Sono {n}! Il tuo orto? È vuoto. Grazie per le carote!"] },
+      "green-1": { n: ["Zip l'Acchiappatutto", "Zip l'Imprendibile", "Zip il Canzonatore"], p: [
+        "Sono {n}! Prendimi! Ah, troppo lento. Come al solito.",
+        "Sono {n}! Ti ho rubato una carta e sono già lontano. Marameo!",
+        "Sono {n}! Tu corri come una lumaca stanca."] },
+      "green-2": { n: ["Rosy la Smorfiosa", "Rosy la Capricciosa", "Rosy la Diva"], p: [
+        "Sono {n}! Spostati, mi copri il sole.",
+        "Sono {n}! I tuoi capelli? Mmm… sembrano un nido d'uccello.",
+        "Sono {n}! Non gioco con chi non è rosa. Mi dispiace. Cioè, non tanto."] },
+      "green-3": { n: ["Punta il Pungente", "Punta lo Spinoso", "Punta il Musone"], p: [
+        "Sono {n}! Un abbraccio? Dai, prova. Eh eh.",
+        "Sono {n}! Ho bucato tutti i tuoi palloncini. Pop, pop, pop!",
+        "Sono {n}! Non avvicinarti: pungo E tengo il muso."] },
+      "green-4": { n: ["Dentone lo Sgranocchiatore", "Dentone il Goloso", "Dentone il Terribile"], p: [
+        "Sono {n}! Ho sgranocchiato la tua matita. Non era molto buona.",
+        "Sono {n}! Il mio sorriso? È per farti vedere tutti i miei denti. Tutti.",
+        "Sono {n}! La tua merenda? Gnam! Finita."] },
+      "green-5": { n: ["Zefiro il Ladruncolo", "Zefiro lo Sbruffone", "Zefiro il Picchiatore"], p: [
+        "Sono {n}! Ti volo sopra e ti rubo il cappello.",
+        "Sono {n}! Da quassù sei piccolissimo. Minuscolo. Ah!",
+        "Sono {n}! Il tuo gelato? Zac, l'ho preso al volo."] },
+      "green-6": { n: ["Fiordaliso il Rissoso", "Fiordaliso il Testardo", "Fiordaliso il Carro Armato"], p: [
+        "Sono {n}! Sono piccolo, ma carico. Attento alle ginocchia!",
+        "Sono {n}! Colpo di corno! La tua torre di carte è per terra.",
+        "Sono {n}! No, no e no! Non vado a letto."] },
+      "green-7": { n: ["Caramello la Ficcanaso", "Caramello la Chiacchierona", "Caramello l'Appiccicosa"], p: [
+        "Sono {n}! Ho letto il tuo diario segreto. Molto interessante.",
+        "Sono {n}! Perché hai perso? Perché? Eh, perché?",
+        "Sono {n}! Mi attacco alle dita, come una vera caramella. Buona fortuna!"] },
+      "green-8": { n: ["Brace il Terrificante", "Brace il Ringhiatore", "Brace lo Sputafuoco"], p: [
+        "Sono {n}! GRRR! … Perché non scappi? Dovresti avere paura!",
+        "Sono {n}! Apro il collare e scappano tutti. Tranne te. Che noia.",
+        "Sono {n}! Sputo… noccioli di ciliegia. Attento!"] },
+      "green-9": { n: ["Vela la Schizzona", "Vela la Pirata", "Vela la Squala"], p: [
+        "Sono {n}! Splash! Sei tutto bagnato. Ih ih!",
+        "Sono {n}! Tu nuoti come un sasso.",
+        "Sono {n}! Sono la pirata dei mari preistorici. Dammi le tue carte!"] },
+      "green-10": { n: ["Rex il Tiranno", "Rex il Cattivone", "Rex il Divoratore"], p: [
+        "Sono {n}! Sono il più grande, il più forte, e tu… il più piccolo.",
+        "Sono {n}! In ginocchio davanti al re! … Va bene, anche seduto va bene.",
+        "Sono {n}! A colazione mangio tre torte. Le tue."] },
+      "red-1": { n: ["Carica il Cigolante", "Carica il Caricatissimo", "Carica l'Infernale"], p: [
+        "Sono {n}! Sono carico… contro di te! Grrr, tic tac.",
+        "Sono {n}! Cigolo apposta quando dormi. Iiiic!",
+        "Sono {n}! Se non giri la mia chiave, tengo il muso per sempre."] },
+      "red-2": { n: ["Bip il Brontolone", "Bip il Rotolatore Pazzo", "Bip lo Scorbutico"], p: [
+        "Sono {n}! Bip bip vuol dire: levati di mezzo.",
+        "Sono {n}! Ti rotolo sui piedi. Apposta. Bip!",
+        "Sono {n}! Bip bip bip! Traduzione: hai perso."] },
+      "red-3": { n: ["Sorriso il Ghignone", "Sorriso il Burlone", "Sorriso l'Uovo Marcio"], p: [
+        "Sono {n}! Sorrido perché hai perso. Eh eh eh.",
+        "Sono {n}! Il mio sorriso? È per prenderti in giro.",
+        "Sono {n}! Se mi rompi, attento alla puzza!"] },
+      "red-4": { n: ["Lampadina l'Abbagliante", "Lampadina il Saputello", "Lampadina la Fulminata"], p: [
+        "Sono {n}! Ho TUTTE le idee buone. Tu nessuna.",
+        "Sono {n}! Mi accendo in piena notte, proprio nei tuoi occhi. Sorpresa!",
+        "Sono {n}! La tua risposta è sbagliata. Ding! Lo sapevo."] },
+      "red-5": { n: ["Clic la Spia", "Clic il Paparazzo", "Clic il Burlone"], p: [
+        "Sono {n}! Ho una foto di te in pigiama. La faccio vedere a tutti?",
+        "Sono {n}! Clic! Ti ho beccato con le dita nel naso.",
+        "Sono {n}! Tutte le tue foto sono mosse. Mi muovo apposta."] },
+      "red-6": { n: ["Schermo lo Zapper", "Schermo il Disturbatore", "Schermo lo Spoiler"], p: [
+        "Sono {n}! Ti racconto la fine del cartone? Vince l'eroe. Ecco, fatto.",
+        "Sono {n}! Cambio canale proprio sul più bello. Eh eh.",
+        "Sono {n}! Metto la neve sullo schermo mentre guardi. Pssshhh!"] },
+      "red-7": { n: ["Cassaforte il Robusto", "Cassaforte il Burbero", "Cassaforte il Lucchetto"], p: [
+        "Sono {n}! I tuoi giocattoli sono dentro di me. E ho perso la chiave. Ah!",
+        "Sono {n}! Bum, bum! Levati, arrivo io.",
+        "Sono {n}! Custodisco i tuoi segreti… a meno che qualcuno non mi dia una caramella."] },
+      "red-8": { n: ["Cosmo l'Invasore", "Cosmo il Marziano", "Cosmo il Conquistatore"], p: [
+        "Sono {n}! Ho deciso di invadere… la tua cameretta. Arrenditi!",
+        "Sono {n}! Ti spedisco sulla Luna. Solo andata!",
+        "Sono {n}! Gli alieni sono miei amici. E tu non gli piaci."] },
+      "red-9": { n: ["Zoom la Spia", "Zoom lo Spione", "Zoom il Ficcanaso"], p: [
+        "Sono {n}! Vedo tutte le tue carte. E lo dico a tutti!",
+        "Sono {n}! Ti ho visto mangiare una caramella di nascosto. Lo dico alla mamma?",
+        "Sono {n}! Nasconditi dove vuoi, ti trovo sempre. Eh eh."] },
+      "red-10": { n: ["Maestà il Tiranno", "Maestà lo Spietato", "Maestà il Grande Capo"], p: [
+        "Sono {n}! Inchinatevi! Più giù! Ancora più giù!",
+        "Sono {n}! Sono il re, quindi vinco sempre. È la legge.",
+        "Sono {n}! Tu sarai il mio servitore. Comincia a lucidarmi i bulloni."] },
+      "yellow-1": { n: ["l'agente Martino il Severo", "l'ispettore Brontolo", "l'agente Scontento"], p: [
+        "Sono {n}! Tu! Hai imbrogliato? Ti tengo d'occhio!",
+        "Sono {n}! In prigione! … Va bene, la prigione è la tua cameretta.",
+        "Sono {n}! Mani in alto! E dammi la tua merenda."] },
+      "yellow-2": { n: ["Fatina la Malefica", "Fatina la Dispettosa", "Fatina la Birbona"], p: [
+        "Sono {n}! Abracadabra: le tue patatine sono diventate broccoli!",
+        "Sono {n}! Un colpo di bacchetta, e tutte le tue carte sono degli 1. Ah ah!",
+        "Sono {n}! Ti trasformo in un rospo. Ma un rospo carino."] },
+      "yellow-3": { n: ["lo sceriffo Lazo il Temibile", "il bandito Lazo", "Lazo il Burbero"], p: [
+        "Sono {n}! Questa città è troppo piccola per tutti e due. Vai a giocare altrove!",
+        "Sono {n}! Ti prendo col lazo, e i piatti li lavi tu.",
+        "Sono {n}! Mani in alto! Dammi le tue caramelle."] },
+      "yellow-4": { n: ["Lina la Selvaggia", "Lina la Spina", "Lina la Segugia"], p: [
+        "Sono {n}! Ho trovato le tracce dei tuoi calzini puzzolenti. Bleah!",
+        "Sono {n}! Conosco una scorciatoia… ma non te la dico.",
+        "Sono {n}! Ti sei perso? Peggio per te!"] },
+      "yellow-5": { n: ["Leo lo Sbruffone", "Leo il Campione", "Leo l'Imbroglione"], p: [
+        "Sono {n}! Sono il miglior giocatore del mondo. Tu sei in panchina.",
+        "Sono {n}! Fallo di mano? Quale mano? L'arbitro non ha visto niente.",
+        "Sono {n}! Ho segnato dieci gol. Tu, zero. Tiè!"] },
+      "yellow-6": { n: ["Ines la Ficcanaso", "Ines l'Implacabile", "Ines l'Accusatrice"], p: [
+        "Sono {n}! Ho scoperto chi ha mangiato i biscotti. Sei tu! Colpevole!",
+        "Sono {n}! Niente mi sfugge. Soprattutto le tue marachelle.",
+        "Sono {n}! Il tesoro l'ho trovato prima io. E me lo tengo."] },
+      "yellow-7": { n: ["il dottor Sami il Severo", "il dottor Sciroppo-Amaro", "il dottor Brontolo"], p: [
+        "Sono {n}! Apri la bocca… hai mangiato troppe caramelle! Vietato!",
+        "Sono {n}! Per guarire: un cucchiaio di sciroppo agli spinaci. Gnam… o forse no.",
+        "Sono {n}! Non sei malato, fai finta. Ti ho scoperto!"] },
+      "yellow-8": { n: ["Fiamma la Prepotente", "Fiamma la Doccia-Fredda", "la capitana Severa"], p: [
+        "Sono {n}! Hai fatto una marachella? Doccia fredda!",
+        "Sono {n}! Le candeline di compleanno non le spengo. Le innaffio.",
+        "Sono {n}! Nino-nino! Levati, e in fretta!"] },
+      "yellow-9": { n: ["Stella la Supersonica", "Stella la Spietata", "Stella il Razzo Pazzo"], p: [
+        "Sono {n}! Io sono andata sulla Luna. Tu sei andato… dal panettiere.",
+        "Sono {n}! Ti porto nello spazio e ti lascio su Plutone.",
+        "Sono {n}! Le stelle? Sono tutte mie. Giù le mani!"] },
+      "yellow-10": { n: ["la professoressa Provetta la Pazza", "la professoressa Esplosione", "la professoressa Diabolica"], p: [
+        "Sono {n}! Il mio esperimento trasformerà i tuoi compiti… in ancora più compiti! Muahaha!",
+        "Sono {n}! Inventerò una pozione per vincere sempre.",
+        "Sono {n}! Bum! Ops. No, no, l'ho fatto apposta."] },
     },
   },
 };
