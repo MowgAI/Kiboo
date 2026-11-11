@@ -4,10 +4,10 @@
   --ink-soft: #6A5C80;
   --panel: #FFFFFF;
   --line: #DCD3E8;
-  --felt: #3B2A55;
-  --felt-ring: #4E3A70;
+  --felt: #5B4A86;
+  --felt-ring: #7A68A8;
   --felt-ink: #F3EDFB;
-  --felt-soft: #BFAEDB;
+  --felt-soft: #DCD0F0;
   --sun: #FFC93C;
   --sun-ink: #2A1F3D;
   --c-blue: #1F6FE5;
@@ -31,8 +31,8 @@
     --ink-soft: #A797BF;
     --panel: #221A2E;
     --line: #3A2F4A;
-    --felt: #33244B;
-    --felt-ring: #46345F;
+    --felt: #4A3B6E;
+    --felt-ring: #634F8C;
     --mark: rgba(255, 201, 60, 0.28);
     --ok: #4CC47F;
   --setup: #172238;
@@ -49,8 +49,8 @@
   --ink-soft: #A797BF;
   --panel: #221A2E;
   --line: #3A2F4A;
-  --felt: #33244B;
-  --felt-ring: #46345F;
+  --felt: #4A3B6E;
+  --felt-ring: #634F8C;
   --mark: rgba(255, 201, 60, 0.28);
   --ok: #4CC47F;
   --ko: #FF6F6F;
