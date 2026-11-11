@@ -415,6 +415,13 @@
     "gift.revealO": "See one of West's hidden cards",
     "gift.revealE": "See one of East's hidden cards",
     "gift.collect": "Win a card for my collection",
+    "gift.choose": "Choose the card you want to win:",
+    "gift.have": "You already have it",
+    "name.label": "Give it a name (optional)",
+    "name.save": "Save the name",
+    "name.saved": p => `Done: it's called ${p.name} in the introductions and the parade.`,
+    "name.reset": "It keeps its original name.",
+    "name.rename": "Click to give it a name",
     "gift.won": p => `New card for your collection: the <strong>${p.card}</strong> from the ${familyName(p.s)} family. ` +
       `You now have ${p.n} ${S(p.n, "card", "cards")} out of 40` +
       (p.fam === 10 ? `, and the ${familyName(p.s)} family is complete!` : ` (${p.fam} out of 10 ${familyName(p.s)}).`),

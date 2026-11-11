@@ -422,6 +422,13 @@
     "gift.revealO": "Vedi una carta nascosta di Ovest",
     "gift.revealE": "Vedi una carta nascosta di Est",
     "gift.collect": "Vinci una carta per la mia collezione",
+    "gift.choose": "Scegli la carta che vuoi vincere:",
+    "gift.have": "Ce l'hai già",
+    "name.label": "Dalle un nome (facoltativo)",
+    "name.save": "Salva il nome",
+    "name.saved": p => `Fatto: si chiama ${p.name} nelle presentazioni e nella parata.`,
+    "name.reset": "Mantiene il suo nome originale.",
+    "name.rename": "Clicca per darle un nome",
     "gift.won": p => `Nuova carta per la tua collezione: <strong>${artc(p.card)}</strong> della famiglia dei ${familyName(p.s)}. ` +
       `Ora hai ${p.n} ${S(p.n, "carta", "carte")} su 40` +
       (p.fam === 10 ? `, e la famiglia dei ${familyName(p.s)} è completa!` : ` (${p.fam} su 10 tra i ${familyName(p.s)}).`),

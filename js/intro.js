@@ -62,7 +62,7 @@ const Intro = (() => {
   function paradeLine(s, v) {
     const all = window.KIBOO_PARADE || {}, key = COLORS[s] + "-" + v;
     const list = (all[I18N.lang] && all[I18N.lang][key]) || (all.fr && all.fr[key]);
-    return list ? list[Math.floor(Math.random() * list.length)] : presentation(s, v);
+    return list ? Rewards.personalize(list[Math.floor(Math.random() * list.length)], { s, v }) : presentation(s, v);
   }
   // Choix de la langue de l'accueil (EN · FR · IT), puis on redessine la vue courante.
   const langs = () => `<div class="intro-langs" role="group" aria-label="Language">${I18N.SUPPORTED.map(l =>
@@ -94,7 +94,8 @@ const Intro = (() => {
   const presentation = (s, v) => {
     const all = window.KIBOO_CHARACTERS || {};
     const key = COLORS[s] + "-" + v;
-    return (all[I18N.lang] && all[I18N.lang][key]) || (all.fr && all.fr[key]) || "";
+    // Avec le nom que le joueur a donné à cette carte dans sa collection, s'il y en a un.
+    return Rewards.personalize((all[I18N.lang] && all[I18N.lang][key]) || (all.fr && all.fr[key]) || "", { s, v });
   };
 
   /* ---------- La fenêtre ---------- */

@@ -134,7 +134,7 @@ Le réglage « Carré de Coco » (quand le joueur humain est déclarant) propose
 
 Quand un joueur humain est à la table, chaque pli terminé reste affiché jusqu'au clic sur « Pli suivant » (ou sur la table), pour avoir le temps de retenir les cartes jouées.
 
-Toutes les 3 bonnes réponses (cumulées, exercices compris), le joueur choisit un cadeau : voir une carte cachée d'Ouest ou d'Est (pendant une partie), ou gagner une carte pour sa collection. Le bouton « Collection » montre l'album des 40 cartes. La progression et la collection sont gardées dans le navigateur. Le code est dans `js/quiz.js` et `js/rewards.js`.
+Toutes les 3 bonnes réponses (cumulées, exercices compris), le joueur choisit un cadeau : voir une carte cachée d'Ouest ou d'Est (pendant une partie), ou gagner une carte pour sa collection, qu'il **choisit** parmi celles qui lui manquent et à laquelle il peut **donner un nom**. Ce nom remplace celui du personnage dans les présentations et la parade ; on peut renommer ses cartes depuis la collection (clic sur une carte). Les noms restent sur l'appareil (`kiboo.names.v1`, non envoyé au compte). Le bouton « Collection » montre l'album des 40 cartes. La progression et la collection sont gardées dans le navigateur. Le code est dans `js/quiz.js` et `js/rewards.js`.
 
 ## Mode évaluation (score duplicate)
 

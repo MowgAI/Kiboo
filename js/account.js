@@ -52,7 +52,8 @@ const Account = (() => {
   }
 
   /* ---------- La sauvegarde : toutes les clés « kiboo.* » du navigateur ---------- */
-  const OWN = k => k.startsWith("kiboo.") && k !== SKIP_INTRO;
+  // Les noms donnés aux cartes (kiboo.names.v1) restent sur l'appareil : ils ne sont pas envoyés.
+  const OWN = k => k.startsWith("kiboo.") && k !== SKIP_INTRO && k !== "kiboo.names.v1";
   function snapshot() {
     const data = {};
     try {

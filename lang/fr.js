@@ -418,6 +418,13 @@
     "gift.revealO": "Voir une carte cachée d'Ouest",
     "gift.revealE": "Voir une carte cachée d'Est",
     "gift.collect": "Gagner une carte pour ma collection",
+    "gift.choose": "Choisis la carte que tu veux gagner :",
+    "gift.have": "Tu l'as déjà",
+    "name.label": "Donne-lui un nom (facultatif)",
+    "name.save": "Enregistrer le nom",
+    "name.saved": p => `C'est noté : elle s'appelle ${p.name} dans les présentations et la parade.`,
+    "name.reset": "Elle garde son nom d'origine.",
+    "name.rename": "Cliquer pour lui donner un nom",
     "gift.won": p => `Nouvelle carte pour ta collection : le <strong>${p.card}</strong> de la famille des ${familyName(p.s)}. ` +
       `Tu as maintenant ${p.n} ${S(p.n, "carte", "cartes")} sur 40` +
       (p.fam === 10 ? `, et la famille des ${familyName(p.s)} est complète !` : ` (${p.fam} sur 10 chez les ${familyName(p.s)}).`),
