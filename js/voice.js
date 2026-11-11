@@ -110,7 +110,7 @@ const Voice = (() => {
     u.lang = LOCALE[lang] || "fr-FR";
     u.voice = v;
     u.rate = (RATE[lang] || 1) * (opts.rate || 1);
-    u.pitch = pitch;
+    u.pitch = Math.min(2, pitch * (opts.pitch || 1));   // opts.pitch : plus aigu (> 1) ou plus grave (< 1)
     // Pendant que la voix parle, la musique baisse (js/sound.js).
     const done = new Promise(resolve => {
       u.onend = u.onerror = () => { Sound.duck(false); Timing.setSpeaking(false); resolve(true); };

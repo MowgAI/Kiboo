@@ -45,22 +45,33 @@ const Intro = (() => {
   // Musique de la vue : celle de l'accueil, ou celle de la famille présentée.
   let family = null;
   const styleNow = () => (family === null ? "intro" : "fam" + family);
-  const playMusic = () => Sound.music(introMusic ? styleNow() : null);
-  function setFamily(f) { family = f; playMusic(); }
+  // musicOpts (parade) : la musique suit le mode et change de tonalité à chaque personnage (js/sound.js).
+  let musicOpts = {};
+  const playMusic = () => Sound.music(introMusic ? styleNow() : null, musicOpts);
+  function setFamily(f, opts = {}) { family = f; musicOpts = opts; playMusic(); }
   // Un personnage arrive : son bruit (miaou, rugissement…), puis il parle.
   let talkToken = 0;
   // Chaque personnage parle avec une voix d'homme ou de femme (lang/parade.js), un peu plus vite dans la parade.
   const genderOf = (s, v) => ((window.KIBOO_PARADE || {}).gender || {})[COLORS[s] + "-" + v] || "m";
-  function introduce(s, v, text, rate = 1) {
+  function introduce(s, v, text, rate = 1, pitch = 1) {
     const token = ++talkToken;
     Voice.stop();
     if (!sound) return Promise.resolve(false);
     Sound.character(s, v);
-    return new Promise(r => setTimeout(r, 600)).then(() => (token === talkToken ? Voice.speak(text, introLang, { gender: genderOf(s, v), rate }) : false));
+    return new Promise(r => setTimeout(r, 600)).then(() => (token === talkToken ? Voice.speak(text, introLang, { gender: genderOf(s, v), rate, pitch }) : false));
   }
   // Ce que dit un personnage dans la parade : « Je suis… » et un truc marrant, tiré au hasard parmi les siens.
+  // Selon le mode de la parade (lang/parade-modes.js) : un nom et une phrase tirés au hasard ;
+  // en mode gentil, ou pour un personnage pas encore écrit dans le mode, sa phrase de lang/parade.js.
   function paradeLine(s, v) {
-    const all = window.KIBOO_PARADE || {}, key = COLORS[s] + "-" + v;
+    const key = COLORS[s] + "-" + v;
+    const modal = (((window.PARADE_MODES || {})[I18N.lang] || {})[paradeMode] || {})[key];
+    const any = list => list[Math.floor(Math.random() * list.length)];
+    // Un nom donné par le joueur à sa carte (collection) n'est jamais remplacé par un nom tiré au hasard.
+    const mine = Rewards.nameOf({ s, v });
+    const name = mine ? mine.replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[ch]) : any(modal ? modal.n : [""]);
+    if (paradeMode !== "gentil" && modal) return any(modal.p).replaceAll("{n}", name);
+    const all = window.KIBOO_PARADE || {};
     const list = (all[I18N.lang] && all[I18N.lang][key]) || (all.fr && all.fr[key]);
     return list ? Rewards.personalize(list[Math.floor(Math.random() * list.length)], { s, v }) : presentation(s, v);
   }
@@ -216,6 +227,12 @@ const Intro = (() => {
 
   /* ---------- La parade de Kiboo ---------- */
   let paradeRun = 0, paused = false, forward = false, skipNow = null, resumeFn = null;
+  // Les modes de la parade : gentil, bébé, drôle, méchant (choix gardé dans le navigateur).
+  // La voix change avec le mode : bébé plus aiguë, drôle plus vive, méchant plus grave.
+  const MODES = ["gentil", "bebe", "drole", "mechant"];
+  const MODE_VOICE = { gentil: {}, bebe: { pitch: 1.5, rate: 0.95 }, drole: { pitch: 1.15, rate: 1.08 }, mechant: { pitch: 0.55, rate: 0.9 } };
+  let paradeMode = "gentil";
+  try { const m = localStorage.getItem("kiboo.paradeMode"); if (MODES.includes(m)) paradeMode = m; } catch (e) { /* pas de stockage */ }
   const wait = ms => new Promise(r => setTimeout(r, ms));
 
   function parade(start) { inLang(paradeView); wireLangs(); runParade(start); }
@@ -223,6 +240,9 @@ const Intro = (() => {
     view = "parade";
     box.innerHTML = `<div class="intro-stage intro-show intro-parade">${langs()}
       <h2 class="intro-fam">🎪 ${T("intro.parade")}</h2>
+      <div class="intro-chips" role="group" aria-label="${T("intro.paradeMode")}">
+        ${MODES.map(m => `<button type="button" class="intro-chip" data-mode="${m}" aria-pressed="${m === paradeMode}">${T("intro.mode." + m)}</button>`).join("")}
+      </div>
       <div class="parade-floor" data-role="floor"></div>
       <div class="intro-nav">
         <button class="act ghost" type="button" data-a="pause">${paused ? `▶ ${T("intro.resume")}` : `⏸ ${T("intro.pause")}`}</button>
@@ -233,6 +253,14 @@ const Intro = (() => {
     </div>`;
     const q = sel => box.querySelector(sel);
     q("[data-a=back]").onclick = () => { paradeRun++; Voice.stop(); home(); };
+    // Changer de mode : le personnage à l'écran se présente de nouveau, dans le nouveau mode.
+    for (const b of box.querySelectorAll("[data-mode]")) b.onclick = () => {
+      if (b.dataset.mode === paradeMode) return;
+      paradeMode = b.dataset.mode;
+      try { localStorage.setItem("kiboo.paradeMode", paradeMode); } catch (e) { /* pas de stockage */ }
+      for (const x of box.querySelectorAll("[data-mode]")) x.setAttribute("aria-pressed", x.dataset.mode === paradeMode);
+      if (index < 40) runParade(index);
+    };
     q("[data-a=sound]").onclick = e => {
       sound = !sound;
       if (!sound) Voice.stop();
@@ -270,10 +298,10 @@ const Intro = (() => {
            </div>`
         : `<div class="parade-end">${[0, 1, 2, 3].map(s => `<div class="card" style="background-image:url(${img(s, 10)})"></div>`).join("")}
              <p class="intro-text">${text}</p></div>`;
-      if (i < 40) setFamily(Math.floor(i / 10)); else setFamily(null);
+      if (i < 40) setFamily(Math.floor(i / 10), { mode: paradeMode, shift: [0, 3, -2, 5, 2][i % 5] }); else setFamily(null);
       const skip = new Promise(r => { skipNow = r; });
       const talk = paused ? Promise.resolve(false)
-        : i < 40 ? introduce(Math.floor(i / 10), (i % 10) + 1, text, 1.08)
+        : i < 40 ? introduce(Math.floor(i / 10), (i % 10) + 1, text, 1.08 * (MODE_VOICE[paradeMode].rate || 1), MODE_VOICE[paradeMode].pitch || 1)
         : (sound ? Voice.speak(text, introLang) : Promise.resolve(false));
       await Promise.race([talk.then(spoken => wait(spoken ? 900 : Math.max(2500, text.length * 60))), skip]);
       if (run !== paradeRun) return;
@@ -294,6 +322,7 @@ const Intro = (() => {
     box.hidden = false;
     document.body.classList.add("intro-open");
     family = null;
+    musicOpts = {};
     playMusic();
     home();
   }
