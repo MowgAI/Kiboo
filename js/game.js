@@ -317,6 +317,7 @@ function dealHands() {
 }
 
 function newGame(hands, opts = {}) {
+  if (typeof Setup !== "undefined") Setup.hideStart();
   const initial = {};
   SEATS.forEach(s => { initial[s] = hands[s].slice(); });
   const types = { O: config.O, E: config.E, S: config.S };
@@ -785,6 +786,7 @@ function setHelp(on) {
   if (!on && helpMode()) { config.coco = cocoBefore === "goat" ? "off" : cocoBefore; cocoBefore = null; }
   $("cfg-coco").value = config.coco;
   helpLabel();
+  if (typeof Setup !== "undefined") Setup.refresh();
 }
 function helpLabel() {
   $("btn-help-play").querySelector(".lbl").textContent = helpMode() ? T("btn.noHelp") : T("btn.help");
@@ -815,8 +817,11 @@ document.addEventListener("kiboo-lang", () => {
 });
 
 // Première donne une fois tous les scripts chargés (exercices, cadeaux, questions).
-// Elle attend la fin de l'écran d'accueil (js/intro.js) ; ses cartes sont distribuées avec une animation.
+// Elle attend la fin de l'écran d'accueil (js/intro.js), puis que le joueur ait fait ses choix sur
+// l'écran « Prépare ta partie » (js/setup.js) ; ses cartes sont distribuées avec une animation.
 window.addEventListener("DOMContentLoaded", async () => {
   if (typeof Intro !== "undefined") await Intro.ready;
-  newGame(dealHands(), { first: true });
+  if (game) return;                             // une donne a déjà été lancée (Nouvelle donne, Goat…)
+  await Setup.waitStart();
+  if (!game) newGame(dealHands(), { first: true });
 });

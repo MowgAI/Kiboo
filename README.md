@@ -41,6 +41,7 @@ python3 -m http.server 8000
 - `js/feedback.js` : formulaire « Donner mon avis »
 - `js/quiz.js` : questions pendant la partie et moteur de déduction
 - `js/rewards.js` : cadeaux, progression et collection
+- `js/setup.js` : les choix importants en gros boutons et l'écran « Prépare ta partie »
 - `js/intro.js` : écran d'accueil, présentations des familles et des personnages, distribution animée
 - `lang/parade.js` : ce que disent les personnages dans la parade, et la voix (homme ou femme) de chacun
 - `lang/personnages.js` : présentations des 40 personnages (français, anglais, italien)
@@ -68,6 +69,19 @@ Au démarrage, un écran d'accueil montre le logo Kiboo qui se forme lettre par 
 - **Les personnages** : les 40 personnages se présentent un par un (flèches du clavier pour avancer).
 
 Les présentations sont lues à voix haute (bouton Son). L'accueil a sa propre langue, l'anglais par défaut (la voix anglaise est la meilleure sur la plupart des appareils) : les boutons EN · FR · IT la changent sans toucher à la langue du jeu. Une case « Ne plus afficher l'accueil au démarrage » est gardée dans le navigateur ; un clic sur le logo Kiboo rouvre l'accueil. Les animations sont coupées si l'appareil demande de réduire les animations. Les textes des personnages sont dans `lang/personnages.js` (à relire et modifier librement) ; le code est dans `js/intro.js`.
+
+## Préparer sa partie et réglages
+
+- Au démarrage (après l'écran d'accueil), la partie ne commence pas toute seule : l'écran **« Prépare ta partie »** s'affiche sur la table et guide le joueur (texte, et lecture à voix haute avec le bouton Écouter). On y choisit les **quatre réglages importants**, puis on clique sur « Commencer la partie » :
+  - **Ta place** : Sud (déclarant), Ouest ou Est (défense), ou regarder les robots ;
+  - **Atout** : sans atout ou avec atout ;
+  - **Aide de Goat** : sans aide ou avec Goat (carré de Coco automatique) ;
+  - **Questions pendant la partie** : aucune, quelques-unes ou toutes.
+
+  Goat et les questions ne servent qu'au déclarant : ils sont grisés pour les autres places.
+- Ces quatre choix restent en gros boutons en haut des réglages pendant le jeu (ils valent pour la donne suivante).
+- Les autres réglages sont rangés dans **trois groupes repliables** : 🤖 Joueurs et robots (robot de chaque place, vitesse), 💡 Aides et apprentissage (carré de Coco, jeux ouverts, meilleurs coups, explications de Piperno, mode évaluation), 🎵 Ambiance (musique, bruitages, lecture à voix haute, voix).
+- Code : `js/setup.js`.
 
 ## Atout
 

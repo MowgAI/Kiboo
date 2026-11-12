@@ -9,6 +9,7 @@ Notes gardées pour plus tard (à reprendre quand on aura le temps).
 - En attendant : la collection est déjà partagée dans le même navigateur (même site mowgai.github.io) via les clés `kiboo.rewards.v1` (cartes gagnées, à compléter sans jamais écraser) et `kiboo.names.v1` (noms donnés par le joueur, jamais changés automatiquement, restent sur l'appareil).
 
 ## Autres idées en attente
+- **Téléphone Samsung trop sombre** : vérifier le mode sombre (et les réglages d'affichage de Samsung Internet / Chrome) et éclaircir les couleurs.
 - Récompenses dans Kimind : décider quand donner une carte.
 - Personnalisation (simple sans compte, puis avec compte et temps de réflexion).
 - Plan de jeu : pause après l'entame, question « plan de jeu », retour après la donne, plan montré par Goat ou Piperno.

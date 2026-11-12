@@ -653,3 +653,36 @@ body.intro-open { overflow: hidden; }
 #album-rename .gift-won { margin-top: 0; }
 #album-rename .gift-card { flex: none; }
 #album-rename .card { --w: 70px; margin: 0; animation: none; }
+
+/* Les choix importants (js/setup.js) : gros boutons groupés */
+.main-choices { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 10px 22px; }
+.choice { display: flex; flex-direction: column; gap: 5px; }
+.choice-label { font-size: 0.9rem; font-weight: 600; color: var(--ink-soft); display: flex; align-items: center; gap: 6px; }
+.seg { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+.seg button {
+  font: inherit; font-weight: 600; font-size: 0.95rem; cursor: pointer;
+  padding: 6px 12px; border-radius: 999px; border: 2px solid var(--line); background: var(--panel); color: var(--ink);
+}
+.seg button:hover { border-color: var(--ink); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--page); border-color: var(--ink); }
+/* Les autres réglages, rangés dans des groupes qui se replient */
+.setup-groups { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 8px; }
+.group { flex: 1 1 260px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 6px 12px; }
+.group summary { cursor: pointer; font-weight: 600; padding: 4px 0; display: flex; align-items: center; gap: 6px; }
+.group[open] summary { margin-bottom: 6px; }
+.group-body { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: end; padding-bottom: 6px; }
+/* L'écran « Prépare ta partie », sur la table */
+.start { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, 0.25); border-radius: inherit; }
+.start-card { background: var(--panel); color: var(--ink); border-radius: 18px; padding: 18px 20px; max-width: 760px; width: 100%; box-shadow: 0 8px 30px rgba(0,0,0,0.35); display: flex; flex-direction: column; gap: 12px; }
+.start-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.start-card h2 { margin: 0; font-size: 1.4rem; }
+.start-card p { margin: 0; }
+.start-card .main-choices { gap: 14px 24px; }
+.start-go { align-self: center; font-size: 1.15rem; padding: 10px 26px; border-color: var(--sun); background: var(--sun); color: var(--sun-ink); }
+.choice.off .seg { opacity: 0.45; }
+.choice-label small { font-weight: 400; }
+.seg button:disabled { cursor: default; }
+/* Pendant l'écran de départ : la table est assez haute pour lui, et les choix du haut sont cachés (ils y sont). */
+/* L'écran de départ occupe toute la grille de la table : la table prend sa hauteur. */
+.table > .start { position: relative; inset: auto; grid-column: 1 / -1; grid-row: 1 / -1; align-self: stretch; justify-self: stretch; }
+body:has(#start:not([hidden])) #main-choices { display: none; }
