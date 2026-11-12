@@ -692,3 +692,15 @@ body:has(#start:not([hidden])) #main-choices { display: none; }
 /* Atout et questions sont déjà en gros boutons : leurs menus d'origine restent cachés dans les groupes. */
 .group-body .field:has(#cfg-trump), .group-body .field:has(#cfg-quiz) { display: none; }
 .group { align-self: flex-start; }
+
+/* ---------- Le choix des robots et leur présentation ---------- */
+.seg .stars { display: block; font-size: 0.7rem; letter-spacing: 1px; color: #E0A100; }
+.seg button[aria-pressed="true"] .stars { color: #FFD24A; }
+.choice-note { font-size: 0.85rem; color: var(--ink-soft); }
+button.link { background: none; border: 0; padding: 0; font: inherit; color: var(--ink); text-decoration: underline; cursor: pointer; font-weight: 600; }
+.robot-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; margin-top: 4px; }
+.robot-card { display: flex; gap: 10px; align-items: flex-start; padding: 8px; border: 1px solid var(--ink-soft); border-radius: 10px; background: var(--page); }
+.robot-face { width: 64px; height: 64px; border-radius: 50%; border: 2px solid #D62828; flex: none; background-color: #fff; background-size: 175% auto; background-position: 50% 26%; background-repeat: no-repeat; }
+.robot-card .stars { color: #E0A100; letter-spacing: 1px; }
+.robot-card em { display: block; font-size: 0.85rem; color: var(--ink-soft); }
+.robot-card p { margin: 4px 0 0; font-size: 0.88rem; }

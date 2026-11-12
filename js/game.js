@@ -310,7 +310,7 @@ const PLAYER_TYPES = {
 };
 
 /* ===================== État de la partie ===================== */
-const config = { O: "deterministe", E: "deterministe", S: "humain", speed: 650, open: false, hints: false, explain: false, quiz: "off", eval: true, coco: "off", voice: false, music: false, sfx: true, trump: "none" };
+const config = { O: "aleatoire", E: "aleatoire", S: "humain", speed: 650, open: false, hints: false, explain: false, quiz: "off", eval: true, coco: "off", voice: false, music: false, sfx: true, trump: "none" };
 let game = null;
 let runToken = 0;
 const sleep = ms => new Promise(r => setTimeout(r, ms));

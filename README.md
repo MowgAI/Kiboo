@@ -72,15 +72,16 @@ Les présentations sont lues à voix haute (bouton Son). L'accueil a sa propre l
 
 ## Préparer sa partie et réglages
 
-- Au démarrage (après l'écran d'accueil), la partie ne commence pas toute seule : l'écran **« Prépare ta partie »** s'affiche sur la table et guide le joueur (texte, et lecture à voix haute avec le bouton Écouter). On y choisit les **quatre réglages importants**, puis on clique sur « Commencer la partie » :
+- Au démarrage (après l'écran d'accueil), la partie ne commence pas toute seule : l'écran **« Prépare ta partie »** s'affiche sur la table et guide le joueur (texte, et lecture à voix haute avec le bouton Écouter). On y choisit les **cinq réglages importants**, puis on clique sur « Commencer la partie » :
   - **Ta place** : Sud (déclarant), Ouest ou Est (défense), ou regarder les robots ;
+  - **Les robots** : le même robot à toutes les autres places, du plus facile au plus fort (étoiles) : PiperRand ★ (par défaut), Piperno ★★, Averell ★★★, Averell250 ★★★★, Cheater ★★★★★. Le lien « Qui sont les robots ? » ouvre leur présentation : un avatar (une carte de la famille des robots), un niveau et quelques mots simples ;
   - **Atout** : sans atout ou avec atout ;
   - **Aide de Goat** : sans aide ou avec Goat (carré de Coco automatique) ;
   - **Questions pendant la partie** : aucune, quelques-unes ou toutes.
 
   Goat et les questions ne servent qu'au déclarant : ils sont grisés pour les autres places.
   Les autres réglages (les trois groupes ci-dessous) sont aussi dans cet écran : la partie ne commence qu'au clic sur « Commencer la partie ». Ils retournent ensuite au-dessus de la table.
-- Ces quatre choix restent en gros boutons en haut des réglages pendant le jeu (ils valent pour la donne suivante).
+- Ces cinq choix restent en gros boutons en haut des réglages pendant le jeu (ils valent pour la donne suivante).
 - Les autres réglages sont rangés dans **trois groupes repliables** : 🤖 Joueurs et robots (robot de chaque place, vitesse), 💡 Aides et apprentissage (carré de Coco, jeux ouverts, meilleurs coups, explications de Piperno, mode évaluation), 🎵 Ambiance (musique, bruitages, lecture à voix haute, voix).
 - Code : `js/setup.js`.
 
