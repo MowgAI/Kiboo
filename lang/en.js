@@ -122,7 +122,7 @@
     "pip.leadStrong": p => `He leads his favourite suit, ${C[p.suit]}. He holds the highest card left (the ${p.top}): he plays his highest.`,
     "pip.leadWeak": p => `He leads his favourite suit, ${C[p.suit]}. He doesn't hold the highest card left (the ${p.top}): he plays his lowest.`,
     "pip.partnerFollow": "His partner is already winning the trick: he follows with his lowest card.",
-    "pip.partnerDiscard": p => `His partner is already winning the trick and he has no ${C[p.led]} left: he discards the first card of his hand, in the order blue, green, red, yellow.`,
+    "pip.partnerDiscard": p => `His partner is already winning the trick and he has no ${C[p.led]} left: he discards the first card of his hand, in the order green, yellow, red, blue.`,
     "pip.win": p => `He plays the lowest card that makes his side win${p.now ? " for now" : ""}.`,
     "pip.cantWin": "He can't make his side win: he follows with his lowest card.",
     "pip.discardKeep": p => `He has no ${C[p.led]} left and can't win the trick: he discards a low card, keeping his favourite suit (${C[p.my]}).`,
@@ -199,7 +199,7 @@
     "quiz.no": "No, impossible",
     "quiz.maybe": "We can't know",
     "quiz.q.same": p => `Can West have <strong>as many cards</strong> in another suit as in ${p.suit}?`,
-    "quiz.rule.same": "With suits of equal length, the opening lead rule chooses the one with the most points (with equal points too, the last one in the order blue, green, red, yellow). So another suit of the same length is possible if it has fewer points.",
+    "quiz.rule.same": "With suits of equal length, the opening lead rule chooses the one with the most points (with equal points too, the last one in the order green, yellow, red, blue). So another suit of the same length is possible if it has fewer points.",
     "quiz.q.higher": p => `West led the ${C[p.s]} ${p.v}. Can he have a <strong>higher ${C[p.s]} card</strong> than the ${p.v}?`,
     "quiz.q.lower": p => `West led the ${C[p.s]} ${p.v}. Can he have a <strong>lower ${C[p.s]} card</strong> than the ${p.v}?`,
     "quiz.rule.seq": "The opening lead rule plays the top card of a sequence (at least two touching cards, the top one at least a 7); otherwise, the lowest card of the suit.",
@@ -219,7 +219,7 @@
     "quiz.unseen": "The cards you can't see, suit by suit:",
     "quiz.perSuit": "Suit by suit:",
     "quiz.same.possible": p => `${p.suit}: <strong>possible</strong>. For example ${p.k} ${C[p.L]} cards (${p.pL} points) and ${p.k} ${C[p.s]} cards (${p.pS} points): West does lead ${C[p.L]}` +
-      (p.tie ? ` (as many points, but ${C[p.L]} comes after ${C[p.s]} in the order blue, green, red, yellow)` : "") + ".",
+      (p.tie ? ` (as many points, but ${C[p.L]} comes after ${C[p.s]} in the order green, yellow, red, blue)` : "") + ".",
     "quiz.same.short": p => `${p.suit}: <strong>impossible</strong>. ${C[p.L][0].toUpperCase() + C[p.L].slice(1)} is West's longest suit: he has at least ${p.minL} of them. But ` +
       (p.rest === 0 ? `there is no ${C[p.s]} card left` : `only ${p.rest} ${C[p.s]} ${S(p.rest, "card is", "cards are")} left for East and West`) +
       ": not enough to have as many.",
@@ -550,7 +550,7 @@
       <p>Piperno, Averell and Averell250 always choose their opening lead the same way:</p>
       <ol>
         <li>They take their <strong>longest suit</strong>, the one in which they have the most cards.</li>
-        <li>If two suits have <strong>as many cards</strong>, they take the one with the <strong>most points</strong> (the sum of the values). With equal points too, they take the last one in the order blue, green, red, yellow.</li>
+        <li>If two suits have <strong>as many cards</strong>, they take the one with the <strong>most points</strong> (the sum of the values). With equal points too, they take the last one in the order green, yellow, red, blue.</li>
         <li>In that suit, if they have a <dfn>sequence</dfn> (at least two touching cards, like the 7 and the 8), they play the <strong>top card of the sequence</strong>, but only if that card is <strong>at least a 7</strong>. If they have several sequences, they take the highest.</li>
         <li>Without a sequence (or with a sequence that is too low, like the 3 and the 4), they play the <strong>lowest card</strong> of the suit.</li>
       </ol>

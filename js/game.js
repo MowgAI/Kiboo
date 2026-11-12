@@ -14,6 +14,10 @@ const DECLARER = "S", DUMMY = "N", OPENING_LEADER = "O";
 const team = seat => (seat === "N" || seat === "S") ? "NS" : "EO";
 const nextSeat = seat => SEATS[(SEATS.indexOf(seat) + 1) % 4];
 const cardId = c => c.s * 10 + (c.v - 1);
+// Ordre des couleurs pour départager (atout, entame, choix de Piperno), de la plus petite à la plus
+// grande : vert < jaune < rouge < bleu. (L'ordre d'affichage des mains reste bleu, vert, rouge, jaune.)
+const SUIT_ORDER = [1, 3, 2, 0];
+const suitRank = s => SUIT_ORDER.indexOf(s);
 // Noms des couleurs, places et cartes dans la langue choisie : voir js/i18n.js et lang/*.js.
 const cardName = c => I18N.g("card")(c);
 
@@ -32,7 +36,7 @@ function shuffle(a) {
 // Tri pour l'affichage : par couleur, puis de la plus forte à la plus faible.
 const sortForDisplay = h => h.slice().sort((a, b) => a.s - b.s || b.v - a.v);
 // Tri « algorithmique » (comme le code de Samuel) : par couleur, puis croissant.
-const sortAsc = h => h.slice().sort((a, b) => a.s - b.s || a.v - b.v);
+const sortAsc = h => h.slice().sort((a, b) => suitRank(a.s) - suitRank(b.s) || a.v - b.v);
 
 function legalCards(hand, trick) {
   if (trick.length === 0) return hand.slice();
@@ -50,13 +54,15 @@ function trickWinner(trick, trump = -1) {
   return best.seat;
 }
 // Atout de la donne : la couleur la plus longue de Nord et Sud réunis (à égalité, la plus forte
-// somme des valeurs, puis la dernière dans l'ordre bleu, vert, rouge, jaune).
+// somme des valeurs, puis la plus grande dans l'ordre vert < jaune < rouge < bleu).
 function longestTrump(hands) {
   let best = -1, bestLen = -1, bestSum = -1;
   for (let s = 0; s < 4; s++) {
     const cards = [...hands.N, ...hands.S].filter(c => c.s === s);
     const sum = cards.reduce((t, c) => t + c.v, 0);
-    if (cards.length > bestLen || (cards.length === bestLen && sum >= bestSum)) { best = s; bestLen = cards.length; bestSum = sum; }
+    if (cards.length > bestLen || (cards.length === bestLen && (sum > bestSum || (sum === bestSum && suitRank(s) > suitRank(best))))) {
+      best = s; bestLen = cards.length; bestSum = sum;
+    }
   }
   return best;
 }
@@ -101,7 +107,7 @@ function openingChoice(hand, trump = -1) {
   bySuit.forEach((cards, s) => {
     if (cards.length !== maxLen) return;
     const sum = cards.reduce((t, c) => t + c.v, 0);
-    if (sum >= bestSum) { bestSum = sum; suit = s; }
+    if (sum > bestSum || (sum === bestSum && suitRank(s) > suitRank(suit))) { bestSum = sum; suit = s; }
   });
   const cards = bySuit[suit];
   let top = null;                                   // plus haute de la séquence la plus haute

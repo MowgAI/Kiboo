@@ -125,7 +125,7 @@
     "pip.leadStrong": p => `Il entame dans sa couleur préférée, ${theColor(p.suit)}. Il détient la plus forte carte restante (le ${p.top}) : il joue sa plus haute.`,
     "pip.leadWeak": p => `Il entame dans sa couleur préférée, ${theColor(p.suit)}. Il n'a pas la plus forte carte restante (le ${p.top}) : il joue sa plus petite.`,
     "pip.partnerFollow": "Son partenaire gagne déjà le pli : il fournit sa plus petite carte.",
-    "pip.partnerDiscard": p => `Son partenaire gagne déjà le pli et il n'a plus de ${colorName(p.led)} : il défausse la première carte de sa main, dans l'ordre bleu, vert, rouge, jaune.`,
+    "pip.partnerDiscard": p => `Son partenaire gagne déjà le pli et il n'a plus de ${colorName(p.led)} : il défausse la première carte de sa main, dans l'ordre vert, jaune, rouge, bleu.`,
     "pip.win": p => `Il joue la plus petite carte qui fait gagner son camp${p.now ? " pour l'instant" : ""}.`,
     "pip.cantWin": "Il ne peut pas faire gagner son camp : il fournit sa plus petite carte.",
     "pip.discardKeep": p => `Il n'a plus de ${colorName(p.led)} et ne peut pas gagner le pli : il défausse une petite carte en gardant sa couleur préférée (${theColor(p.my)}).`,
@@ -202,7 +202,7 @@
     "quiz.no": "Non, c'est impossible",
     "quiz.maybe": "On ne peut pas savoir",
     "quiz.q.same": p => `Ouest peut-il avoir <strong>autant de cartes</strong> dans une autre couleur que le ${p.suit} ?`,
-    "quiz.rule.same": "À longueur égale, la règle d'entame choisit la couleur qui a le plus de points (à points égaux, la dernière dans l'ordre bleu, vert, rouge, jaune). Une autre couleur aussi longue est donc possible si elle a moins de points.",
+    "quiz.rule.same": "À longueur égale, la règle d'entame choisit la couleur qui a le plus de points (à points égaux, la dernière dans l'ordre vert, jaune, rouge, bleu). Une autre couleur aussi longue est donc possible si elle a moins de points.",
     "quiz.q.higher": p => `Ouest a entamé le ${p.v} ${C[p.s]}. Peut-il avoir une <strong>carte ${cardAdj(p.s, 1)} plus forte</strong> que le ${p.v} ?`,
     "quiz.q.lower": p => `Ouest a entamé le ${p.v} ${C[p.s]}. Peut-il avoir une <strong>carte ${cardAdj(p.s, 1)} plus faible</strong> que le ${p.v} ?`,
     "quiz.rule.seq": "La règle d'entame fait jouer la plus haute carte d'une séquence (au moins deux cartes qui se suivent, la plus haute valant au moins 7) ; sinon, la plus petite carte de la couleur.",
@@ -222,7 +222,7 @@
     "quiz.unseen": "Les cartes que tu ne vois pas, couleur par couleur :",
     "quiz.perSuit": "Couleur par couleur :",
     "quiz.same.possible": p => `${p.suit} : <strong>possible</strong>. Par exemple ${p.k} cartes ${cardAdj(p.L, p.k)} (${p.pL} points) et ${p.k} cartes ${cardAdj(p.s, p.k)} (${p.pS} points) : Ouest entame bien ${theColor(p.L)}` +
-      (p.tie ? ` (autant de points, mais ${theColor(p.L)} passe après ${theColor(p.s)} dans l'ordre bleu, vert, rouge, jaune)` : "") + ".",
+      (p.tie ? ` (autant de points, mais ${theColor(p.L)} passe après ${theColor(p.s)} dans l'ordre vert, jaune, rouge, bleu)` : "") + ".",
     "quiz.same.short": p => `${p.suit} : <strong>impossible</strong>. Le ${C[p.L]} est la couleur la plus longue d'Ouest : il en a au moins ${p.minL} cartes. Or ` +
       (p.rest === 0 ? `il ne reste aucune carte ${cardAdj(p.s, 1)}` : `il ne reste que ${p.rest} ${S(p.rest, "carte", "cartes")} ${cardAdj(p.s, p.rest)} pour Est et Ouest`) +
       " : pas assez pour en avoir autant.",
@@ -553,7 +553,7 @@
       <p>Piperno, Averell et Averell250 choisissent toujours leur entame de la même façon :</p>
       <ol>
         <li>Ils prennent leur <strong>couleur la plus longue</strong>, celle où ils ont le plus de cartes.</li>
-        <li>Si deux couleurs ont <strong>autant de cartes</strong>, ils prennent celle qui a le <strong>plus de points</strong> (la somme des valeurs). À points égaux aussi, ils prennent la dernière dans l'ordre bleu, vert, rouge, jaune.</li>
+        <li>Si deux couleurs ont <strong>autant de cartes</strong>, ils prennent celle qui a le <strong>plus de points</strong> (la somme des valeurs). À points égaux aussi, ils prennent la dernière dans l'ordre vert, jaune, rouge, bleu.</li>
         <li>Dans cette couleur, s'ils ont une <dfn>séquence</dfn> (au moins deux cartes qui se suivent, comme le 7 et le 8), ils jouent la <strong>plus haute carte de la séquence</strong>, mais seulement si cette carte vaut <strong>au moins 7</strong>. S'ils ont plusieurs séquences, ils prennent la plus haute.</li>
         <li>Sans séquence (ou avec une séquence trop petite, comme le 3 et le 4), ils jouent la <strong>plus petite carte</strong> de la couleur.</li>
       </ol>

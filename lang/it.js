@@ -129,7 +129,7 @@
     "pip.leadStrong": p => `Attacca nel suo colore preferito, il ${C[p.suit]}. Ha la carta più alta rimasta (${art(p.top)}): gioca la sua più alta.`,
     "pip.leadWeak": p => `Attacca nel suo colore preferito, il ${C[p.suit]}. Non ha la carta più alta rimasta (${art(p.top)}): gioca la sua più bassa.`,
     "pip.partnerFollow": "Il suo compagno vince già la presa: risponde con la sua carta più bassa.",
-    "pip.partnerDiscard": p => `Il suo compagno vince già la presa e lui non ha più ${C[p.led]}: scarta la prima carta della sua mano, nell'ordine blu, verde, rosso, giallo.`,
+    "pip.partnerDiscard": p => `Il suo compagno vince già la presa e lui non ha più ${C[p.led]}: scarta la prima carta della sua mano, nell'ordine verde, giallo, rosso, blu.`,
     "pip.win": p => `Gioca la carta più bassa che fa vincere la sua linea${p.now ? " per ora" : ""}.`,
     "pip.cantWin": "Non può far vincere la sua linea: risponde con la sua carta più bassa.",
     "pip.discardKeep": p => `Non ha più ${C[p.led]} e non può vincere la presa: scarta una carta bassa tenendo il suo colore preferito (il ${C[p.my]}).`,
@@ -206,7 +206,7 @@
     "quiz.no": "No, è impossibile",
     "quiz.maybe": "Non si può sapere",
     "quiz.q.same": p => `Ovest può avere <strong>tante carte</strong> in un altro colore quante nel ${p.suit}?`,
-    "quiz.rule.same": "A parità di lunghezza, la regola d'attacco sceglie il colore con più punti (a parità di punti, l'ultimo nell'ordine blu, verde, rosso, giallo). Un altro colore altrettanto lungo è quindi possibile se ha meno punti.",
+    "quiz.rule.same": "A parità di lunghezza, la regola d'attacco sceglie il colore con più punti (a parità di punti, l'ultimo nell'ordine verde, giallo, rosso, blu). Un altro colore altrettanto lungo è quindi possibile se ha meno punti.",
     "quiz.q.higher": p => `Ovest ha attaccato con ${art(p.v)} ${C[p.s]}. Può avere una <strong>carta ${F1[p.s]} più alta</strong> ${del(p.v)}?`,
     "quiz.q.lower": p => `Ovest ha attaccato con ${art(p.v)} ${C[p.s]}. Può avere una <strong>carta ${F1[p.s]} più bassa</strong> ${del(p.v)}?`,
     "quiz.rule.seq": "La regola d'attacco fa giocare la carta più alta di una sequenza (almeno due carte consecutive, la più alta almeno 7); altrimenti, la carta più bassa del colore.",
@@ -226,7 +226,7 @@
     "quiz.unseen": "Le carte che non vedi, colore per colore:",
     "quiz.perSuit": "Colore per colore:",
     "quiz.same.possible": p => `${p.suit}: <strong>possibile</strong>. Per esempio ${p.k} carte ${FN[p.L]} (${p.pL} punti) e ${p.k} carte ${FN[p.s]} (${p.pS} punti): Ovest attacca proprio nel ${C[p.L]}` +
-      (p.tie ? ` (stessi punti, ma il ${C[p.L]} viene dopo il ${C[p.s]} nell'ordine blu, verde, rosso, giallo)` : "") + ".",
+      (p.tie ? ` (stessi punti, ma il ${C[p.L]} viene dopo il ${C[p.s]} nell'ordine verde, giallo, rosso, blu)` : "") + ".",
     "quiz.same.short": p => `${p.suit}: <strong>impossibile</strong>. Il ${C[p.L]} è il colore più lungo di Ovest: ne ha almeno ${p.minL} carte. Ma ` +
       (p.rest === 0 ? `non resta nessuna carta ${F1[p.s]}` : `${S(p.rest, `resta solo ${p.rest} carta ${F1[p.s]}`, `restano solo ${p.rest} carte ${FN[p.s]}`)} per Est e Ovest`) +
       ": non abbastanza per averne altrettante.",
@@ -557,7 +557,7 @@
       <p>Piperno, Averell e Averell250 scelgono sempre il loro attacco allo stesso modo:</p>
       <ol>
         <li>Prendono il loro <strong>colore più lungo</strong>, quello in cui hanno più carte.</li>
-        <li>Se due colori hanno <strong>tante carte quanto l'altro</strong>, prendono quello con <strong>più punti</strong> (la somma dei valori). A parità di punti, prendono l'ultimo nell'ordine blu, verde, rosso, giallo.</li>
+        <li>Se due colori hanno <strong>tante carte quanto l'altro</strong>, prendono quello con <strong>più punti</strong> (la somma dei valori). A parità di punti, prendono l'ultimo nell'ordine verde, giallo, rosso, blu.</li>
         <li>In quel colore, se hanno una <dfn>sequenza</dfn> (almeno due carte consecutive, come il 7 e l'8), giocano la <strong>carta più alta della sequenza</strong>, ma solo se questa carta vale <strong>almeno 7</strong>. Se hanno più sequenze, prendono la più alta.</li>
         <li>Senza sequenza (o con una sequenza troppo bassa, come il 3 e il 4), giocano la <strong>carta più bassa</strong> del colore.</li>
       </ol>

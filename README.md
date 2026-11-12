@@ -85,7 +85,7 @@ Les présentations sont lues à voix haute (bouton Son). L'accueil a sa propre l
 
 ## Atout
 
-Le réglage « Atout » permet de jouer **sans atout** (par défaut) ou **avec un atout** : la couleur la plus longue de Nord et Sud réunis (à égalité, la plus forte somme des valeurs, puis la dernière dans l'ordre bleu, vert, rouge, jaune). L'atout est affiché en haut à gauche de la table.
+Le réglage « Atout » permet de jouer **sans atout** (par défaut) ou **avec un atout** : la couleur la plus longue de Nord et Sud réunis (à égalité, la plus forte somme des valeurs, puis la plus grande dans l'ordre vert < jaune < rouge < bleu). L'atout est affiché en haut à gauche de la table.
 
 - Il faut toujours fournir ; sans la couleur demandée, on peut **couper** (jouer atout) ou défausser, sans obligation de couper. Le plus fort atout du pli l'emporte.
 - **Entame** : les robots gardent leur règle d'entame, mais jamais dans la couleur d'atout.
