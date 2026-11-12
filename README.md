@@ -79,6 +79,7 @@ Les présentations sont lues à voix haute (bouton Son). L'accueil a sa propre l
   - **Questions pendant la partie** : aucune, quelques-unes ou toutes.
 
   Goat et les questions ne servent qu'au déclarant : ils sont grisés pour les autres places.
+  Les autres réglages (les trois groupes ci-dessous) sont aussi dans cet écran : la partie ne commence qu'au clic sur « Commencer la partie ». Ils retournent ensuite au-dessus de la table.
 - Ces quatre choix restent en gros boutons en haut des réglages pendant le jeu (ils valent pour la donne suivante).
 - Les autres réglages sont rangés dans **trois groupes repliables** : 🤖 Joueurs et robots (robot de chaque place, vitesse), 💡 Aides et apprentissage (carré de Coco, jeux ouverts, meilleurs coups, explications de Piperno, mode évaluation), 🎵 Ambiance (musique, bruitages, lecture à voix haute, voix).
 - Code : `js/setup.js`.

@@ -75,14 +75,24 @@ const Setup = (() => {
         <div class="start-head"><h2>${T("start.title")}</h2><span id="voice-start"></span></div>
         <p>${T("start.guide")}</p>
         <div class="main-choices" id="start-choices"></div>
+        <p class="start-more">${T("start.more")}</p>
+        <div data-role="groups"></div>
         <button class="act start-go" type="button" data-a="go"><span class="emo" aria-hidden="true">▶️</span>${T("start.go")}</button>
       </div>`;
     box.querySelector("#voice-start").replaceWith(Voice.button(() => T("voice.start")));
+    // Les autres réglages (robots, vitesse, aides, ambiance) viennent dans l'écran de départ ;
+    // ils retournent à leur place, au-dessus de la table, quand la partie commence.
+    box.querySelector("[data-role=groups]").appendChild(document.querySelector(".setup-groups"));
     draw($("start-choices"));
     box.querySelector("[data-a=go]").onclick = () => { hideStart(); if (starting) { starting(); starting = null; } };
     box.querySelector("[data-a=go]").focus({ preventScroll: true });
   }
-  function hideStart() { $("start").hidden = true; $("start").innerHTML = ""; }
+  function hideStart() {
+    const groups = document.querySelector(".setup-groups");
+    if (groups && $("start").contains(groups)) document.querySelector(".setup .btns").after(groups);
+    $("start").hidden = true;
+    $("start").innerHTML = "";
+  }
   // Attend que le joueur clique sur « Commencer la partie ».
   const waitStart = () => new Promise(resolve => { starting = resolve; showStart(); });
 

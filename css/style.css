@@ -686,3 +686,9 @@ body.intro-open { overflow: hidden; }
 /* L'écran de départ occupe toute la grille de la table : la table prend sa hauteur. */
 .table > .start { position: relative; inset: auto; grid-column: 1 / -1; grid-row: 1 / -1; align-self: stretch; justify-self: stretch; }
 body:has(#start:not([hidden])) #main-choices { display: none; }
+.start-card .start-more { font-size: 0.92rem; color: var(--ink-soft); }
+.start-card .setup-groups .group { background: var(--setup); }
+.start-card .group-body .field select { background: var(--page); }
+/* Atout et questions sont déjà en gros boutons : leurs menus d'origine restent cachés dans les groupes. */
+.group-body .field:has(#cfg-trump), .group-body .field:has(#cfg-quiz) { display: none; }
+.group { align-self: flex-start; }
